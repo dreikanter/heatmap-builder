@@ -1,0 +1,295 @@
+require "date"
+
+module HeatmapBuilder
+  class CalendarHeatmapBuilder
+    DEFAULT_OPTIONS = {
+      cell_size: 12,
+      cell_spacing: 1,
+      font_size: 8,
+      border_width: 1,
+      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39],
+      start_of_week: :monday, # :sunday, :monday, :tuesday, etc.
+      month_spacing: 5, # extra vertical space between months
+      show_month_labels: true,
+      show_day_labels: true,
+      show_outside_cells: false # show cells outside the timeframe with inactive styling
+    }.freeze
+
+    def initialize(scores_by_date, options = {})
+      @scores_by_date = scores_by_date
+      @options = DEFAULT_OPTIONS.merge(options)
+      validate_options!
+      @start_date = parse_date_range.first
+      @end_date = parse_date_range.last
+    end
+
+    def generate
+      build_svg
+    end
+
+    private
+
+    attr_reader :scores_by_date, :options, :start_date, :end_date
+
+    def validate_options!
+      raise Error, "scores_by_date must be a hash" unless scores_by_date.is_a?(Hash)
+      raise Error, "cell_size must be positive" unless options[:cell_size] > 0
+      raise Error, "font_size must be positive" unless options[:font_size] > 0
+      raise Error, "colors must be an array" unless options[:colors].is_a?(Array)
+      raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
+
+      valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
+      unless valid_start_days.include?(options[:start_of_week])
+        raise Error, "start_of_week must be one of: #{valid_start_days.join(", ")}"
+      end
+    end
+
+    def parse_date_range
+      dates = scores_by_date.keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
+      return [Date.today - 365, Date.today] if dates.empty?
+
+      [dates.min, dates.max]
+    end
+
+    def build_svg
+      width = svg_width
+      height = svg_height
+
+      svg_content = []
+
+      # Add day labels if enabled
+      if options[:show_day_labels]
+        svg_content << day_labels_svg
+      end
+
+      # Add month labels and cells
+      svg_content << calendar_cells_svg
+
+      if options[:show_month_labels]
+        svg_content << month_labels_svg
+      end
+
+      <<~SVG
+        <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
+          #{svg_content.join}
+        </svg>
+      SVG
+    end
+
+    def calendar_cells_svg
+      svg = ""
+      current_date = calendar_start_date
+      week_index = 0
+      last_month = nil
+      current_x_offset = 0
+      calendar_end_date = calendar_end_date_with_full_weeks
+
+      while current_date <= calendar_end_date
+        # Check if we need to add month spacing
+        if current_date.month != last_month && !last_month.nil?
+          current_x_offset += options[:month_spacing]
+        end
+        last_month = current_date.month
+
+        # Generate week column - always fill all 7 days
+        7.times do |day_index|
+          x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
+          y = day_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
+
+          if current_date.between?(start_date, end_date)
+            # Active cell within the specified timeframe
+            score = scores_by_date[current_date] || scores_by_date[current_date.to_s] || 0
+            svg << cell_svg(score, x, y, false)
+          elsif options[:show_outside_cells]
+            # Inactive cell outside the specified timeframe
+            svg << cell_svg(0, x, y, true)
+          end
+
+          current_date += 1
+        end
+
+        week_index += 1
+      end
+
+      svg
+    end
+
+    def cell_svg(score, x, y, inactive = false)
+      color = score_to_color(score)
+
+      # Make inactive cells duller by reducing opacity
+      if inactive
+        color = make_color_inactive(color)
+      end
+
+      # Create colored square
+      colored_rect = "<rect x=\"#{x}\" y=\"#{y}\" width=\"#{options[:cell_size]}\" height=\"#{options[:cell_size]}\" fill=\"#{color}\"/>"
+
+      # Create border overlay
+      border_rect = if options[:border_width] > 0
+        inset = options[:border_width] / 2.0
+        border_x = x + inset
+        border_y = y + inset
+        border_size = options[:cell_size] - options[:border_width]
+        border_color = darker_color(color)
+        "<rect x=\"#{border_x}\" y=\"#{border_y}\" width=\"#{border_size}\" height=\"#{border_size}\" fill=\"none\" stroke=\"#{border_color}\" stroke-width=\"#{options[:border_width]}\"/>"
+      else
+        ""
+      end
+
+      "#{colored_rect}#{border_rect}"
+    end
+
+    def day_labels_svg
+      return "" unless options[:show_day_labels]
+
+      day_names = day_names_for_week_start
+      svg = ""
+
+      day_names.each_with_index do |day_name, index|
+        y = day_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
+        svg << "<text x=\"#{options[:font_size]}\" y=\"#{y}\" text-anchor=\"middle\" font-family=\"Arial, sans-serif\" font-size=\"#{options[:font_size]}\" fill=\"#666666\">#{day_name}</text>"
+      end
+
+      svg
+    end
+
+    def month_labels_svg
+      return "" unless options[:show_month_labels]
+
+      svg = ""
+      current_date = calendar_start_date
+      week_index = 0
+      last_month = nil
+      displayed_months = {}
+      current_x_offset = 0
+      calendar_end_date = calendar_end_date_with_full_weeks
+
+      while current_date <= calendar_end_date
+        # Check if we need to add month spacing
+        if current_date.month != last_month && !last_month.nil?
+          current_x_offset += options[:month_spacing]
+        end
+
+        # Add month label at start of each month, but only if the month overlaps with our specified timeframe
+        if current_date.month != last_month && !displayed_months[current_date.month]
+          # Check if this month has any days within our specified timeframe
+          month_start = Date.new(current_date.year, current_date.month, 1)
+          month_end = Date.new(current_date.year, current_date.month, -1)
+
+          if month_start <= end_date && month_end >= start_date
+            x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
+            y = options[:font_size] + 2
+            month_name = current_date.strftime("%b")
+            svg << "<text x=\"#{x}\" y=\"#{y}\" font-family=\"Arial, sans-serif\" font-size=\"#{options[:font_size]}\" fill=\"#666666\">#{month_name}</text>"
+          end
+
+          displayed_months[current_date.month] = true
+        end
+
+        last_month = current_date.month
+        current_date += 7
+        week_index += 1
+      end
+
+      svg
+    end
+
+    def score_to_color(score)
+      return options[:colors].first if score == 0
+
+      max_color_index = options[:colors].length - 1
+      color_index = 1 + (score - 1) % max_color_index
+      options[:colors][color_index]
+    end
+
+    def darker_color(hex_color)
+      hex = hex_color.delete("#")
+      r = hex[0..1].to_i(16)
+      g = hex[2..3].to_i(16)
+      b = hex[4..5].to_i(16)
+
+      # Much more subtle border - only 10% darker instead of 30%
+      r = (r * 0.9).to_i
+      g = (g * 0.9).to_i
+      b = (b * 0.9).to_i
+
+      "#%02x%02x%02x" % [r, g, b]
+    end
+
+    def calendar_start_date
+      # Find the start of the week containing start_date
+      days_back = (start_date.wday - week_start_wday) % 7
+      start_date - days_back
+    end
+
+    def calendar_end_date_with_full_weeks
+      # Find the end of the week containing end_date
+      days_forward = (6 - (end_date.wday - week_start_wday)) % 7
+      end_date + days_forward
+    end
+
+    def make_color_inactive(hex_color)
+      # Make color duller by reducing saturation and increasing lightness
+      hex = hex_color.delete("#")
+      r = hex[0..1].to_i(16)
+      g = hex[2..3].to_i(16)
+      b = hex[4..5].to_i(16)
+
+      # Blend with light gray to make it appear duller/inactive
+      gray = 230
+      mix_ratio = 0.6 # 60% original color, 40% gray
+
+      r = (r * mix_ratio + gray * (1 - mix_ratio)).to_i
+      g = (g * mix_ratio + gray * (1 - mix_ratio)).to_i
+      b = (b * mix_ratio + gray * (1 - mix_ratio)).to_i
+
+      "#%02x%02x%02x" % [r, g, b]
+    end
+
+    def week_start_wday
+      case options[:start_of_week]
+      when :sunday then 0
+      when :monday then 1
+      when :tuesday then 2
+      when :wednesday then 3
+      when :thursday then 4
+      when :friday then 5
+      when :saturday then 6
+      end
+    end
+
+    def day_names_for_week_start
+      all_days = %w[S M T W T F S]
+      start_index = week_start_wday
+      all_days.rotate(start_index)
+    end
+
+    def month_spacing_weeks
+      options[:month_spacing] / (options[:cell_size] + options[:cell_spacing])
+    end
+
+    def label_offset
+      options[:show_day_labels] ? options[:font_size] * 2 : 0
+    end
+
+    def day_label_offset
+      options[:show_month_labels] ? options[:font_size] + 5 : 0
+    end
+
+    def svg_width
+      weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
+      month_spacing_total = (months_in_range - 1) * options[:month_spacing]
+
+      label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
+    end
+
+    def svg_height
+      day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
+    end
+
+    def months_in_range
+      ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
+    end
+  end
+end
