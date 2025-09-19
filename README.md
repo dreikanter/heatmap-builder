@@ -104,18 +104,6 @@ svg = HeatmapBuilder.generate_calendar(scores_by_date, calendar_options)
 - Score `1+`: Cycles through remaining colors based on score value
 - Higher scores automatically map to available colors in the palette
 
-## Examples
-
-To generate all example SVG files:
-
-```bash
-ruby examples/generate_samples.rb
-```
-
-This creates sample visualizations showing different configurations and use cases.
-
-![Calendar with Outside Cells](examples/calendar_with_outside_cells.svg)
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Run tests with:
@@ -126,9 +114,15 @@ ruby -Ilib:test test/heatmap_builder_test.rb
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
+To generate all example SVG files you see in this readme:
+
+```bash
+ruby examples/generate_samples.rb
+```
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/alexmusayev/heatmap-builder. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/dreikanter/heatmap-builder. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -136,4 +130,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the HeatmapBuilder project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/alexmusayev/heatmap-builder/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the HeatmapBuilder project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/dreikanter/heatmap-builder/blob/master/CODE_OF_CONDUCT.md).
