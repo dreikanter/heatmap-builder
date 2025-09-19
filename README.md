@@ -2,6 +2,20 @@
 
 A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-style calendar layouts and linear progress indicators. Perfect for Rails applications and any project that needs to display activity data in a visual format.
 
+![GitHub-style Calendar](examples/calendar_github_style.svg)
+
+## Features
+
+- 📅 **Calendar heatmaps**: GitHub-style calendar layouts for date-based data
+- 📊 **Linear heatmaps**: Traditional progress indicator bars
+- 🎨 **Parametric styling**: Customize cell size, spacing, colors, fonts, and borders
+- 🔢 **Score display**: Shows actual numeric values in each cell
+- 🎯 **Zero dependencies**: No external runtime dependencies
+- 🚀 **Rails ready**: Works seamlessly with Rails views using `raw` helper
+- 📱 **Responsive**: SVG format scales perfectly at any size
+- 🎨 **Smart contrast**: Automatically chooses readable text colors
+- ⚡ **Fast**: Generates SVG strings quickly for real-time use
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -48,8 +62,6 @@ scores_by_date = {
 
 svg = HeatmapBuilder.generate_calendar(scores_by_date)
 ```
-
-![GitHub-style Calendar](examples/calendar_github_style.svg)
 
 ### Custom Configuration
 
@@ -103,18 +115,6 @@ ruby examples/generate_samples.rb
 This creates sample visualizations showing different configurations and use cases.
 
 ![Calendar with Outside Cells](examples/calendar_with_outside_cells.svg)
-
-## Features
-
-- 📅 **Calendar heatmaps**: GitHub-style calendar layouts for date-based data
-- 📊 **Linear heatmaps**: Traditional progress indicator bars
-- 🎨 **Parametric styling**: Customize cell size, spacing, colors, fonts, and borders
-- 🔢 **Score display**: Shows actual numeric values in each cell
-- 🎯 **Zero dependencies**: No external runtime dependencies
-- 🚀 **Rails ready**: Works seamlessly with Rails views using `raw` helper
-- 📱 **Responsive**: SVG format scales perfectly at any size
-- 🎨 **Smart contrast**: Automatically chooses readable text colors
-- ⚡ **Fast**: Generates SVG strings quickly for real-time use
 
 ## Development
 
