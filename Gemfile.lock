@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    progress_indicator (0.1.0)
+    heatmap-builder (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -60,10 +60,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (>= 1.17)
-  minitest (>= 5.0)
-  progress_indicator!
-  rake (>= 10.0)
+  bundler (~> 2.0)
+  heatmap-builder!
+  minitest (~> 5.0)
+  rake (~> 13.0)
   standard (~> 1.0)
 
 BUNDLED WITH

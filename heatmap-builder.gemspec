@@ -1,10 +1,10 @@
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "heatmap-builder/version"
+require "heatmap_builder/version"
 
 Gem::Specification.new do |spec|
   spec.name = "heatmap-builder"
-  spec.version = ProgressIndicator::VERSION
+  spec.version = HeatmapBuilder::VERSION
   spec.authors = ["Alex Musayev"]
   spec.email = ["alex.musayev@gmail.com"]
 
@@ -18,8 +18,8 @@ Gem::Specification.new do |spec|
   if spec.respond_to?(:metadata)
     spec.metadata["allowed_push_host"] = "https://rubygems.org"
     spec.metadata["homepage_uri"] = spec.homepage
-    spec.metadata["source_code_uri"] = "https://github.com/dreikanter/heatmap-builder"
-    spec.metadata["changelog_uri"] = "https://github.com/dreikanter/heatmap-builder/blob/main/CHANGELOG.md"
+    spec.metadata["source_code_uri"] = "#{spec.homepage}.git"
+    spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/main/CHANGELOG.md"
   else
     raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   end
@@ -34,8 +34,10 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", ">= 1.17"
-  spec.add_development_dependency "rake", ">= 10.0"
-  spec.add_development_dependency "minitest", ">= 5.0"
+  spec.required_ruby_version = ">= 3.0"
+
+  spec.add_development_dependency "bundler", "~> 2.0"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_development_dependency "standard", "~> 1.0"
 end
