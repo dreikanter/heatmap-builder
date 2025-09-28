@@ -30,10 +30,41 @@ def generate_sample_svgs
   File.write(filepath, svg)
   generated_files << filepath
 
+  # Linear heatmap with different palettes
+  puts "Generating linear heatmaps with different palettes..."
+  linear_scores = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+  # Blue Ocean palette
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::BLUE_OCEAN,
+    cell_size: 18
+  })
+  filepath = "examples/linear_blue_ocean.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
+  # Warm Sunset palette
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::WARM_SUNSET,
+    cell_size: 18
+  })
+  filepath = "examples/linear_warm_sunset.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
+  # Purple Vibes palette
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::PURPLE_VIBES,
+    cell_size: 18
+  })
+  filepath = "examples/linear_purple_vibes.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
   # GitHub-style calendar
   puts "Generating GitHub-style calendar..."
   calendar_data = sample_calendar_data
-  svg = HeatmapBuilder.generate_calendar(calendar_data, {
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
     cell_size: 14,
     month_spacing: 0
   })
@@ -41,9 +72,42 @@ def generate_sample_svgs
   File.write(filepath, svg)
   generated_files << filepath
 
+  # Calendar with Blue Ocean palette
+  puts "Generating calendar with Blue Ocean palette..."
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    colors: HeatmapBuilder::BLUE_OCEAN,
+    cell_size: 14,
+    month_spacing: 0
+  })
+  filepath = "examples/calendar_blue_ocean.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
+  # Calendar with Warm Sunset palette
+  puts "Generating calendar with Warm Sunset palette..."
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    colors: HeatmapBuilder::WARM_SUNSET,
+    cell_size: 14,
+    month_spacing: 0
+  })
+  filepath = "examples/calendar_warm_sunset.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
+  # Calendar with Purple Vibes palette
+  puts "Generating calendar with Purple Vibes palette..."
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    colors: HeatmapBuilder::PURPLE_VIBES,
+    cell_size: 14,
+    month_spacing: 0
+  })
+  filepath = "examples/calendar_purple_vibes.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
   # Calendar with Sunday start
   puts "Generating calendar with Sunday start..."
-  svg = HeatmapBuilder.generate_calendar(calendar_data, {
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
     cell_size: 14,
     start_of_week: :sunday,
     month_spacing: 0
@@ -54,7 +118,7 @@ def generate_sample_svgs
 
   # Calendar with outside cells
   puts "Generating calendar with outside cells..."
-  svg = HeatmapBuilder.generate_calendar(calendar_data, {
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
     cell_size: 14,
     show_outside_cells: true,
     month_spacing: 0

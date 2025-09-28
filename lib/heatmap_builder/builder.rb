@@ -6,12 +6,18 @@ module HeatmapBuilder
     include SvgHelpers
     include ColorHelpers
 
+    # Predefined color palettes
+    GITHUB_GREEN = %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39].freeze
+    BLUE_OCEAN = %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9].freeze
+    WARM_SUNSET = %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316].freeze
+    PURPLE_VIBES = %w[#f3e8ff #d8b4fe #c084fc #a855f7 #9333ea].freeze
+
     DEFAULT_OPTIONS = {
       cell_size: 10,
       cell_spacing: 1,
       font_size: 8,
       border_width: 1,
-      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39],
+      colors: GITHUB_GREEN,
       text_color: "#000000"
     }.freeze
 

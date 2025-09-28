@@ -8,6 +8,12 @@ require_relative "heatmap_builder/calendar_heatmap_builder"
 module HeatmapBuilder
   class Error < StandardError; end
 
+  # Predefined color palettes for easy access
+  GITHUB_GREEN = Builder::GITHUB_GREEN
+  BLUE_OCEAN = Builder::BLUE_OCEAN
+  WARM_SUNSET = Builder::WARM_SUNSET
+  PURPLE_VIBES = Builder::PURPLE_VIBES
+
   def self.build_linear(scores, options = {})
     LinearHeatmapBuilder.new(scores, options).build
   end
