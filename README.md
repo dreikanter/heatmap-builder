@@ -68,7 +68,7 @@ options = {
   cell_size: 35,           # Size of each square (default: 20)
   cell_spacing: 1,         # Space between squares (default: 2)
   font_size: 20,           # Font size for score text (default: 12)
-  colors: %w[              # Custom color palette (default: GitHub-style)
+  colors: %w[
     #f0f0f0
     #c6e48b
     #7bc96f

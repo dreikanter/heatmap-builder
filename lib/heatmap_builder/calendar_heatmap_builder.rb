@@ -15,7 +15,8 @@ module HeatmapBuilder
       month_spacing: 5, # extra vertical space between months
       show_month_labels: true,
       show_day_labels: true,
-      show_outside_cells: false # show cells outside the timeframe with inactive styling
+      show_outside_cells: false, # show cells outside the timeframe with inactive styling
+      day_labels: %w[S M T W T F S] # day abbreviations starting from Sunday
     }.freeze
 
     def initialize(scores_by_date, options = {})
@@ -274,9 +275,8 @@ module HeatmapBuilder
     end
 
     def day_names_for_week_start
-      all_days = %w[S M T W T F S]
       start_index = week_start_wday
-      all_days.rotate(start_index)
+      options[:day_labels].rotate(start_index)
     end
 
     def month_spacing_weeks
