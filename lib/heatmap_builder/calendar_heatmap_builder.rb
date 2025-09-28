@@ -126,26 +126,16 @@ module HeatmapBuilder
         fill: color
       )
 
-      border_rect = cell_border(x, y, color)
+      border_rect = cell_border(
+        x, y, color,
+        cell_size: options[:cell_size],
+        border_width: options[:border_width],
+        darker_color_method: method(:darker_color)
+      )
 
       "#{colored_rect}#{border_rect}"
     end
 
-    def cell_border(x, y, color)
-      return "" unless options[:border_width] > 0
-
-      inset = options[:border_width] / 2.0
-      border_x = x + inset
-      border_y = y + inset
-      border_size = options[:cell_size] - options[:border_width]
-      border_color = darker_color(color)
-
-      svg_rect(
-        x: border_x, y: border_y,
-        width: border_size, height: border_size,
-        fill: "none", stroke: border_color, stroke_width: options[:border_width]
-      )
-    end
 
     def day_labels_svg
       return "" unless options[:show_day_labels]

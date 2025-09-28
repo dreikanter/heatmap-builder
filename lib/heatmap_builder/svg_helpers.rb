@@ -40,5 +40,22 @@ module HeatmapBuilder
     def kebab_case(key)
       key.to_s.tr("_", "-")
     end
+
+    def cell_border(x, y, color, cell_size:, border_width:, darker_color_method:)
+      return "" unless border_width > 0
+
+      # Inset the border rect by half the stroke width so stroke stays inside
+      inset = border_width / 2.0
+      border_x = x + inset
+      border_y = y + inset
+      border_size = cell_size - border_width
+      border_color = darker_color_method.call(color)
+
+      svg_rect(
+        x: border_x, y: border_y,
+        width: border_size, height: border_size,
+        fill: "none", stroke: border_color, stroke_width: border_width
+      )
+    end
   end
 end
