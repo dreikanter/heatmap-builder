@@ -11,6 +11,7 @@ module HeatmapBuilder
     BLUE_OCEAN = %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9].freeze
     WARM_SUNSET = %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316].freeze
     PURPLE_VIBES = %w[#f3e8ff #d8b4fe #c084fc #a855f7 #9333ea].freeze
+    RED_TO_GREEN = %w[#fef2f2 #fca5a5 #f87171 #fbbf24 #a3d977].freeze
 
     DEFAULT_OPTIONS = {
       cell_size: 10,

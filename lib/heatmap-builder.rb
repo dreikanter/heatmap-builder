@@ -13,6 +13,7 @@ module HeatmapBuilder
   BLUE_OCEAN = Builder::BLUE_OCEAN
   WARM_SUNSET = Builder::WARM_SUNSET
   PURPLE_VIBES = Builder::PURPLE_VIBES
+  RED_TO_GREEN = Builder::RED_TO_GREEN
 
   def self.build_linear(scores, options = {})
     LinearHeatmapBuilder.new(scores, options).build

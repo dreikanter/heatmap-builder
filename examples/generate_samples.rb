@@ -61,6 +61,15 @@ def generate_sample_svgs
   File.write(filepath, svg)
   generated_files << filepath
 
+  # Red to Green palette
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::RED_TO_GREEN,
+    cell_size: 18
+  })
+  filepath = "examples/linear_red_to_green.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
   # GitHub-style calendar
   puts "Generating GitHub-style calendar..."
   calendar_data = sample_calendar_data
@@ -102,6 +111,17 @@ def generate_sample_svgs
     month_spacing: 0
   })
   filepath = "examples/calendar_purple_vibes.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
+  # Calendar with Red to Green palette
+  puts "Generating calendar with Red to Green palette..."
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    colors: HeatmapBuilder::RED_TO_GREEN,
+    cell_size: 14,
+    month_spacing: 0
+  })
+  filepath = "examples/calendar_red_to_green.svg"
   File.write(filepath, svg)
   generated_files << filepath
 
