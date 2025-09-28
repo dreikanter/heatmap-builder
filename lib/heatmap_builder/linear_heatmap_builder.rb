@@ -3,6 +3,7 @@ require_relative "svg_helpers"
 module HeatmapBuilder
   class LinearHeatmapBuilder
     include SvgHelpers
+
     DEFAULT_OPTIONS = {
       cell_size: 10,
       cell_spacing: 1,

@@ -4,13 +4,14 @@ require_relative "svg_helpers"
 module HeatmapBuilder
   class CalendarHeatmapBuilder
     include SvgHelpers
+
     DEFAULT_OPTIONS = {
       cell_size: 12,
       cell_spacing: 1,
       font_size: 8,
       border_width: 1,
       colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39],
-      start_of_week: :monday, # :sunday, :monday, :tuesday, etc.
+      start_of_week: :monday,
       month_spacing: 5, # extra vertical space between months
       show_month_labels: true,
       show_day_labels: true,
