@@ -41,7 +41,6 @@ module HeatmapBuilder
       raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
     end
 
-
     def cell_svg(score, index)
       # Calculate x position - each cell takes cell_size + spacing
       x = index * (options[:cell_size] + options[:cell_spacing])
@@ -76,6 +75,5 @@ module HeatmapBuilder
 
       "#{colored_rect}#{border_rect}#{text_element}"
     end
-
   end
 end

@@ -60,5 +60,4 @@ class HeatmapBuilderTest < Minitest::Test
       HeatmapBuilder.generate([1, 2, 3], colors: ["#ffffff"])
     end
   end
-
 end

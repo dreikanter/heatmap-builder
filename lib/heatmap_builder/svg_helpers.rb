@@ -18,7 +18,7 @@ module HeatmapBuilder
     end
 
     def svg_rect(x:, y:, width:, height:, **attributes)
-      svg_element("rect", { x: x, y: y, width: width, height: height }.merge(attributes))
+      svg_element("rect", {x: x, y: y, width: width, height: height}.merge(attributes))
     end
 
     def svg_text(content, x:, y:, **attributes)
@@ -26,7 +26,7 @@ module HeatmapBuilder
         text_anchor: "middle",
         font_family: "Arial, sans-serif"
       }
-      svg_element("text", { x: x, y: y }.merge(default_attrs).merge(attributes)) { content }
+      svg_element("text", {x: x, y: y}.merge(default_attrs).merge(attributes)) { content }
     end
 
     def svg_container(width:, height:, &block)

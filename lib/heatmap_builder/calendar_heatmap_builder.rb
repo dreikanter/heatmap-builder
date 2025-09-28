@@ -75,7 +75,6 @@ module HeatmapBuilder
       [dates.min, dates.max]
     end
 
-
     def calendar_cells_svg
       svg = ""
       current_date = calendar_start_date
@@ -138,7 +137,6 @@ module HeatmapBuilder
 
       "#{colored_rect}#{border_rect}"
     end
-
 
     def day_labels_svg
       return "" unless options[:show_day_labels]
@@ -203,7 +201,6 @@ module HeatmapBuilder
       svg
     end
 
-
     def calendar_start_date
       # Find the start of the week containing start_date
       days_back = (start_date.wday - week_start_wday) % 7
@@ -262,7 +259,6 @@ module HeatmapBuilder
     def day_label_offset
       options[:show_month_labels] ? options[:font_size] + 5 : 0
     end
-
 
     def months_in_range
       ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
