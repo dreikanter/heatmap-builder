@@ -19,14 +19,14 @@ module HeatmapBuilder
     end
 
     def build
-      width = svg_width
-      height = svg_height
-
       svg_content = scores.map.with_index do |score, index|
         cell_svg(score, index)
       end.join
 
-      svg_container(width: width, height: height) { svg_content }
+      svg_container(
+        width: scores.length * options[:cell_size] + (scores.length - 1) * options[:cell_spacing],
+        height: options[:cell_size]
+      ) { svg_content }
     end
 
     private
@@ -47,7 +47,7 @@ module HeatmapBuilder
       x = index * (options[:cell_size] + options[:cell_spacing])
       y = 0
 
-      color = score_to_color(score)
+      color = score_to_color(score, colors: options[:colors])
 
       # Create colored square (full cell size)
       colored_rect = svg_rect(
@@ -77,50 +77,5 @@ module HeatmapBuilder
       "#{colored_rect}#{border_rect}#{text_element}"
     end
 
-
-    def score_to_color(score)
-      return options[:colors].first if score == 0
-
-      max_color_index = options[:colors].length - 1
-      # Map score to color index, ensuring we don't exceed available colors
-      color_index = 1 + (score - 1) % max_color_index
-      options[:colors][color_index]
-    end
-
-    def text_color(background_color)
-      # Simple contrast check - if dark background, use white text
-      hex = background_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-      brightness = (r * 299 + g * 587 + b * 114) / 1000
-      (brightness > 128) ? "#000000" : "#ffffff"
-    end
-
-    def svg_width
-      scores.length * options[:cell_size] +
-        (scores.length - 1) * options[:cell_spacing]
-    end
-
-    def svg_height
-      options[:cell_size]
-    end
-
-    def darker_color(hex_color)
-      # Remove # if present
-      hex = hex_color.delete("#")
-
-      # Extract RGB values
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      # Make 30% darker
-      r = (r * 0.7).to_i
-      g = (g * 0.7).to_i
-      b = (b * 0.7).to_i
-
-      "#%02x%02x%02x" % [r, g, b]
-    end
   end
 end

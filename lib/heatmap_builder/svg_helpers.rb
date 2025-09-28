@@ -57,5 +57,35 @@ module HeatmapBuilder
         fill: "none", stroke: border_color, stroke_width: border_width
       )
     end
+
+    def score_to_color(score, colors:)
+      return colors.first if score == 0
+
+      max_color_index = colors.length - 1
+      color_index = 1 + (score - 1) % max_color_index
+      colors[color_index]
+    end
+
+    def darker_color(hex_color, factor: 0.7)
+      hex = hex_color.delete("#")
+      r = hex[0..1].to_i(16)
+      g = hex[2..3].to_i(16)
+      b = hex[4..5].to_i(16)
+
+      r = (r * factor).to_i
+      g = (g * factor).to_i
+      b = (b * factor).to_i
+
+      "#%02x%02x%02x" % [r, g, b]
+    end
+
+    def text_color(background_color)
+      hex = background_color.delete("#")
+      r = hex[0..1].to_i(16)
+      g = hex[2..3].to_i(16)
+      b = hex[4..5].to_i(16)
+      brightness = (r * 299 + g * 587 + b * 114) / 1000
+      (brightness > 128) ? "#000000" : "#ffffff"
+    end
   end
 end

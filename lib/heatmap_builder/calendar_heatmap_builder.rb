@@ -29,9 +29,6 @@ module HeatmapBuilder
     end
 
     def build
-      width = svg_width
-      height = svg_height
-
       svg_content = []
 
       # Add day labels if enabled
@@ -45,6 +42,11 @@ module HeatmapBuilder
       if options[:show_month_labels]
         svg_content << month_labels_svg
       end
+
+      weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
+      month_spacing_total = (months_in_range - 1) * options[:month_spacing]
+      width = label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
+      height = day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
 
       svg_container(width: width, height: height) { svg_content.join }
     end
@@ -113,7 +115,7 @@ module HeatmapBuilder
     end
 
     def cell_svg(score, x, y, inactive = false)
-      color = score_to_color(score)
+      color = score_to_color(score, colors: options[:colors])
 
       # Make inactive cells duller by reducing opacity
       if inactive
@@ -131,7 +133,7 @@ module HeatmapBuilder
         x, y, color,
         cell_size: options[:cell_size],
         border_width: options[:border_width],
-        darker_color_method: method(:darker_color)
+        darker_color_method: ->(c) { darker_color(c, factor: 0.9) }
       )
 
       "#{colored_rect}#{border_rect}"
@@ -201,27 +203,6 @@ module HeatmapBuilder
       svg
     end
 
-    def score_to_color(score)
-      return options[:colors].first if score == 0
-
-      max_color_index = options[:colors].length - 1
-      color_index = 1 + (score - 1) % max_color_index
-      options[:colors][color_index]
-    end
-
-    def darker_color(hex_color)
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      # Much more subtle border - only 10% darker instead of 30%
-      r = (r * 0.9).to_i
-      g = (g * 0.9).to_i
-      b = (b * 0.9).to_i
-
-      "#%02x%02x%02x" % [r, g, b]
-    end
 
     def calendar_start_date
       # Find the start of the week containing start_date
@@ -282,16 +263,6 @@ module HeatmapBuilder
       options[:show_month_labels] ? options[:font_size] + 5 : 0
     end
 
-    def svg_width
-      weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
-      month_spacing_total = (months_in_range - 1) * options[:month_spacing]
-
-      label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
-    end
-
-    def svg_height
-      day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
-    end
 
     def months_in_range
       ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
