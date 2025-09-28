@@ -21,7 +21,8 @@ module HeatmapBuilder
 
     alias_method :scores, :data
 
-    def validate_subclass_options!
+    def validate_options!
+      super
       raise Error, "scores must be an array" unless data.is_a?(Array)
     end
 

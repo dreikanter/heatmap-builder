@@ -38,7 +38,8 @@ module HeatmapBuilder
 
     attr_reader :start_date, :end_date
 
-    def validate_subclass_options!
+    def validate_options!
+      super
       raise Error, "scores_by_date must be a hash" unless data.is_a?(Hash)
 
       valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
