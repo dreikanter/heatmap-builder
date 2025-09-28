@@ -17,10 +17,6 @@ module HeatmapBuilder
       end
     end
 
-    def kebab_case(key)
-      key.to_s.tr("_", "-")
-    end
-
     def svg_rect(x:, y:, width:, height:, **attributes)
       svg_element("rect", { x: x, y: y, width: width, height: height }.merge(attributes))
     end
@@ -39,6 +35,10 @@ module HeatmapBuilder
         height: height,
         xmlns: "http://www.w3.org/2000/svg"
       }, &block)
+    end
+
+    def kebab_case(key)
+      key.to_s.tr("_", "-")
     end
   end
 end
