@@ -1,9 +1,8 @@
 require "date"
-require_relative "svg_helpers"
+require_relative "builder"
 
 module HeatmapBuilder
-  class CalendarHeatmapBuilder
-    include SvgHelpers
+  class CalendarHeatmapBuilder < Builder
 
     DEFAULT_OPTIONS = {
       cell_size: 12,
@@ -21,9 +20,7 @@ module HeatmapBuilder
     }.freeze
 
     def initialize(scores_by_date, options = {})
-      @scores_by_date = scores_by_date
-      @options = DEFAULT_OPTIONS.merge(options)
-      validate_options!
+      super(scores_by_date, options)
       @start_date = parse_date_range.first
       @end_date = parse_date_range.last
     end
@@ -53,14 +50,12 @@ module HeatmapBuilder
 
     private
 
-    attr_reader :scores_by_date, :options, :start_date, :end_date
+    alias_method :scores_by_date, :data
 
-    def validate_options!
-      raise Error, "scores_by_date must be a hash" unless scores_by_date.is_a?(Hash)
-      raise Error, "cell_size must be positive" unless options[:cell_size] > 0
-      raise Error, "font_size must be positive" unless options[:font_size] > 0
-      raise Error, "colors must be an array" unless options[:colors].is_a?(Array)
-      raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
+    attr_reader :start_date, :end_date
+
+    def validate_subclass_options!
+      raise Error, "scores_by_date must be a hash" unless data.is_a?(Hash)
 
       valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
       unless valid_start_days.include?(options[:start_of_week])
@@ -213,23 +208,6 @@ module HeatmapBuilder
       end_date + days_forward
     end
 
-    def make_color_inactive(hex_color)
-      # Make color duller by reducing saturation and increasing lightness
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      # Blend with light gray to make it appear duller/inactive
-      gray = 230
-      mix_ratio = 0.6 # 60% original color, 40% gray
-
-      r = (r * mix_ratio + gray * (1 - mix_ratio)).to_i
-      g = (g * mix_ratio + gray * (1 - mix_ratio)).to_i
-      b = (b * mix_ratio + gray * (1 - mix_ratio)).to_i
-
-      "#%02x%02x%02x" % [r, g, b]
-    end
 
     def week_start_wday
       case options[:start_of_week]

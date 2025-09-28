@@ -1,8 +1,7 @@
-require_relative "svg_helpers"
+require_relative "builder"
 
 module HeatmapBuilder
-  class LinearHeatmapBuilder
-    include SvgHelpers
+  class LinearHeatmapBuilder < Builder
 
     DEFAULT_OPTIONS = {
       cell_size: 10,
@@ -13,9 +12,7 @@ module HeatmapBuilder
     }.freeze
 
     def initialize(scores, options = {})
-      @scores = scores
-      @options = DEFAULT_OPTIONS.merge(options)
-      validate_options!
+      super(scores, options)
     end
 
     def build
@@ -31,14 +28,10 @@ module HeatmapBuilder
 
     private
 
-    attr_reader :scores, :options
+    alias_method :scores, :data
 
-    def validate_options!
-      raise Error, "scores must be an array" unless scores.is_a?(Array)
-      raise Error, "cell_size must be positive" unless options[:cell_size] > 0
-      raise Error, "font_size must be positive" unless options[:font_size] > 0
-      raise Error, "colors must be an array" unless options[:colors].is_a?(Array)
-      raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
+    def validate_subclass_options!
+      raise Error, "scores must be an array" unless data.is_a?(Array)
     end
 
     def cell_svg(score, index)
