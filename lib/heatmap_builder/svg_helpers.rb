@@ -1,0 +1,37 @@
+module HeatmapBuilder
+  module SvgHelpers
+    private
+
+    def svg_element(tag, attributes = {}, &block)
+      attr_string = attributes.map { |key, value| "#{key}=\"#{value}\"" }.join(" ")
+      attr_string = " #{attr_string}" unless attr_string.empty?
+
+      if block_given?
+        content = block.call
+        "<#{tag}#{attr_string}>#{content}</#{tag}>"
+      else
+        "<#{tag}#{attr_string}/>"
+      end
+    end
+
+    def svg_rect(x:, y:, width:, height:, **attributes)
+      svg_element("rect", { x: x, y: y, width: width, height: height }.merge(attributes))
+    end
+
+    def svg_text(content, x:, y:, **attributes)
+      default_attrs = {
+        "text-anchor": "middle",
+        "font-family": "Arial, sans-serif"
+      }
+      svg_element("text", { x: x, y: y }.merge(default_attrs).merge(attributes)) { content }
+    end
+
+    def svg_container(width:, height:, &block)
+      svg_element("svg", {
+        width: width,
+        height: height,
+        xmlns: "http://www.w3.org/2000/svg"
+      }, &block)
+    end
+  end
+end

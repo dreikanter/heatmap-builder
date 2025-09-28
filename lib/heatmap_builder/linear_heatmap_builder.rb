@@ -1,5 +1,8 @@
+require_relative "svg_helpers"
+
 module HeatmapBuilder
   class LinearHeatmapBuilder
+    include SvgHelpers
     DEFAULT_OPTIONS = {
       cell_size: 10,
       cell_spacing: 1,
@@ -22,11 +25,7 @@ module HeatmapBuilder
         cell_svg(score, index)
       end.join
 
-      <<~SVG
-        <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
-          #{svg_content}
-        </svg>
-      SVG
+      svg_container(width: width, height: height) { svg_content }
     end
 
     private
@@ -50,7 +49,11 @@ module HeatmapBuilder
       color = score_to_color(score)
 
       # Create colored square (full cell size)
-      colored_rect = "<rect x=\"#{x}\" y=\"#{y}\" width=\"#{options[:cell_size]}\" height=\"#{options[:cell_size]}\" fill=\"#{color}\"/>"
+      colored_rect = svg_rect(
+        x: x, y: y,
+        width: options[:cell_size], height: options[:cell_size],
+        fill: color
+      )
 
       # Create border overlay completely inside the colored square
       border_rect = if options[:border_width] > 0
@@ -60,7 +63,11 @@ module HeatmapBuilder
         border_y = y + inset
         border_size = options[:cell_size] - options[:border_width]
         border_color = darker_color(color)
-        "<rect x=\"#{border_x}\" y=\"#{border_y}\" width=\"#{border_size}\" height=\"#{border_size}\" fill=\"none\" stroke=\"#{border_color}\" stroke-width=\"#{options[:border_width]}\"/>"
+        svg_rect(
+          x: border_x, y: border_y,
+          width: border_size, height: border_size,
+          fill: "none", stroke: border_color, "stroke-width": options[:border_width]
+        )
       else
         ""
       end
@@ -70,7 +77,11 @@ module HeatmapBuilder
       # For better vertical centering: cell center + font_size * 0.35 (accounts for baseline)
       text_y = y + options[:cell_size] / 2 + options[:font_size] * 0.35
 
-      text_element = "<text x=\"#{text_x}\" y=\"#{text_y}\" text-anchor=\"middle\" font-family=\"Arial, sans-serif\" font-size=\"#{options[:font_size]}\" fill=\"#{text_color(color)}\">#{score}</text>"
+      text_element = svg_text(
+        score,
+        x: text_x, y: text_y,
+        "font-size": options[:font_size], fill: text_color(color)
+      )
 
       "#{colored_rect}#{border_rect}#{text_element}"
     end
