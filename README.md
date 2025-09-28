@@ -9,11 +9,11 @@ A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-styl
 - GitHub-style calendar layouts for date-based data.
 - Linear heatmaps.
 - SVG format scales perfectly at any size.
-- **Zero dependencies.**
 - Shows numeric values in each cell.
 - Parametric everything: customize cell size, spacing, colors, fonts, etc.
-- Dynamic color palette generation from user-defined two colors. Also possible to define each color in the palette manually.
+- Dynamic palette generation from two colors or manually-specified colors.
 - OKLCH color interpolation for superior color transitions and perceptual uniformity.
+- **Zero dependencies.**
 
 ## Installation
 
@@ -89,31 +89,49 @@ svg = HeatmapBuilder.build_linear([1, 2, 3, 4, 5, 6, 7], options)
 
 HeatmapBuilder includes 5 beautiful predefined color palettes:
 
+
+#### Linear Heatmap Examples
+
 ```ruby
 # GitHub Green (default)
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
+```
 
+TBD: Add SVG example
+
+```ruby
 # Blue Ocean
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
+```
 
+![Blue Ocean Linear](examples/linear_blue_ocean.svg)
+
+```ruby
 # Warm Sunset
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::WARM_SUNSET)
+```
 
+![Warm Sunset Linear](examples/linear_warm_sunset.svg)
+
+```ruby
 # Purple Vibes
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::PURPLE_VIBES)
+```
 
+![Purple Vibes Linear](examples/linear_purple_vibes.svg)
+
+```ruby
 # Red to Green
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
 ```
 
-#### Linear Heatmap Examples
-
-![Blue Ocean Linear](examples/linear_blue_ocean.svg)
-![Warm Sunset Linear](examples/linear_warm_sunset.svg)
-![Purple Vibes Linear](examples/linear_purple_vibes.svg)
 ![Red to Green Linear](examples/linear_red_to_green.svg)
 
 #### Calendar Heatmap Examples
+
+TBD: Add code example and SVG for default colors
+
+TBD: Add code example to each SVG (assuming data already defined)
 
 ![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
 ![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
