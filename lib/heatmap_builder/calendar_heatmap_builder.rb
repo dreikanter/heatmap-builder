@@ -138,7 +138,7 @@ module HeatmapBuilder
         svg_rect(
           x: border_x, y: border_y,
           width: border_size, height: border_size,
-          fill: "none", stroke: border_color, "stroke-width": options[:border_width]
+          fill: "none", stroke: border_color, stroke_width: options[:border_width]
         )
       else
         ""
@@ -158,7 +158,7 @@ module HeatmapBuilder
         svg << svg_text(
           day_name,
           x: options[:font_size], y: y,
-          "font-size": options[:font_size], fill: "#666666"
+          font_size: options[:font_size], fill: "#666666"
         )
       end
 
@@ -195,7 +195,7 @@ module HeatmapBuilder
             svg << svg_text(
               month_name,
               x: x, y: y,
-              "font-family": "Arial, sans-serif", "font-size": options[:font_size], fill: "#666666"
+              font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
             )
           end
 

@@ -67,7 +67,7 @@ module HeatmapBuilder
         svg_rect(
           x: border_x, y: border_y,
           width: border_size, height: border_size,
-          fill: "none", stroke: border_color, "stroke-width": options[:border_width]
+          fill: "none", stroke: border_color, stroke_width: options[:border_width]
         )
       else
         ""
@@ -81,7 +81,7 @@ module HeatmapBuilder
       text_element = svg_text(
         score,
         x: text_x, y: text_y,
-        "font-size": options[:font_size], fill: text_color(color)
+        font_size: options[:font_size], fill: text_color(color)
       )
 
       "#{colored_rect}#{border_rect}#{text_element}"

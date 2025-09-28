@@ -3,7 +3,11 @@ module HeatmapBuilder
     private
 
     def svg_element(tag, attributes = {}, &block)
-      attr_string = attributes.map { |key, value| "#{key}=\"#{value}\"" }.join(" ")
+      attr_string = attributes.map do |key, value|
+        # Convert symbol keys with underscores to kebab-case
+        attr_name = key.to_s.tr("_", "-")
+        "#{attr_name}=\"#{value}\""
+      end.join(" ")
       attr_string = " #{attr_string}" unless attr_string.empty?
 
       if block_given?
@@ -20,8 +24,8 @@ module HeatmapBuilder
 
     def svg_text(content, x:, y:, **attributes)
       default_attrs = {
-        "text-anchor": "middle",
-        "font-family": "Arial, sans-serif"
+        text_anchor: "middle",
+        font_family: "Arial, sans-serif"
       }
       svg_element("text", { x: x, y: y }.merge(default_attrs).merge(attributes)) { content }
     end
