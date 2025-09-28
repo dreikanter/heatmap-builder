@@ -2,14 +2,6 @@ require_relative "builder"
 
 module HeatmapBuilder
   class LinearHeatmapBuilder < Builder
-    DEFAULT_OPTIONS = {
-      cell_size: 10,
-      cell_spacing: 1,
-      font_size: 8,
-      border_width: 1,
-      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
-    }.freeze
-
     def initialize(scores, options = {})
       super
     end

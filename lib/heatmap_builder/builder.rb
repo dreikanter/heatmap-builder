@@ -4,9 +4,17 @@ module HeatmapBuilder
   class Builder
     include SvgHelpers
 
+    DEFAULT_OPTIONS = {
+      cell_size: 10,
+      cell_spacing: 1,
+      font_size: 8,
+      border_width: 1,
+      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
+    }.freeze
+
     def initialize(data, options = {})
       @data = data
-      @options = self.class::DEFAULT_OPTIONS.merge(options)
+      @options = default_options.merge(options)
       validate_options!
     end
 
@@ -32,6 +40,16 @@ module HeatmapBuilder
 
     def validate_subclass_options!
       # Override in subclasses for specific validation
+    end
+
+    def default_options
+      # Start with base options, then merge subclass-specific options
+      DEFAULT_OPTIONS.merge(subclass_default_options)
+    end
+
+    def subclass_default_options
+      # Override in subclasses to add specific default options
+      {}
     end
 
     def make_color_inactive(hex_color)

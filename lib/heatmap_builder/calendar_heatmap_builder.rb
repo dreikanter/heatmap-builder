@@ -3,21 +3,6 @@ require_relative "builder"
 
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
-    DEFAULT_OPTIONS = {
-      cell_size: 12,
-      cell_spacing: 1,
-      font_size: 8,
-      border_width: 1,
-      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39],
-      start_of_week: :monday,
-      month_spacing: 5, # extra vertical space between months
-      show_month_labels: true,
-      show_day_labels: true,
-      show_outside_cells: false, # show cells outside the timeframe with inactive styling
-      day_labels: %w[S M T W T F S], # day abbreviations starting from Sunday
-      month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # month abbreviations
-    }.freeze
-
     def initialize(scores_by_date, options = {})
       super
       @start_date = parse_date_range.first
@@ -238,6 +223,19 @@ module HeatmapBuilder
 
     def months_in_range
       ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
+    end
+
+    def subclass_default_options
+      {
+        cell_size: 12,
+        start_of_week: :monday,
+        month_spacing: 5, # extra vertical space between months
+        show_month_labels: true,
+        show_day_labels: true,
+        show_outside_cells: false, # show cells outside the timeframe with inactive styling
+        day_labels: %w[S M T W T F S], # day abbreviations starting from Sunday
+        month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # month abbreviations
+      }
     end
   end
 end
