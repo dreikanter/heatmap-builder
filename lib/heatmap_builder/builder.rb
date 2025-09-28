@@ -9,7 +9,8 @@ module HeatmapBuilder
       cell_spacing: 1,
       font_size: 8,
       border_width: 1,
-      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
+      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39],
+      text_color: "#000000"
     }.freeze
 
     def initialize(data, options = {})

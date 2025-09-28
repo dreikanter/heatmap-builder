@@ -79,14 +79,6 @@ module HeatmapBuilder
       "#%02x%02x%02x" % [r, g, b]
     end
 
-    def text_color(background_color)
-      hex = background_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-      brightness = (r * 299 + g * 587 + b * 114) / 1000
-      (brightness > 128) ? "#000000" : "#ffffff"
-    end
 
     def make_color_inactive(hex_color)
       hex = hex_color.delete("#")
