@@ -38,10 +38,10 @@ require 'heatmap-builder'
 
 # Generate SVG for daily scores
 scores = [0, 1, 2, 3, 4, 5, 2, 1]
-svg = HeatmapBuilder.generate(scores)
+svg = HeatmapBuilder.build_linear(scores)
 
 # In a Rails view
-<%= raw HeatmapBuilder.generate(@daily_scores) %>
+<%= raw HeatmapBuilder.build_linear(@daily_scores) %>
 ```
 
 ![Weekly Progress](examples/weekly_progress.svg)
@@ -57,7 +57,7 @@ scores_by_date = {
   # ... more dates
 }
 
-svg = HeatmapBuilder.generate_calendar(scores_by_date)
+svg = HeatmapBuilder.build_calendar(scores_by_date)
 ```
 
 ### Custom Configuration
@@ -65,19 +65,20 @@ svg = HeatmapBuilder.generate_calendar(scores_by_date)
 ```ruby
 # Customize linear heatmap appearance
 options = {
-  cell_size: 35,           # Size of each square (default: 20)
-  cell_spacing: 1,         # Space between squares (default: 2)
-  font_size: 20,           # Font size for score text (default: 12)
-  colors: %w[              # Custom color palette (default: GitHub-style)
-    #f0f0f0
-    #c6e48b
-    #7bc96f
-    #239a3b
-    #196127
+  cell_size: 35,           # Size of each square (default: 10)
+  cell_spacing: 2,         # Space between squares (default: 1)
+  font_size: 20,           # Font size for score text (default: 8)
+  border_width: 2,         # Border thickness (default: 1)
+  colors: %w[
+    #ebedf0
+    #9be9a8
+    #40c463
+    #30a14e
+    #216e39
   ]
 }
 
-svg = HeatmapBuilder.generate([1, 2, 3, 4, 5, 6, 7], options)
+svg = HeatmapBuilder.build_linear([1, 2, 3, 4, 5, 6, 7], options)
 ```
 
 ![Large Cells](examples/large_cells.svg)
@@ -85,12 +86,16 @@ svg = HeatmapBuilder.generate([1, 2, 3, 4, 5, 6, 7], options)
 ```ruby
 # Calendar heatmap options
 calendar_options = {
-  cell_size: 14,
-  start_of_week: :sunday,    # :monday (default) or :sunday
-  show_outside_cells: true   # Show cells outside date range
+  cell_size: 14,                    # Size of each cell (default: 12)
+  start_of_week: :sunday,           # :monday (default) or :sunday
+  show_outside_cells: true,         # Show cells outside date range (default: false)
+  show_month_labels: true,          # Show month names (default: true)
+  show_day_labels: true,            # Show day abbreviations (default: true)
+  day_labels: %w[S M T W T F S],    # Custom day labels (default: S M T W T F S)
+  month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # Custom month labels
 }
 
-svg = HeatmapBuilder.generate_calendar(scores_by_date, calendar_options)
+svg = HeatmapBuilder.build_calendar(scores_by_date, calendar_options)
 ```
 
 ![Calendar with Sunday Start](examples/calendar_sunday_start.svg)
@@ -100,6 +105,7 @@ svg = HeatmapBuilder.generate_calendar(scores_by_date, calendar_options)
 - Score `0`: Uses the first color (typically light gray)
 - Score `1+`: Cycles through remaining colors based on score value
 - Higher scores automatically map to available colors in the palette
+
 
 ## Development
 

@@ -1,60 +1,9 @@
 require "date"
+require_relative "builder"
 
 module HeatmapBuilder
-  class CalendarHeatmapBuilder
-    DEFAULT_OPTIONS = {
-      cell_size: 12,
-      cell_spacing: 1,
-      font_size: 8,
-      border_width: 1,
-      colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39],
-      start_of_week: :monday, # :sunday, :monday, :tuesday, etc.
-      month_spacing: 5, # extra vertical space between months
-      show_month_labels: true,
-      show_day_labels: true,
-      show_outside_cells: false # show cells outside the timeframe with inactive styling
-    }.freeze
-
-    def initialize(scores_by_date, options = {})
-      @scores_by_date = scores_by_date
-      @options = DEFAULT_OPTIONS.merge(options)
-      validate_options!
-      @start_date = parse_date_range.first
-      @end_date = parse_date_range.last
-    end
-
-    def generate
-      build_svg
-    end
-
-    private
-
-    attr_reader :scores_by_date, :options, :start_date, :end_date
-
-    def validate_options!
-      raise Error, "scores_by_date must be a hash" unless scores_by_date.is_a?(Hash)
-      raise Error, "cell_size must be positive" unless options[:cell_size] > 0
-      raise Error, "font_size must be positive" unless options[:font_size] > 0
-      raise Error, "colors must be an array" unless options[:colors].is_a?(Array)
-      raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
-
-      valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
-      unless valid_start_days.include?(options[:start_of_week])
-        raise Error, "start_of_week must be one of: #{valid_start_days.join(", ")}"
-      end
-    end
-
-    def parse_date_range
-      dates = scores_by_date.keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
-      return [Date.today - 365, Date.today] if dates.empty?
-
-      [dates.min, dates.max]
-    end
-
-    def build_svg
-      width = svg_width
-      height = svg_height
-
+  class CalendarHeatmapBuilder < Builder
+    def build
       svg_content = []
 
       # Add day labels if enabled
@@ -69,11 +18,41 @@ module HeatmapBuilder
         svg_content << month_labels_svg
       end
 
-      <<~SVG
-        <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
-          #{svg_content.join}
-        </svg>
-      SVG
+      weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
+      month_spacing_total = (months_in_range - 1) * options[:month_spacing]
+      width = label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
+      height = day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
+
+      svg_container(width: width, height: height) { svg_content.join }
+    end
+
+    private
+
+    alias_method :scores_by_date, :data
+
+    def start_date
+      @start_date ||= parse_date_range.first
+    end
+
+    def end_date
+      @end_date ||= parse_date_range.last
+    end
+
+    def validate_options!
+      super
+      raise Error, "scores_by_date must be a hash" unless data.is_a?(Hash)
+
+      valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
+      unless valid_start_days.include?(options[:start_of_week])
+        raise Error, "start_of_week must be one of: #{valid_start_days.join(", ")}"
+      end
+    end
+
+    def parse_date_range
+      dates = scores_by_date.keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
+      return [Date.today - 365, Date.today] if dates.empty?
+
+      [dates.min, dates.max]
     end
 
     def calendar_cells_svg
@@ -115,7 +94,7 @@ module HeatmapBuilder
     end
 
     def cell_svg(score, x, y, inactive = false)
-      color = score_to_color(score)
+      color = score_to_color(score, colors: options[:colors])
 
       # Make inactive cells duller by reducing opacity
       if inactive
@@ -123,19 +102,18 @@ module HeatmapBuilder
       end
 
       # Create colored square
-      colored_rect = "<rect x=\"#{x}\" y=\"#{y}\" width=\"#{options[:cell_size]}\" height=\"#{options[:cell_size]}\" fill=\"#{color}\"/>"
+      colored_rect = svg_rect(
+        x: x, y: y,
+        width: options[:cell_size], height: options[:cell_size],
+        fill: color
+      )
 
-      # Create border overlay
-      border_rect = if options[:border_width] > 0
-        inset = options[:border_width] / 2.0
-        border_x = x + inset
-        border_y = y + inset
-        border_size = options[:cell_size] - options[:border_width]
-        border_color = darker_color(color)
-        "<rect x=\"#{border_x}\" y=\"#{border_y}\" width=\"#{border_size}\" height=\"#{border_size}\" fill=\"none\" stroke=\"#{border_color}\" stroke-width=\"#{options[:border_width]}\"/>"
-      else
-        ""
-      end
+      border_rect = cell_border(
+        x, y, color,
+        cell_size: options[:cell_size],
+        border_width: options[:border_width],
+        darker_color_method: ->(c) { darker_color(c, factor: 0.9) }
+      )
 
       "#{colored_rect}#{border_rect}"
     end
@@ -148,7 +126,11 @@ module HeatmapBuilder
 
       day_names.each_with_index do |day_name, index|
         y = day_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
-        svg << "<text x=\"#{options[:font_size]}\" y=\"#{y}\" text-anchor=\"middle\" font-family=\"Arial, sans-serif\" font-size=\"#{options[:font_size]}\" fill=\"#666666\">#{day_name}</text>"
+        svg << svg_text(
+          day_name,
+          x: options[:font_size], y: y,
+          font_size: options[:font_size], fill: "#666666"
+        )
       end
 
       svg
@@ -180,8 +162,12 @@ module HeatmapBuilder
           if month_start <= end_date && month_end >= start_date
             x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
             y = options[:font_size] + 2
-            month_name = current_date.strftime("%b")
-            svg << "<text x=\"#{x}\" y=\"#{y}\" font-family=\"Arial, sans-serif\" font-size=\"#{options[:font_size]}\" fill=\"#666666\">#{month_name}</text>"
+            month_name = options[:month_labels][current_date.month - 1]
+            svg << svg_text(
+              month_name,
+              x: x, y: y,
+              font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
+            )
           end
 
           displayed_months[current_date.month] = true
@@ -195,28 +181,6 @@ module HeatmapBuilder
       svg
     end
 
-    def score_to_color(score)
-      return options[:colors].first if score == 0
-
-      max_color_index = options[:colors].length - 1
-      color_index = 1 + (score - 1) % max_color_index
-      options[:colors][color_index]
-    end
-
-    def darker_color(hex_color)
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      # Much more subtle border - only 10% darker instead of 30%
-      r = (r * 0.9).to_i
-      g = (g * 0.9).to_i
-      b = (b * 0.9).to_i
-
-      "#%02x%02x%02x" % [r, g, b]
-    end
-
     def calendar_start_date
       # Find the start of the week containing start_date
       days_back = (start_date.wday - week_start_wday) % 7
@@ -227,24 +191,6 @@ module HeatmapBuilder
       # Find the end of the week containing end_date
       days_forward = (6 - (end_date.wday - week_start_wday)) % 7
       end_date + days_forward
-    end
-
-    def make_color_inactive(hex_color)
-      # Make color duller by reducing saturation and increasing lightness
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      # Blend with light gray to make it appear duller/inactive
-      gray = 230
-      mix_ratio = 0.6 # 60% original color, 40% gray
-
-      r = (r * mix_ratio + gray * (1 - mix_ratio)).to_i
-      g = (g * mix_ratio + gray * (1 - mix_ratio)).to_i
-      b = (b * mix_ratio + gray * (1 - mix_ratio)).to_i
-
-      "#%02x%02x%02x" % [r, g, b]
     end
 
     def week_start_wday
@@ -260,9 +206,8 @@ module HeatmapBuilder
     end
 
     def day_names_for_week_start
-      all_days = %w[S M T W T F S]
       start_index = week_start_wday
-      all_days.rotate(start_index)
+      options[:day_labels].rotate(start_index)
     end
 
     def month_spacing_weeks
@@ -277,19 +222,21 @@ module HeatmapBuilder
       options[:show_month_labels] ? options[:font_size] + 5 : 0
     end
 
-    def svg_width
-      weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
-      month_spacing_total = (months_in_range - 1) * options[:month_spacing]
-
-      label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
-    end
-
-    def svg_height
-      day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
-    end
-
     def months_in_range
       ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
+    end
+
+    def default_options
+      DEFAULT_OPTIONS.merge({
+        cell_size: 12,
+        start_of_week: :monday,
+        month_spacing: 5, # extra vertical space between months
+        show_month_labels: true,
+        show_day_labels: true,
+        show_outside_cells: false, # show cells outside the timeframe with inactive styling
+        day_labels: %w[S M T W T F S], # day abbreviations starting from Sunday
+        month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # month abbreviations
+      })
     end
   end
 end

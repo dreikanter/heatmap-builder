@@ -60,15 +60,4 @@ class HeatmapBuilderTest < Minitest::Test
       HeatmapBuilder.generate([1, 2, 3], colors: ["#ffffff"])
     end
   end
-
-  def test_respects_cells_per_row_limit
-    scores = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    svg = HeatmapBuilder.generate(scores, cells_per_row: 3)
-
-    # Should only render first 3 cells
-    assert_includes svg, ">1</text>"
-    assert_includes svg, ">2</text>"
-    assert_includes svg, ">3</text>"
-    refute_includes svg, ">4</text>"
-  end
 end

@@ -12,7 +12,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
   end
 
   def test_default_options
-    svg = @builder.generate
+    svg = @builder.build
 
     assert_includes svg, "<svg"
     assert_includes svg, "xmlns=\"http://www.w3.org/2000/svg\""
@@ -20,7 +20,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
   end
 
   def test_generates_calendar_grid
-    svg = @builder.generate
+    svg = @builder.build
 
     # Should contain rect elements for calendar cells
     assert_includes svg, "<rect"
@@ -29,7 +29,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
 
   def test_start_of_week_monday
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, start_of_week: :monday)
-    svg = builder.generate
+    svg = builder.build
 
     # Should include day labels starting with Monday
     assert_includes svg, ">M</text>"
@@ -37,7 +37,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
 
   def test_start_of_week_sunday
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, start_of_week: :sunday)
-    svg = builder.generate
+    svg = builder.build
 
     # Should include day labels starting with Sunday
     assert_includes svg, ">S</text>"
@@ -45,7 +45,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
 
   def test_month_labels
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, show_month_labels: true)
-    svg = builder.generate
+    svg = builder.build
 
     # Should include month label for January
     assert_includes svg, ">Jan</text>"
@@ -53,7 +53,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
 
   def test_day_labels
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, show_day_labels: true)
-    svg = builder.generate
+    svg = builder.build
 
     # Should include day labels
     assert_includes svg, ">M</text>"
@@ -63,7 +63,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
   def test_custom_colors
     colors = %w[#ffffff #ff0000 #00ff00]
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, colors: colors)
-    svg = builder.generate
+    svg = builder.build
 
     assert_includes svg, "fill=\"#ffffff\""
     assert_includes svg, "fill=\"#ff0000\""
@@ -93,7 +93,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
       Date.new(2024, 1, 2) => 2
     }
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(date_scores)
-    svg = builder.generate
+    svg = builder.build
 
     assert_includes svg, "<svg"
     assert_includes svg, "</svg>"
@@ -101,7 +101,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
 
   def test_empty_scores
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new({})
-    svg = builder.generate
+    svg = builder.build
 
     assert_includes svg, "<svg"
     assert_includes svg, "</svg>"
