@@ -3,12 +3,6 @@ require_relative "builder"
 
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
-    def initialize(scores_by_date, options = {})
-      super
-      @start_date = parse_date_range.first
-      @end_date = parse_date_range.last
-    end
-
     def build
       svg_content = []
 
@@ -36,7 +30,13 @@ module HeatmapBuilder
 
     alias_method :scores_by_date, :data
 
-    attr_reader :start_date, :end_date
+    def start_date
+      @start_date ||= parse_date_range.first
+    end
+
+    def end_date
+      @end_date ||= parse_date_range.last
+    end
 
     def validate_options!
       super

@@ -38,6 +38,5 @@ module HeatmapBuilder
     def default_options
       DEFAULT_OPTIONS
     end
-
   end
 end

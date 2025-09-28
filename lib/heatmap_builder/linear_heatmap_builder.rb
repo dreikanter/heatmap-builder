@@ -2,10 +2,6 @@ require_relative "builder"
 
 module HeatmapBuilder
   class LinearHeatmapBuilder < Builder
-    def initialize(scores, options = {})
-      super
-    end
-
     def build
       svg_content = scores.map.with_index do |score, index|
         cell_svg(score, index)
