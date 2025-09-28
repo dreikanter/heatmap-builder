@@ -5,24 +5,24 @@ class ColorHelpersTest < Minitest::Test
     @builder = HeatmapBuilder::LinearHeatmapBuilder.new([1])
   end
 
-  # Tests for LAB color conversion
-  def test_rgb_to_lab_conversion
+  # Tests for OKLCH color conversion
+  def test_rgb_to_oklch_conversion
     # Test with pure red
-    lab = @builder.send(:rgb_to_lab, 255, 0, 0)
+    oklch = @builder.send(:rgb_to_oklch, 255, 0, 0)
 
-    assert_in_delta 53.24, lab[0], 1.0  # L (lightness)
-    assert_in_delta 80.11, lab[1], 1.0  # A (green-red)
-    assert_in_delta 67.22, lab[2], 1.0  # B (blue-yellow)
+    assert_in_delta 0.63, oklch[0], 0.05  # L (lightness)
+    assert_in_delta 0.26, oklch[1], 0.05  # C (chroma)
+    assert_in_delta 29.0, oklch[2], 5.0   # H (hue in degrees)
   end
 
-  def test_lab_to_rgb_conversion
-    # Test conversion back from LAB
-    lab = [53.24, 80.11, 67.22]  # Approximately red
-    rgb = @builder.send(:lab_to_rgb, *lab)
+  def test_oklch_to_rgb_conversion
+    # Test conversion back from OKLCH
+    oklch = [0.63, 0.26, 29.0]  # Approximately red
+    rgb = @builder.send(:oklch_to_rgb, *oklch)
 
-    assert_in_delta 255, rgb[0], 5  # R
-    assert_in_delta 0, rgb[1], 5    # G
-    assert_in_delta 0, rgb[2], 5    # B
+    assert_in_delta 255, rgb[0], 10  # R
+    assert_in_delta 0, rgb[1], 10    # G
+    assert_in_delta 0, rgb[2], 10    # B
   end
 
   def test_hex_to_rgb_conversion
@@ -41,7 +41,7 @@ class ColorHelpersTest < Minitest::Test
     assert_equal "#00ff00", hex
   end
 
-  # Tests for LAB-based color operations
+  # Tests for OKLCH-based color operations
   def test_darker_color_maintains_hue
     original = "#ff0000"  # Red
     darker = @builder.send(:darker_color, original)
@@ -49,11 +49,12 @@ class ColorHelpersTest < Minitest::Test
     refute_equal original, darker
     assert_match /^#[0-9a-f]{6}$/, darker  # Valid hex color
 
-    # Should be darker (lower perceived brightness)
-    original_lab = @builder.send(:rgb_to_lab, *@builder.send(:hex_to_rgb, original))
-    darker_lab = @builder.send(:rgb_to_lab, *@builder.send(:hex_to_rgb, darker))
+    # Should be darker (lower lightness)
+    original_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, original))
+    darker_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, darker))
 
-    assert darker_lab[0] < original_lab[0]  # Lower lightness
+    assert darker_oklch[0] < original_oklch[0]  # Lower lightness
+    assert_in_delta original_oklch[2], darker_oklch[2], 5.0  # Hue should be preserved
   end
 
   def test_make_color_inactive_creates_muted_version
@@ -63,13 +64,12 @@ class ColorHelpersTest < Minitest::Test
     refute_equal original, inactive
     assert_match /^#[0-9a-f]{6}$/, inactive  # Valid hex color
 
-    # Should be more muted (closer to gray)
-    original_lab = @builder.send(:rgb_to_lab, *@builder.send(:hex_to_rgb, original))
-    inactive_lab = @builder.send(:rgb_to_lab, *@builder.send(:hex_to_rgb, inactive))
+    # Should be more muted (lower chroma)
+    original_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, original))
+    inactive_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, inactive))
 
-    # A and B components should be closer to 0 (more gray)
-    assert inactive_lab[1].abs < original_lab[1].abs
-    assert inactive_lab[2].abs < original_lab[2].abs
+    assert inactive_oklch[1] < original_oklch[1]  # Lower chroma (more muted)
+    assert_in_delta original_oklch[2], inactive_oklch[2], 5.0  # Hue should be preserved
   end
 
   def test_generate_color_palette_creates_gradient
@@ -85,19 +85,30 @@ class ColorHelpersTest < Minitest::Test
     end
 
     # Should create a smooth gradient (lightness should decrease)
-    labs = colors.map { |c| @builder.send(:rgb_to_lab, *@builder.send(:hex_to_rgb, c)) }
-    labs.each_cons(2) do |lab1, lab2|
-      assert lab2[0] <= lab1[0], "Lightness should decrease or stay same"
+    oklchs = colors.map { |c| @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, c)) }
+    oklchs.each_cons(2) do |oklch1, oklch2|
+      assert oklch2[0] <= oklch1[0], "Lightness should decrease or stay same"
     end
   end
 
-  def test_interpolate_lab_creates_midpoint
-    lab1 = [0, 0, 0]     # Black in LAB
-    lab2 = [100, 0, 0]   # White in LAB
+  def test_interpolate_oklch_creates_midpoint
+    oklch1 = [0, 0, 0]    # Black in OKLCH
+    oklch2 = [1, 0, 0]    # White in OKLCH
 
-    midpoint = @builder.send(:interpolate_lab, lab1, lab2, 0.5)
+    midpoint = @builder.send(:interpolate_oklch, oklch1, oklch2, 0.5)
 
-    assert_equal [50, 0, 0], midpoint  # Midpoint
+    assert_equal [0.5, 0, 0], midpoint  # Midpoint
+  end
+
+  def test_interpolate_oklch_handles_hue_wraparound
+    # Test interpolation across the 0/360 degree boundary
+    oklch1 = [0.5, 0.2, 350]  # Near red
+    oklch2 = [0.5, 0.2, 10]   # Also near red, but across the boundary
+
+    midpoint = @builder.send(:interpolate_oklch, oklch1, oklch2, 0.5)
+
+    # Should take the shorter path (average = 0 degrees, which becomes 360)
+    assert_in_delta 0, midpoint[2] % 360, 5  # Should be close to 0/360
   end
 
   def test_score_to_color_with_generated_palette

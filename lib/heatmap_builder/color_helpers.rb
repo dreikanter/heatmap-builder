@@ -17,81 +17,86 @@ module HeatmapBuilder
 
     def darker_color(hex_color, factor: 0.7)
       rgb = hex_to_rgb(hex_color)
-      lab = rgb_to_lab(*rgb)
+      oklch = rgb_to_oklch(*rgb)
 
       # Reduce lightness (L component) by factor
-      darker_lab = [lab[0] * factor, lab[1], lab[2]]
-      darker_rgb = lab_to_rgb(*darker_lab)
+      darker_oklch = [oklch[0] * factor, oklch[1], oklch[2]]
+      darker_rgb = oklch_to_rgb(*darker_oklch)
 
       rgb_to_hex(*darker_rgb)
     end
 
     def make_color_inactive(hex_color)
-      # Convert to LAB for blending
+      # Convert to OKLCH for blending
       rgb = hex_to_rgb(hex_color)
-      lab = rgb_to_lab(*rgb)
+      oklch = rgb_to_oklch(*rgb)
 
-      # Light gray target in LAB space
-      gray_lab = rgb_to_lab(230, 230, 230)
+      # Reduce chroma (saturation) to make it more muted
+      # Also slightly reduce lightness
+      inactive_oklch = [
+        oklch[0] * 0.85,  # Slightly reduce lightness
+        oklch[1] * 0.4,   # Significantly reduce chroma (saturation)
+        oklch[2]          # Keep hue unchanged
+      ]
 
-      # Blend in LAB space - 60% original color, 40% gray
-      mix_ratio = 0.6
-      blended_lab = interpolate_lab(gray_lab, lab, mix_ratio)
-      blended_rgb = lab_to_rgb(*blended_lab)
-
-      rgb_to_hex(*blended_rgb)
+      inactive_rgb = oklch_to_rgb(*inactive_oklch)
+      rgb_to_hex(*inactive_rgb)
     end
 
-    def rgb_to_lab(r, g, b)
-      # Normalize RGB to 0-1
-      r, g, b = r / 255.0, g / 255.0, b / 255.0
+    def rgb_to_oklch(r, g, b)
+      # Convert to linear RGB first
+      r_linear = srgb_to_linear(r / 255.0)
+      g_linear = srgb_to_linear(g / 255.0)
+      b_linear = srgb_to_linear(b / 255.0)
 
-      # Gamma correction (sRGB → linear RGB)
-      r = (r > 0.04045) ? ((r + 0.055) / 1.055)**2.4 : r / 12.92
-      g = (g > 0.04045) ? ((g + 0.055) / 1.055)**2.4 : g / 12.92
-      b = (b > 0.04045) ? ((b + 0.055) / 1.055)**2.4 : b / 12.92
+      # Linear RGB to OKLab using the Oklab transformation matrix
+      l = 0.4122214708 * r_linear + 0.5363325363 * g_linear + 0.0514459929 * b_linear
+      m = 0.2119034982 * r_linear + 0.6806995451 * g_linear + 0.1073969566 * b_linear
+      s = 0.0883024619 * r_linear + 0.2817188376 * g_linear + 0.6299787005 * b_linear
 
-      # Convert to XYZ (using D65 illuminant)
-      x = (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) / 0.95047
-      y = (r * 0.2126729 + g * 0.7151522 + b * 0.0721750) / 1.0
-      z = (r * 0.0193339 + g * 0.1191920 + b * 0.9503041) / 1.08883
+      # Apply cube root
+      l_root = l >= 0 ? l**(1.0/3) : -((-l)**(1.0/3))
+      m_root = m >= 0 ? m**(1.0/3) : -((-m)**(1.0/3))
+      s_root = s >= 0 ? s**(1.0/3) : -((-s)**(1.0/3))
 
-      # XYZ to LAB
-      fx = (x > 0.008856) ? x**(1.0 / 3) : (7.787 * x + 16.0 / 116)
-      fy = (y > 0.008856) ? y**(1.0 / 3) : (7.787 * y + 16.0 / 116)
-      fz = (z > 0.008856) ? z**(1.0 / 3) : (7.787 * z + 16.0 / 116)
+      # Convert to OKLab
+      ok_l = 0.2104542553 * l_root + 0.7936177850 * m_root - 0.0040720468 * s_root
+      ok_a = 1.9779984951 * l_root - 2.4285922050 * m_root + 0.4505937099 * s_root
+      ok_b = 0.0259040371 * l_root + 0.7827717662 * m_root - 0.8086757660 * s_root
 
-      l = 116 * fy - 16
-      a = 500 * (fx - fy)
-      b_lab = 200 * (fy - fz)
+      # Convert OKLab to OKLCH
+      chroma = Math.sqrt(ok_a * ok_a + ok_b * ok_b)
+      hue = Math.atan2(ok_b, ok_a) * 180.0 / Math::PI
+      hue += 360 if hue < 0
 
-      [l, a, b_lab]
+      [ok_l, chroma, hue]
     end
 
-    def lab_to_rgb(l, a, b_lab)
-      # LAB to XYZ
-      fy = (l + 16) / 116.0
-      fx = a / 500.0 + fy
-      fz = fy - b_lab / 200.0
+    def oklch_to_rgb(ok_l, chroma, hue)
+      # Convert OKLCH to OKLab
+      hue_rad = hue * Math::PI / 180.0
+      ok_a = chroma * Math.cos(hue_rad)
+      ok_b = chroma * Math.sin(hue_rad)
 
-      x = (fx**3 > 0.008856) ? fx**3 : (fx - 16.0 / 116) / 7.787
-      y = (fy**3 > 0.008856) ? fy**3 : (fy - 16.0 / 116) / 7.787
-      z = (fz**3 > 0.008856) ? fz**3 : (fz - 16.0 / 116) / 7.787
+      # OKLab to linear RGB
+      l_root = ok_l + 0.3963377774 * ok_a + 0.2158037573 * ok_b
+      m_root = ok_l - 0.1055613458 * ok_a - 0.0638541728 * ok_b
+      s_root = ok_l - 0.0894841775 * ok_a - 1.2914855480 * ok_b
 
-      # Apply D65 illuminant
-      x *= 0.95047
-      y *= 1.0
-      z *= 1.08883
+      # Cube the values
+      l = l_root * l_root * l_root
+      m = m_root * m_root * m_root
+      s = s_root * s_root * s_root
 
-      # XYZ to linear RGB
-      r = x * 3.2404542 + y * -1.5371385 + z * -0.4985314
-      g = x * -0.9692660 + y * 1.8760108 + z * 0.0415560
-      b = x * 0.0556434 + y * -0.2040259 + z * 1.0572252
+      # Convert to linear RGB
+      r_linear = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
+      g_linear = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s
+      b_linear = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
 
-      # Linear RGB to sRGB (gamma correction)
-      r = (r > 0.0031308) ? 1.055 * (r**(1.0 / 2.4)) - 0.055 : 12.92 * r
-      g = (g > 0.0031308) ? 1.055 * (g**(1.0 / 2.4)) - 0.055 : 12.92 * g
-      b = (b > 0.0031308) ? 1.055 * (b**(1.0 / 2.4)) - 0.055 : 12.92 * b
+      # Convert to sRGB
+      r = linear_to_srgb(r_linear)
+      g = linear_to_srgb(g_linear)
+      b = linear_to_srgb(b_linear)
 
       # Clamp to 0-255 and convert to integers
       r = (r * 255).clamp(0, 255).round
@@ -101,11 +106,34 @@ module HeatmapBuilder
       [r, g, b]
     end
 
-    def interpolate_lab(lab1, lab2, ratio)
+    def srgb_to_linear(component)
+      component <= 0.04045 ? component / 12.92 : ((component + 0.055) / 1.055)**2.4
+    end
+
+    def linear_to_srgb(component)
+      component <= 0.0031308 ? component * 12.92 : 1.055 * (component**(1.0/2.4)) - 0.055
+    end
+
+    def interpolate_oklch(oklch1, oklch2, ratio)
+      # Handle hue interpolation (shortest path around the circle)
+      hue1, hue2 = oklch1[2], oklch2[2]
+      hue_diff = hue2 - hue1
+
+      # Take shorter path around the circle
+      if hue_diff > 180
+        hue_diff -= 360
+      elsif hue_diff < -180
+        hue_diff += 360
+      end
+
+      interpolated_hue = hue1 + hue_diff * ratio
+      interpolated_hue += 360 if interpolated_hue < 0
+      interpolated_hue -= 360 if interpolated_hue >= 360
+
       [
-        lab1[0] + (lab2[0] - lab1[0]) * ratio, # L
-        lab1[1] + (lab2[1] - lab1[1]) * ratio, # A
-        lab1[2] + (lab2[2] - lab1[2]) * ratio  # B
+        oklch1[0] + (oklch2[0] - oklch1[0]) * ratio, # L (lightness)
+        oklch1[1] + (oklch2[1] - oklch1[1]) * ratio, # C (chroma)
+        interpolated_hue                              # H (hue)
       ]
     end
 
@@ -125,14 +153,14 @@ module HeatmapBuilder
       from_rgb = hex_to_rgb(from_color)
       to_rgb = hex_to_rgb(to_color)
 
-      from_lab = rgb_to_lab(*from_rgb)
-      to_lab = rgb_to_lab(*to_rgb)
+      from_oklch = rgb_to_oklch(*from_rgb)
+      to_oklch = rgb_to_oklch(*to_rgb)
 
       colors = []
       (0...steps).each do |i|
         ratio = i.to_f / (steps - 1)
-        interpolated_lab = interpolate_lab(from_lab, to_lab, ratio)
-        interpolated_rgb = lab_to_rgb(*interpolated_lab)
+        interpolated_oklch = interpolate_oklch(from_oklch, to_oklch, ratio)
+        interpolated_rgb = oklch_to_rgb(*interpolated_oklch)
         colors << rgb_to_hex(*interpolated_rgb)
       end
 
