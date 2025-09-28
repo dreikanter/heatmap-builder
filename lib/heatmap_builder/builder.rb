@@ -43,8 +43,8 @@ module HeatmapBuilder
         raise Error, "must have at least 2 colors" unless colors.length >= 2
       elsif colors.is_a?(Hash)
         raise Error, "colors hash must have from, to, and steps keys" unless colors.key?(:from) && colors.key?(:to) && colors.key?(:steps)
-        raise Error, "steps must be at least 2" unless colors[:steps] >= 2
         raise Error, "steps must be a number" unless colors[:steps].is_a?(Integer)
+        raise Error, "steps must be at least 2" unless colors[:steps] >= 2
       else
         raise Error, "colors must be an array or hash with from/to/steps"
       end

@@ -57,6 +57,5 @@ module HeatmapBuilder
         fill: "none", stroke: border_color, stroke_width: border_width
       )
     end
-
   end
 end
