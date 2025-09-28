@@ -16,38 +16,32 @@ module HeatmapBuilder
     end
 
     def darker_color(hex_color, factor: 0.7)
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
+      rgb = hex_to_rgb(hex_color)
+      lab = rgb_to_lab(*rgb)
 
-      r = (r * factor).to_i
-      g = (g * factor).to_i
-      b = (b * factor).to_i
+      # Reduce lightness (L component) by factor
+      darker_lab = [lab[0] * factor, lab[1], lab[2]]
+      darker_rgb = lab_to_rgb(*darker_lab)
 
-      "#%02x%02x%02x" % [r, g, b]
+      rgb_to_hex(*darker_rgb)
     end
 
     def make_color_inactive(hex_color)
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
+      # Convert to LAB for blending
+      rgb = hex_to_rgb(hex_color)
+      lab = rgb_to_lab(*rgb)
 
-      # Blend with light gray to make it appear duller/inactive
-      gray = 230
-      mix_ratio = 0.6 # 60% original color, 40% gray
+      # Light gray target in LAB space
+      gray_lab = rgb_to_lab(230, 230, 230)
 
-      r = blend_color_component(r, gray, mix_ratio)
-      g = blend_color_component(g, gray, mix_ratio)
-      b = blend_color_component(b, gray, mix_ratio)
+      # Blend in LAB space - 60% original color, 40% gray
+      mix_ratio = 0.6
+      blended_lab = interpolate_lab(gray_lab, lab, mix_ratio)
+      blended_rgb = lab_to_rgb(*blended_lab)
 
-      "#%02x%02x%02x" % [r, g, b]
+      rgb_to_hex(*blended_rgb)
     end
 
-    def blend_color_component(original, target, mix_ratio)
-      (original * mix_ratio + target * (1 - mix_ratio)).to_i
-    end
 
     def rgb_to_lab(r, g, b)
       # Normalize RGB to 0-1
