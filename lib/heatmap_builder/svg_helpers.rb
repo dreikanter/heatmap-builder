@@ -87,5 +87,26 @@ module HeatmapBuilder
       brightness = (r * 299 + g * 587 + b * 114) / 1000
       (brightness > 128) ? "#000000" : "#ffffff"
     end
+
+    def make_color_inactive(hex_color)
+      hex = hex_color.delete("#")
+      r = hex[0..1].to_i(16)
+      g = hex[2..3].to_i(16)
+      b = hex[4..5].to_i(16)
+
+      # Blend with light gray to make it appear duller/inactive
+      gray = 230
+      mix_ratio = 0.6 # 60% original color, 40% gray
+
+      r = blend_color_component(r, gray, mix_ratio)
+      g = blend_color_component(g, gray, mix_ratio)
+      b = blend_color_component(b, gray, mix_ratio)
+
+      "#%02x%02x%02x" % [r, g, b]
+    end
+
+    def blend_color_component(original, target, mix_ratio)
+      (original * mix_ratio + target * (1 - mix_ratio)).to_i
+    end
   end
 end

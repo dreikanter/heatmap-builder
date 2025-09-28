@@ -226,8 +226,8 @@ module HeatmapBuilder
       ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
     end
 
-    def subclass_default_options
-      {
+    def default_options
+      DEFAULT_OPTIONS.merge({
         cell_size: 12,
         start_of_week: :monday,
         month_spacing: 5, # extra vertical space between months
@@ -236,7 +236,7 @@ module HeatmapBuilder
         show_outside_cells: false, # show cells outside the timeframe with inactive styling
         day_labels: %w[S M T W T F S], # day abbreviations starting from Sunday
         month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # month abbreviations
-      }
+      })
     end
   end
 end
