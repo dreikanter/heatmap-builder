@@ -16,7 +16,8 @@ module HeatmapBuilder
       show_month_labels: true,
       show_day_labels: true,
       show_outside_cells: false, # show cells outside the timeframe with inactive styling
-      day_labels: %w[S M T W T F S] # day abbreviations starting from Sunday
+      day_labels: %w[S M T W T F S], # day abbreviations starting from Sunday
+      month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # month abbreviations
     }.freeze
 
     def initialize(scores_by_date, options = {})
@@ -181,7 +182,7 @@ module HeatmapBuilder
           if month_start <= end_date && month_end >= start_date
             x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
             y = options[:font_size] + 2
-            month_name = current_date.strftime("%b")
+            month_name = options[:month_labels][current_date.month - 1]
             svg << svg_text(
               month_name,
               x: x, y: y,
