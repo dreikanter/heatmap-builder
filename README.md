@@ -38,10 +38,10 @@ require 'heatmap-builder'
 
 # Generate SVG for daily scores
 scores = [0, 1, 2, 3, 4, 5, 2, 1]
-svg = HeatmapBuilder.generate(scores)
+svg = HeatmapBuilder.build(scores)
 
 # In a Rails view
-<%= raw HeatmapBuilder.generate(@daily_scores) %>
+<%= raw HeatmapBuilder.build(@daily_scores) %>
 ```
 
 ![Weekly Progress](examples/weekly_progress.svg)
@@ -57,7 +57,7 @@ scores_by_date = {
   # ... more dates
 }
 
-svg = HeatmapBuilder.generate_calendar(scores_by_date)
+svg = HeatmapBuilder.build_calendar(scores_by_date)
 ```
 
 ### Custom Configuration
@@ -78,7 +78,7 @@ options = {
   ]
 }
 
-svg = HeatmapBuilder.generate([1, 2, 3, 4, 5, 6, 7], options)
+svg = HeatmapBuilder.build([1, 2, 3, 4, 5, 6, 7], options)
 ```
 
 ![Large Cells](examples/large_cells.svg)
@@ -95,7 +95,7 @@ calendar_options = {
   month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # Custom month labels
 }
 
-svg = HeatmapBuilder.generate_calendar(scores_by_date, calendar_options)
+svg = HeatmapBuilder.build_calendar(scores_by_date, calendar_options)
 ```
 
 ![Calendar with Sunday Start](examples/calendar_sunday_start.svg)
@@ -105,6 +105,20 @@ svg = HeatmapBuilder.generate_calendar(scores_by_date, calendar_options)
 - Score `0`: Uses the first color (typically light gray)
 - Score `1+`: Cycles through remaining colors based on score value
 - Higher scores automatically map to available colors in the palette
+
+## API Compatibility
+
+The gem provides both new and legacy method names for backward compatibility:
+
+```ruby
+# New preferred methods
+HeatmapBuilder.build(scores)
+HeatmapBuilder.build_calendar(scores_by_date)
+
+# Legacy methods (still supported)
+HeatmapBuilder.generate(scores)
+HeatmapBuilder.generate_calendar(scores_by_date)
+```
 
 ## Development
 

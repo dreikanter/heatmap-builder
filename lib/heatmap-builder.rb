@@ -7,11 +7,17 @@ require_relative "heatmap_builder/calendar_heatmap_builder"
 module HeatmapBuilder
   class Error < StandardError; end
 
-  def self.generate(scores, options = {})
+  def self.build(scores, options = {})
     LinearHeatmapBuilder.new(scores, options).build
   end
 
-  def self.generate_calendar(scores_by_date, options = {})
+  def self.build_calendar(scores_by_date, options = {})
     CalendarHeatmapBuilder.new(scores_by_date, options).build
+  end
+
+  # Backward compatibility aliases
+  class << self
+    alias_method :generate, :build
+    alias_method :generate_calendar, :build_calendar
   end
 end
