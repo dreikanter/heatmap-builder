@@ -1,8 +1,10 @@
 require_relative "svg_helpers"
+require_relative "color_helpers"
 
 module HeatmapBuilder
   class Builder
     include SvgHelpers
+    include ColorHelpers
 
     DEFAULT_OPTIONS = {
       cell_size: 10,
@@ -31,8 +33,21 @@ module HeatmapBuilder
     def validate_options!
       raise Error, "cell_size must be positive" unless options[:cell_size] > 0
       raise Error, "font_size must be positive" unless options[:font_size] > 0
-      raise Error, "colors must be an array" unless options[:colors].is_a?(Array)
-      raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
+      validate_colors_option!
+    end
+
+    def validate_colors_option!
+      colors = options[:colors]
+
+      if colors.is_a?(Array)
+        raise Error, "must have at least 2 colors" unless colors.length >= 2
+      elsif colors.is_a?(Hash)
+        raise Error, "colors hash must have from, to, and steps keys" unless colors.key?(:from) && colors.key?(:to) && colors.key?(:steps)
+        raise Error, "steps must be at least 2" unless colors[:steps] >= 2
+        raise Error, "steps must be a number" unless colors[:steps].is_a?(Integer)
+      else
+        raise Error, "colors must be an array or hash with from/to/steps"
+      end
     end
 
     # Override in subclasses to provide specific default options
