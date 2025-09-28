@@ -2,7 +2,6 @@ require_relative "builder"
 
 module HeatmapBuilder
   class LinearHeatmapBuilder < Builder
-
     DEFAULT_OPTIONS = {
       cell_size: 10,
       cell_spacing: 1,
@@ -12,7 +11,7 @@ module HeatmapBuilder
     }.freeze
 
     def initialize(scores, options = {})
-      super(scores, options)
+      super
     end
 
     def build

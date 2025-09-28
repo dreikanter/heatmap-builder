@@ -3,7 +3,6 @@ require_relative "builder"
 
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
-
     DEFAULT_OPTIONS = {
       cell_size: 12,
       cell_spacing: 1,
@@ -20,7 +19,7 @@ module HeatmapBuilder
     }.freeze
 
     def initialize(scores_by_date, options = {})
-      super(scores_by_date, options)
+      super
       @start_date = parse_date_range.first
       @end_date = parse_date_range.last
     end
@@ -207,7 +206,6 @@ module HeatmapBuilder
       days_forward = (6 - (end_date.wday - week_start_wday)) % 7
       end_date + days_forward
     end
-
 
     def week_start_wday
       case options[:start_of_week]
