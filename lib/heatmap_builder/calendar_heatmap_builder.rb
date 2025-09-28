@@ -27,7 +27,24 @@ module HeatmapBuilder
     end
 
     def build
-      build_svg
+      width = svg_width
+      height = svg_height
+
+      svg_content = []
+
+      # Add day labels if enabled
+      if options[:show_day_labels]
+        svg_content << day_labels_svg
+      end
+
+      # Add month labels and cells
+      svg_content << calendar_cells_svg
+
+      if options[:show_month_labels]
+        svg_content << month_labels_svg
+      end
+
+      svg_container(width: width, height: height) { svg_content.join }
     end
 
     private
@@ -54,26 +71,6 @@ module HeatmapBuilder
       [dates.min, dates.max]
     end
 
-    def build_svg
-      width = svg_width
-      height = svg_height
-
-      svg_content = []
-
-      # Add day labels if enabled
-      if options[:show_day_labels]
-        svg_content << day_labels_svg
-      end
-
-      # Add month labels and cells
-      svg_content << calendar_cells_svg
-
-      if options[:show_month_labels]
-        svg_content << month_labels_svg
-      end
-
-      svg_container(width: width, height: height) { svg_content.join }
-    end
 
     def calendar_cells_svg
       svg = ""
