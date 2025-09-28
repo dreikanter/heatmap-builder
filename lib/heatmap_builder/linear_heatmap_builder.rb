@@ -4,7 +4,6 @@ module HeatmapBuilder
       cell_size: 10,
       cell_spacing: 1,
       font_size: 8,
-      cells_per_row: 7,
       border_width: 1,
       colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
     }.freeze
@@ -27,7 +26,6 @@ module HeatmapBuilder
       raise Error, "scores must be an array" unless scores.is_a?(Array)
       raise Error, "cell_size must be positive" unless options[:cell_size] > 0
       raise Error, "font_size must be positive" unless options[:font_size] > 0
-      raise Error, "cells_per_row must be positive" unless options[:cells_per_row] > 0
       raise Error, "colors must be an array" unless options[:colors].is_a?(Array)
       raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
     end
@@ -36,7 +34,7 @@ module HeatmapBuilder
       width = svg_width
       height = svg_height
 
-      svg_content = scores.first(options[:cells_per_row]).map.with_index do |score, index|
+      svg_content = scores.map.with_index do |score, index|
         cell_svg(score, index)
       end.join
 
@@ -100,8 +98,8 @@ module HeatmapBuilder
     end
 
     def svg_width
-      options[:cells_per_row] * options[:cell_size] +
-        (options[:cells_per_row] - 1) * options[:cell_spacing]
+      scores.length * options[:cell_size] +
+        (scores.length - 1) * options[:cell_spacing]
     end
 
     def svg_height

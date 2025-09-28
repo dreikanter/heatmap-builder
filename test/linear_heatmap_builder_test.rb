@@ -49,11 +49,11 @@ class LinearHeatmapBuilderTest < Minitest::Test
 
   def test_svg_dimensions
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3],
-      cell_size: 15, cell_spacing: 3, cells_per_row: 2, border_width: 1)
+      cell_size: 15, cell_spacing: 3, border_width: 1)
     svg = builder.generate
 
-    # Width = 2 * 15 + 1 * 3 = 33
-    assert_includes svg, "width=\"33\""
+    # Width = 3 * 15 + 2 * 3 = 51 (3 cells, 2 spacings)
+    assert_includes svg, "width=\"51\""
     # Height = cell_size = 15
     assert_includes svg, "height=\"15\""
   end
