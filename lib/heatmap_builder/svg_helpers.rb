@@ -4,8 +4,7 @@ module HeatmapBuilder
 
     def svg_element(tag, attributes = {}, &block)
       attr_string = attributes.map do |key, value|
-        # Convert symbol keys with underscores to kebab-case
-        attr_name = key.to_s.tr("_", "-")
+        attr_name = kebab_case(key)
         "#{attr_name}=\"#{value}\""
       end.join(" ")
       attr_string = " #{attr_string}" unless attr_string.empty?
@@ -16,6 +15,10 @@ module HeatmapBuilder
       else
         "<#{tag}#{attr_string}/>"
       end
+    end
+
+    def kebab_case(key)
+      key.to_s.tr("_", "-")
     end
 
     def svg_rect(x:, y:, width:, height:, **attributes)
