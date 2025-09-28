@@ -14,8 +14,19 @@ module HeatmapBuilder
       validate_options!
     end
 
-    def generate
-      build_svg
+    def build
+      width = svg_width
+      height = svg_height
+
+      svg_content = scores.map.with_index do |score, index|
+        cell_svg(score, index)
+      end.join
+
+      <<~SVG
+        <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
+          #{svg_content}
+        </svg>
+      SVG
     end
 
     private
@@ -30,20 +41,6 @@ module HeatmapBuilder
       raise Error, "must have at least 2 colors" unless options[:colors].length >= 2
     end
 
-    def build_svg
-      width = svg_width
-      height = svg_height
-
-      svg_content = scores.map.with_index do |score, index|
-        cell_svg(score, index)
-      end.join
-
-      <<~SVG
-        <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
-          #{svg_content}
-        </svg>
-      SVG
-    end
 
     def cell_svg(score, index)
       # Calculate x position - each cell takes cell_size + spacing
