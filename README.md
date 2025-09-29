@@ -203,16 +203,17 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::RED_TO_GREE
 Generate custom color palettes from any two colors using OKLCH color space for superior color interpolation:
 
 ```ruby
-# Generate a 5-step palette from red to blue
-custom_colors = {
-  from: "#ff0000",
-  to: "#0000ff",
+# Generate a 5-step palette from an electric cyan to hot magenta
+neon_gradient = {
+  from: "#00FFFF",
+  to: "#FF1493",
   steps: 5
 }
 
-# Linear example with custom palette
-svg = HeatmapBuilder.build_linear(scores, colors: custom_colors)
+svg = HeatmapBuilder.build_calendar(calendar_data, colors: neon_gradient)
 ```
+
+![Neon Gradient Linear](examples/linear_neon_gradient.svg)
 
 The OKLCH color space ensures perceptually uniform color transitions, making gradients appear smooth and natural to the human eye.
 
