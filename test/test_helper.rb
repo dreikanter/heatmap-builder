@@ -13,3 +13,23 @@ require "heatmap-builder"
 
 require "minitest/autorun"
 require "minitest/spec"
+require "fileutils"
+
+def assert_matches_snapshot(actual_content, snapshot_name)
+  snapshot_path = File.join(__dir__, "snapshots", snapshot_name)
+
+  if File.exist?(snapshot_path) && !ENV['UPDATE_SNAPSHOTS']
+    expected = File.read(snapshot_path)
+    assert_equal expected, actual_content, "Snapshot mismatch for #{snapshot_name}"
+  else
+    FileUtils.mkdir_p(File.dirname(snapshot_path))
+    File.write(snapshot_path, actual_content)
+    puts "📸 Snapshot: #{snapshot_name}"
+    assert true, "Generated snapshot: #{snapshot_name}"
+  end
+end
+
+# Backward compatibility - keep the old fixture_file method
+def fixture_file(filename)
+  File.read(File.join(__dir__, "fixtures", filename))
+end
