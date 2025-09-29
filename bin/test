@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+# Simple test runner script
+exec "ruby", "-Ilib:test", "test/heatmap_builder_test.rb"

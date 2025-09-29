@@ -249,7 +249,7 @@ The `day_labels` array should contain 7 elements starting from Sunday, and `mont
 After checking out the repo, run `bin/setup` to install development dependencies. Run tests with:
 
 ```bash
-ruby -Ilib:test test/heatmap_builder_test.rb
+bin/test
 ```
 
 To install this gem onto your local machine, run `bundle exec rake install`.
