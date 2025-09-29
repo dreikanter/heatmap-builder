@@ -34,6 +34,15 @@ def generate_sample_svgs
   puts "Generating linear heatmaps with different palettes..."
   linear_scores = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+  # GitHub Green palette (default)
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::GITHUB_GREEN,
+    cell_size: 18
+  })
+  filepath = "examples/linear_github_green.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
   # Blue Ocean palette
   svg = HeatmapBuilder.build_linear(linear_scores, {
     colors: HeatmapBuilder::BLUE_OCEAN,
@@ -78,6 +87,16 @@ def generate_sample_svgs
     month_spacing: 0
   })
   filepath = "examples/calendar_github_style.svg"
+  File.write(filepath, svg)
+  generated_files << filepath
+
+  # Default colors calendar example
+  puts "Generating default colors calendar..."
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    cell_size: 14,
+    month_spacing: 0
+  })
+  filepath = "examples/calendar_default.svg"
   File.write(filepath, svg)
   generated_files << filepath
 
