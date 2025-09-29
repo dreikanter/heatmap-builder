@@ -92,13 +92,13 @@ All options have defaults and are optional:
 
 ```ruby
 HeatmapBuilder.build_calendar(scores_by_date, {
-  # Appearance (inherits linear options)
-  cell_size: 12,              # Size of each square in pixels (default 12 for calendar)
+  # Appearance
+  cell_size: 12,              # Size of each square in pixels
   cell_spacing: 1,            # Space between squares in pixels
-  font_size: 8,               # Font size for labels
+  font_size: 8,               # Font size for score text
   border_width: 1,            # Border width around each cell
-  text_color: "#000000",      # Color of label text
-  colors: HeatmapBuilder::GITHUB_GREEN,  # Color palette
+  text_color: "#000000",      # Color of score text
+  colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
 
   # Calendar-specific options
   start_of_week: :monday,     # :sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday
