@@ -62,7 +62,14 @@ scores_by_date = {
 svg = HeatmapBuilder.build_calendar(scores_by_date)
 ```
 
+### Color Mapping
+
+- Score `0`: Uses the first color (typically light gray)
+- Score `1+`: Cycles through remaining colors based on score value
+
 ### Custom Configuration
+
+TBD: Demonstrate full list of the available parameters for linear and calendar heatmaps
 
 ```ruby
 # Customize linear heatmap appearance
@@ -83,77 +90,8 @@ options = {
 svg = HeatmapBuilder.build_linear([1, 2, 3, 4, 5, 6, 7], options)
 ```
 
-![Large Cells](examples/large_cells.svg)
+TBD: Add generated SVG here
 
-### Predefined Color Palettes
-
-HeatmapBuilder includes 5 beautiful predefined color palettes:
-
-
-#### Linear Heatmap Examples
-
-```ruby
-# GitHub Green (default)
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
-```
-
-TBD: Add SVG example
-
-```ruby
-# Blue Ocean
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
-```
-
-![Blue Ocean Linear](examples/linear_blue_ocean.svg)
-
-```ruby
-# Warm Sunset
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::WARM_SUNSET)
-```
-
-![Warm Sunset Linear](examples/linear_warm_sunset.svg)
-
-```ruby
-# Purple Vibes
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::PURPLE_VIBES)
-```
-
-![Purple Vibes Linear](examples/linear_purple_vibes.svg)
-
-```ruby
-# Red to Green
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
-```
-
-![Red to Green Linear](examples/linear_red_to_green.svg)
-
-#### Calendar Heatmap Examples
-
-TBD: Add code example and SVG for default colors
-
-TBD: Add code example to each SVG (assuming data already defined)
-
-![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
-![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
-![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
-![Red to Green Calendar](examples/calendar_red_to_green.svg)
-
-### Dynamic Color Generation
-
-Generate custom color palettes from any two colors using OKLCH color space for superior color interpolation:
-
-```ruby
-# Generate a 5-step palette from red to blue
-custom_colors = {
-  from: "#ff0000",
-  to: "#0000ff",
-  steps: 5
-}
-
-svg = HeatmapBuilder.build_linear(scores, colors: custom_colors)
-```
-
-The OKLCH color space ensures perceptually uniform color transitions, making gradients appear smooth and natural to the human eye.
 
 ```ruby
 # Calendar heatmap options
@@ -172,16 +110,79 @@ svg = HeatmapBuilder.build_calendar(scores_by_date, calendar_options)
 
 ![Calendar with Sunday Start](examples/calendar_sunday_start.svg)
 
-### Color Mapping
+![Large Cells](examples/large_cells.svg)
 
-- Score `0`: Uses the first color (typically light gray)
-- Score `1+`: Cycles through remaining colors based on score value
-- Higher scores automatically map to available colors in the palette
+### Predefined Color Palettes
 
+HeatmapBuilder includes a number of beautiful predefined color palettes:
+
+#### Linear Heatmap Examples
+
+```ruby
+HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
+```
+
+TBD: Add SVG example
+
+```ruby
+HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
+```
+
+![Blue Ocean Linear](examples/linear_blue_ocean.svg)
+
+```ruby
+HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::WARM_SUNSET)
+```
+
+![Warm Sunset Linear](examples/linear_warm_sunset.svg)
+
+```ruby
+HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::PURPLE_VIBES)
+```
+
+![Purple Vibes Linear](examples/linear_purple_vibes.svg)
+
+```ruby
+HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
+```
+
+![Red to Green Linear](examples/linear_red_to_green.svg)
+
+#### Calendar Heatmap Examples
+
+TBD: Add code example and SVG for default colors
+
+TBD: Add code example to each SVG (assuming data already defined)
+
+![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
+![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
+![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
+![Red to Green Calendar](examples/calendar_red_to_green.svg)
+
+### Dynamic Palettes Generation
+
+Generate custom color palettes from any two colors using OKLCH color space for superior color interpolation:
+
+```ruby
+# Generate a 5-step palette from red to blue
+custom_colors = {
+  from: "#ff0000",
+  to: "#0000ff",
+  steps: 5
+}
+
+svg = HeatmapBuilder.build_linear(scores, colors: custom_colors)
+```
+
+The OKLCH color space ensures perceptually uniform color transitions, making gradients appear smooth and natural to the human eye.
+
+### I18n
+
+TBD: Add a note on i18n (can be done via custmizing day_labels and month_labels)
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Run tests with:
+After checking out the repo, run `bin/setup` to install development dependencies. Run tests with:
 
 ```bash
 ruby -Ilib:test test/heatmap_builder_test.rb
