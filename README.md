@@ -62,14 +62,11 @@ scores_by_date = {
 svg = HeatmapBuilder.build_calendar(scores_by_date)
 ```
 
-### Color Mapping
+![GitHub-style Calendar](examples/calendar_github_style.svg)
 
-- Score `0`: Uses the first color (typically light gray)
-- Score `1+`: Cycles through remaining colors based on score value
+## Configuration
 
-### Custom Configuration
-
-#### Linear Heatmap Options
+### Linear Heatmap Options
 
 All options have defaults and are optional:
 
@@ -89,7 +86,7 @@ HeatmapBuilder.build_linear(scores, {
 })
 ```
 
-#### Calendar Heatmap Options
+### Calendar Heatmap Options
 
 All options have defaults and are optional:
 
@@ -116,115 +113,88 @@ HeatmapBuilder.build_calendar(scores_by_date, {
 })
 ```
 
-#### Available Color Palettes
+### Color Mapping
 
-Use predefined palettes like `HeatmapBuilder::GITHUB_GREEN`, `HeatmapBuilder::BLUE_OCEAN`, `HeatmapBuilder::WARM_SUNSET`, `HeatmapBuilder::PURPLE_VIBES`, or `HeatmapBuilder::RED_TO_GREEN`.
-
-```ruby
-# Customize linear heatmap appearance
-options = {
-  cell_size: 35,           # Size of each square (default: 10)
-  cell_spacing: 2,         # Space between squares (default: 1)
-  font_size: 20,           # Font size for score text (default: 8)
-  border_width: 2,         # Border thickness (default: 1)
-  colors: %w[
-    #ebedf0
-    #9be9a8
-    #40c463
-    #30a14e
-    #216e39
-  ]
-}
-
-svg = HeatmapBuilder.build_linear([1, 2, 3, 4, 5, 6, 7], options)
-```
-
-![Large Cells Custom Options](examples/large_cells.svg)
-
-
-```ruby
-# Calendar heatmap options
-calendar_options = {
-  cell_size: 14,                    # Size of each cell (default: 12)
-  start_of_week: :sunday,           # :monday (default) or :sunday
-  show_outside_cells: true,         # Show cells outside date range (default: false)
-  show_month_labels: true,          # Show month names (default: true)
-  show_day_labels: true,            # Show day abbreviations (default: true)
-  day_labels: %w[S M T W T F S],    # Custom day labels (default: S M T W T F S)
-  month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # Custom month labels
-}
-
-svg = HeatmapBuilder.build_calendar(scores_by_date, calendar_options)
-```
-
-![Calendar with Sunday Start](examples/calendar_sunday_start.svg)
-
-![Large Cells](examples/large_cells.svg)
+- Score `0`: Uses the first color (typically light gray)
+- Score `1+`: Cycles through remaining colors based on score value
 
 ### Predefined Color Palettes
 
-HeatmapBuilder includes a number of beautiful predefined color palettes:
-
-#### Linear Heatmap Examples
+#### GitHub Green
 
 ```ruby
+# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
 ```
 
 ![GitHub Green Linear](examples/linear_github_green.svg)
 
 ```ruby
+# Calendar
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::GITHUB_GREEN)
+```
+
+![Default Calendar](examples/calendar_default.svg)
+
+#### Blue Ocean
+
+```ruby
+# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
 ```
 
 ![Blue Ocean Linear](examples/linear_blue_ocean.svg)
 
 ```ruby
+# Calendar
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
+```
+
+![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
+
+#### Warm Sunset
+
+```ruby
+# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::WARM_SUNSET)
 ```
 
 ![Warm Sunset Linear](examples/linear_warm_sunset.svg)
 
 ```ruby
+# Calendar
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
+```
+
+![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
+
+#### Purple Vibes
+
+```ruby
+# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Linear](examples/linear_purple_vibes.svg)
 
 ```ruby
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
-```
-
-![Red to Green Linear](examples/linear_red_to_green.svg)
-
-#### Calendar Heatmap Examples
-
-```ruby
-# Default GitHub Green calendar
-HeatmapBuilder.build_calendar(calendar_data)
-```
-
-![Default Calendar](examples/calendar_default.svg)
-
-```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
-```
-
-![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
-
-```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
-```
-
-![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
-
-```ruby
+# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
 
+#### Red to Green
+
 ```ruby
+# Linear
+HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
+```
+
+![Red to Green Linear](examples/linear_red_to_green.svg)
+
+```ruby
+# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
 ```
 
@@ -242,6 +212,7 @@ custom_colors = {
   steps: 5
 }
 
+# Linear example with custom palette
 svg = HeatmapBuilder.build_linear(scores, colors: custom_colors)
 ```
 
