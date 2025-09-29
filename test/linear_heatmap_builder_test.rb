@@ -20,6 +20,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
 
     # Score 0 should use first color (gray)
     assert_includes svg, "fill=\"#ebedf0\""
+
     # Higher scores should use progressively greener colors
     assert_includes svg, "fill=\"#9be9a8\""
     assert_includes svg, "fill=\"#40c463\""

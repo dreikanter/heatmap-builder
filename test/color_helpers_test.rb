@@ -62,7 +62,7 @@ describe HeatmapBuilder::ColorHelpers do
   end
 
   it "#make_color_inactive should create muted version by reducing chroma" do
-    original = "#0000ff"  # Blue
+    original = "#0000ff"
     inactive = @builder.send(:make_color_inactive, original)
 
     refute_equal original, inactive
@@ -80,8 +80,8 @@ describe HeatmapBuilder::ColorHelpers do
     colors = @builder.send(:generate_color_palette, "#ffffff", "#000000", 5)
 
     assert_equal 5, colors.length
-    assert_equal "#ffffff", colors.first   # Start color
-    assert_equal "#000000", colors.last    # End color
+    assert_equal "#ffffff", colors.first
+    assert_equal "#000000", colors.last
 
     # Colors should be valid hex
     colors.each do |color|
