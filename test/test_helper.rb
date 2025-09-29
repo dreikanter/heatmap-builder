@@ -29,7 +29,6 @@ def assert_matches_snapshot(actual_content, snapshot_name)
   end
 end
 
-# Backward compatibility - keep the old fixture_file method
-def fixture_file(filename)
-  File.read(File.join(__dir__, "fixtures", filename))
+def valid_hex_color
+  /^#[0-9a-f]{6}$/
 end

@@ -47,7 +47,7 @@ describe HeatmapBuilder::ColorHelpers do
     darker = @builder.send(:darker_color, original)
 
     refute_equal original, darker
-    assert_match /^#[0-9a-f]{6}$/, darker  # Valid hex color
+    assert_match(valid_hex_color, darker)
 
     # Should be darker (lower lightness)
     original_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, original))
@@ -62,7 +62,7 @@ describe HeatmapBuilder::ColorHelpers do
     inactive = @builder.send(:make_color_inactive, original)
 
     refute_equal original, inactive
-    assert_match /^#[0-9a-f]{6}$/, inactive  # Valid hex color
+    assert_match(valid_hex_color, inactive)
 
     # Should be more muted (lower chroma)
     original_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, original))
@@ -81,7 +81,7 @@ describe HeatmapBuilder::ColorHelpers do
 
     # Colors should be valid hex
     colors.each do |color|
-      assert_match /^#[0-9a-f]{6}$/, color
+      assert_match(valid_hex_color, color)
     end
 
     # Should create a smooth gradient (lightness should decrease)
