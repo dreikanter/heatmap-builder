@@ -69,7 +69,62 @@ svg = HeatmapBuilder.build_calendar(scores_by_date)
 
 ### Custom Configuration
 
-TBD: Demonstrate full list of the available parameters for linear and calendar heatmaps
+#### Linear Heatmap Options
+
+All options have defaults and are optional:
+
+```ruby
+HeatmapBuilder.build_linear(scores, {
+  # Appearance
+  cell_size: 10,              # Size of each square in pixels
+  cell_spacing: 1,            # Space between squares in pixels
+  font_size: 8,               # Font size for score text
+  border_width: 1,            # Border width around each cell
+  text_color: "#000000",      # Color of score text
+
+  # Colors - can be an array of hex colors or a hash for OKLCH interpolation
+  colors: HeatmapBuilder::GITHUB_GREEN,  # Array: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
+  # OR use OKLCH interpolation:
+  # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
+})
+```
+
+#### Calendar Heatmap Options
+
+All options have defaults and are optional:
+
+```ruby
+HeatmapBuilder.build_calendar(scores_by_date, {
+  # Appearance (inherits linear options)
+  cell_size: 12,              # Size of each square in pixels (default 12 for calendar)
+  cell_spacing: 1,            # Space between squares in pixels
+  font_size: 8,               # Font size for labels
+  border_width: 1,            # Border width around each cell
+  text_color: "#000000",      # Color of label text
+  colors: HeatmapBuilder::GITHUB_GREEN,  # Color palette
+
+  # Calendar-specific options
+  start_of_week: :monday,     # :sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday
+  month_spacing: 5,           # Extra space between months in pixels
+  show_month_labels: true,    # Show month names at top
+  show_day_labels: true,      # Show day abbreviations on left
+  show_outside_cells: false,  # Show inactive cells outside date range
+
+  # Internationalization
+  day_labels: %w[S M T W T F S],  # Day abbreviations starting from Sunday
+  month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]  # Month abbreviations
+})
+```
+
+#### Available Color Palettes
+
+```ruby
+HeatmapBuilder::GITHUB_GREEN   # %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
+HeatmapBuilder::BLUE_OCEAN     # %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9]
+HeatmapBuilder::WARM_SUNSET    # %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316]
+HeatmapBuilder::PURPLE_VIBES   # %w[#f3e8ff #d8b4fe #c084fc #a855f7 #9333ea]
+HeatmapBuilder::RED_TO_GREEN   # %w[#f5f5f5 #ff9999 #f7ad6a #d2c768 #99dd99]
+```
 
 ```ruby
 # Customize linear heatmap appearance
