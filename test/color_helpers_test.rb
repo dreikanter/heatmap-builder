@@ -1,12 +1,16 @@
 require "test_helper"
 
-class ColorHelpersTest < Minitest::Test
-  def setup
+describe HeatmapBuilder::ColorHelpers do
+  before do
     @builder = HeatmapBuilder::LinearHeatmapBuilder.new([1])
   end
 
+  def valid_hex_color
+    /^#[0-9a-f]{6}$/
+  end
+
   # Tests for OKLCH color conversion
-  def test_rgb_to_oklch_conversion
+  it "#rgb_to_oklch should convert RGB to OKLCH color space" do
     # Test with pure red
     oklch = @builder.send(:rgb_to_oklch, 255, 0, 0)
 
@@ -15,7 +19,7 @@ class ColorHelpersTest < Minitest::Test
     assert_in_delta 29.0, oklch[2], 5.0   # H (hue in degrees)
   end
 
-  def test_oklch_to_rgb_conversion
+  it "#oklch_to_rgb should convert OKLCH back to RGB" do
     # Test conversion back from OKLCH
     oklch = [0.63, 0.26, 29.0]  # Approximately red
     rgb = @builder.send(:oklch_to_rgb, *oklch)
@@ -25,7 +29,7 @@ class ColorHelpersTest < Minitest::Test
     assert_in_delta 0, rgb[2], 10    # B
   end
 
-  def test_hex_to_rgb_conversion
+  it "#hex_to_rgb should convert hex colors to RGB arrays" do
     rgb = @builder.send(:hex_to_rgb, "#ff0000")
     assert_equal [255, 0, 0], rgb
 
@@ -33,7 +37,7 @@ class ColorHelpersTest < Minitest::Test
     assert_equal [0, 255, 0], rgb
   end
 
-  def test_rgb_to_hex_conversion
+  it "#rgb_to_hex should convert RGB values to hex strings" do
     hex = @builder.send(:rgb_to_hex, 255, 0, 0)
     assert_equal "#ff0000", hex
 
@@ -42,12 +46,12 @@ class ColorHelpersTest < Minitest::Test
   end
 
   # Tests for OKLCH-based color operations
-  def test_darker_color_maintains_hue
+  it "#darker_color should maintain hue while reducing lightness" do
     original = "#ff0000"  # Red
     darker = @builder.send(:darker_color, original)
 
     refute_equal original, darker
-    assert_match /^#[0-9a-f]{6}$/, darker  # Valid hex color
+    assert_match(valid_hex_color, darker)
 
     # Should be darker (lower lightness)
     original_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, original))
@@ -57,12 +61,12 @@ class ColorHelpersTest < Minitest::Test
     assert_in_delta original_oklch[2], darker_oklch[2], 5.0  # Hue should be preserved
   end
 
-  def test_make_color_inactive_creates_muted_version
-    original = "#0000ff"  # Blue
+  it "#make_color_inactive should create muted version by reducing chroma" do
+    original = "#0000ff"
     inactive = @builder.send(:make_color_inactive, original)
 
     refute_equal original, inactive
-    assert_match /^#[0-9a-f]{6}$/, inactive  # Valid hex color
+    assert_match(valid_hex_color, inactive)
 
     # Should be more muted (lower chroma)
     original_oklch = @builder.send(:rgb_to_oklch, *@builder.send(:hex_to_rgb, original))
@@ -72,16 +76,16 @@ class ColorHelpersTest < Minitest::Test
     assert_in_delta original_oklch[2], inactive_oklch[2], 5.0  # Hue should be preserved
   end
 
-  def test_generate_color_palette_creates_gradient
+  it "#generate_color_palette should create smooth gradient between colors" do
     colors = @builder.send(:generate_color_palette, "#ffffff", "#000000", 5)
 
     assert_equal 5, colors.length
-    assert_equal "#ffffff", colors.first   # Start color
-    assert_equal "#000000", colors.last    # End color
+    assert_equal "#ffffff", colors.first
+    assert_equal "#000000", colors.last
 
     # Colors should be valid hex
     colors.each do |color|
-      assert_match /^#[0-9a-f]{6}$/, color
+      assert_match(valid_hex_color, color)
     end
 
     # Should create a smooth gradient (lightness should decrease)
@@ -91,7 +95,7 @@ class ColorHelpersTest < Minitest::Test
     end
   end
 
-  def test_interpolate_oklch_creates_midpoint
+  it "#interpolate_oklch should create midpoint between two OKLCH colors" do
     oklch1 = [0, 0, 0]    # Black in OKLCH
     oklch2 = [1, 0, 0]    # White in OKLCH
 
@@ -100,7 +104,7 @@ class ColorHelpersTest < Minitest::Test
     assert_equal [0.5, 0, 0], midpoint  # Midpoint
   end
 
-  def test_interpolate_oklch_handles_hue_wraparound
+  it "#interpolate_oklch should handle hue wraparound across 0/360 boundary" do
     # Test interpolation across the 0/360 degree boundary
     oklch1 = [0.5, 0.2, 350]  # Near red
     oklch2 = [0.5, 0.2, 10]   # Also near red, but across the boundary
@@ -111,8 +115,8 @@ class ColorHelpersTest < Minitest::Test
     assert_in_delta 0, midpoint[2] % 360, 5  # Should be close to 0/360
   end
 
-  def test_score_to_color_with_generated_palette
-    colors = { from: "#ffffff", to: "#ff0000", steps: 3 }
+  it "#score_to_color should work with generated color palette" do
+    colors = {from: "#ffffff", to: "#ff0000", steps: 3}
 
     # Score 0 should use first color (from)
     color = @builder.send(:score_to_color, 0, colors: colors)
@@ -128,7 +132,7 @@ class ColorHelpersTest < Minitest::Test
     assert_equal "#ff0000", color
   end
 
-  def test_score_to_color_with_array_colors
+  it "#score_to_color should work with array of colors" do
     colors = ["#ffffff", "#ff0000", "#00ff00"]
 
     # Score 0 should use first color

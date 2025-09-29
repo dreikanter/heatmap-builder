@@ -55,9 +55,9 @@ module HeatmapBuilder
       s = 0.0883024619 * r_linear + 0.2817188376 * g_linear + 0.6299787005 * b_linear
 
       # Apply cube root
-      l_root = l >= 0 ? l**(1.0/3) : -((-l)**(1.0/3))
-      m_root = m >= 0 ? m**(1.0/3) : -((-m)**(1.0/3))
-      s_root = s >= 0 ? s**(1.0/3) : -((-s)**(1.0/3))
+      l_root = (l >= 0) ? l**(1.0 / 3) : -((-l)**(1.0 / 3))
+      m_root = (m >= 0) ? m**(1.0 / 3) : -((-m)**(1.0 / 3))
+      s_root = (s >= 0) ? s**(1.0 / 3) : -((-s)**(1.0 / 3))
 
       # Convert to OKLab
       ok_l = 0.2104542553 * l_root + 0.7936177850 * m_root - 0.0040720468 * s_root
@@ -107,11 +107,11 @@ module HeatmapBuilder
     end
 
     def srgb_to_linear(component)
-      component <= 0.04045 ? component / 12.92 : ((component + 0.055) / 1.055)**2.4
+      (component <= 0.04045) ? component / 12.92 : ((component + 0.055) / 1.055)**2.4
     end
 
     def linear_to_srgb(component)
-      component <= 0.0031308 ? component * 12.92 : 1.055 * (component**(1.0/2.4)) - 0.055
+      (component <= 0.0031308) ? component * 12.92 : 1.055 * (component**(1.0 / 2.4)) - 0.055
     end
 
     def interpolate_oklch(oklch1, oklch2, ratio)
