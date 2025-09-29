@@ -1,7 +1,7 @@
 require "test_helper"
 
-class CalendarHeatmapBuilderTest < Minitest::Test
-  def setup
+describe HeatmapBuilder::CalendarHeatmapBuilder do
+  before do
     @scores = {
       "2024-01-01" => 1,
       "2024-01-02" => 2,
@@ -11,7 +11,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     @builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores)
   end
 
-  def test_default_options
+  it "should build SVG with default options" do
     svg = @builder.build
 
     assert_includes svg, "<svg"
@@ -19,7 +19,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "</svg>"
   end
 
-  def test_generates_calendar_grid
+  it "should generate calendar grid with rect elements" do
     svg = @builder.build
 
     # Should contain rect elements for calendar cells
@@ -27,7 +27,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "fill=\"#"
   end
 
-  def test_start_of_week_monday
+  it "should use Monday as start of week when specified" do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, start_of_week: :monday)
     svg = builder.build
 
@@ -35,7 +35,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, ">M</text>"
   end
 
-  def test_start_of_week_sunday
+  it "should use Sunday as start of week when specified" do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, start_of_week: :sunday)
     svg = builder.build
 
@@ -43,7 +43,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, ">S</text>"
   end
 
-  def test_month_labels
+  it "should display month labels when enabled" do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, show_month_labels: true)
     svg = builder.build
 
@@ -51,7 +51,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, ">Jan</text>"
   end
 
-  def test_day_labels
+  it "should display day labels when enabled" do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, show_day_labels: true)
     svg = builder.build
 
@@ -60,7 +60,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, ">T</text>"
   end
 
-  def test_custom_colors
+  it "should use custom colors when provided" do
     colors = %w[#ffffff #ff0000 #00ff00]
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(@scores, colors: colors)
     svg = builder.build
@@ -69,7 +69,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "fill=\"#ff0000\""
   end
 
-  def test_validation_errors
+  it "should raise errors for invalid inputs" do
     assert_raises(HeatmapBuilder::Error) do
       HeatmapBuilder::CalendarHeatmapBuilder.new("invalid")
     end
@@ -87,7 +87,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     end
   end
 
-  def test_date_objects_as_keys
+  it "should accept Date objects as keys" do
     date_scores = {
       Date.new(2024, 1, 1) => 1,
       Date.new(2024, 1, 2) => 2
@@ -99,7 +99,7 @@ class CalendarHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "</svg>"
   end
 
-  def test_empty_scores
+  it "should handle empty scores hash" do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new({})
     svg = builder.build
 

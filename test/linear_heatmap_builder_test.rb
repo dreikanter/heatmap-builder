@@ -1,11 +1,11 @@
 require "test_helper"
 
-class LinearHeatmapBuilderTest < Minitest::Test
-  def setup
+describe HeatmapBuilder::LinearHeatmapBuilder do
+  before do
     @builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3])
   end
 
-  def test_default_options
+  it "should use default options when none provided" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1])
     svg = builder.build
 
@@ -14,7 +14,7 @@ class LinearHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "height=\"10\""  # cell_size only
   end
 
-  def test_score_to_color_mapping
+  it "#score_to_color should map scores to appropriate colors" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2, 3, 4, 5])
     svg = builder.build
 
@@ -25,7 +25,7 @@ class LinearHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "fill=\"#40c463\""
   end
 
-  def test_fixed_text_color
+  it "should use fixed text color regardless of background" do
     # Test with any background - text color should always be the default (#000000)
     light_colors = %w[#ffffff #ebedf0 #9be9a8]
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2], colors: light_colors)
@@ -39,14 +39,14 @@ class LinearHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "fill=\"#000000\""
   end
 
-  def test_custom_text_color
+  it "should respect custom text color when provided" do
     # Test that custom text color is respected
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], text_color: "#ff0000")
     svg = builder.build
     assert_includes svg, "fill=\"#ff0000\""
   end
 
-  def test_custom_cell_spacing
+  it "should apply custom cell spacing" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], cell_spacing: 5)
     svg = builder.build
 
@@ -54,7 +54,7 @@ class LinearHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "x=\"15\""
   end
 
-  def test_svg_dimensions
+  it "should calculate correct SVG dimensions" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3],
       cell_size: 15, cell_spacing: 3, border_width: 1)
     svg = builder.build
@@ -65,7 +65,7 @@ class LinearHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "height=\"15\""
   end
 
-  def test_validation_errors
+  it "should raise errors for invalid inputs" do
     assert_raises(HeatmapBuilder::Error) do
       HeatmapBuilder::LinearHeatmapBuilder.new("invalid")
     end
@@ -79,7 +79,7 @@ class LinearHeatmapBuilderTest < Minitest::Test
     end
   end
 
-  def test_large_scores_cycle_colors
+  it "should cycle through colors for large scores" do
     colors = %w[#ebedf0 #9be9a8 #40c463]
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3], colors: colors)
     svg = builder.build
