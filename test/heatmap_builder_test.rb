@@ -66,7 +66,7 @@ describe HeatmapBuilder do
   # Tests for new object color format
   it ".build_linear should work with object color format" do
     scores = [0, 1, 2, 3, 4]  # Start with 0 to get the first color
-    svg = HeatmapBuilder.build_linear(scores, colors: { from: "#ffffff", to: "#ff0000", steps: 5 })
+    svg = HeatmapBuilder.build_linear(scores, colors: {from: "#ffffff", to: "#ff0000", steps: 5})
 
     assert_includes svg, "<svg"
     assert_includes svg, "</svg>"
@@ -75,19 +75,19 @@ describe HeatmapBuilder do
 
   it ".build_linear should validate object color format missing keys" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder.build_linear([1, 2, 3], colors: { from: "#fff" })
+      HeatmapBuilder.build_linear([1, 2, 3], colors: {from: "#fff"})
     end
   end
 
   it ".build_linear should validate object color format insufficient steps" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder.build_linear([1, 2, 3], colors: { from: "#fff", to: "#000", steps: 1 })
+      HeatmapBuilder.build_linear([1, 2, 3], colors: {from: "#fff", to: "#000", steps: 1})
     end
   end
 
   it ".build_linear should validate object color format non-integer steps" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder.build_linear([1, 2, 3], colors: { from: "#fff", to: "#000", steps: "5" })
+      HeatmapBuilder.build_linear([1, 2, 3], colors: {from: "#fff", to: "#000", steps: "5"})
     end
   end
 
@@ -155,7 +155,7 @@ describe HeatmapBuilder do
   end
 
   it ".generate_calendar alias should work for backward compatibility" do
-    scores_by_date = { "2024-01-01" => 1 }
+    scores_by_date = {"2024-01-01" => 1}
     svg = HeatmapBuilder.generate_calendar(scores_by_date)
 
     assert_includes svg, "<svg"

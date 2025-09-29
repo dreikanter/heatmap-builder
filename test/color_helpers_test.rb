@@ -112,7 +112,7 @@ describe HeatmapBuilder::ColorHelpers do
   end
 
   it "#score_to_color should work with generated color palette" do
-    colors = { from: "#ffffff", to: "#ff0000", steps: 3 }
+    colors = {from: "#ffffff", to: "#ff0000", steps: 3}
 
     # Score 0 should use first color (from)
     color = @builder.send(:score_to_color, 0, colors: colors)
