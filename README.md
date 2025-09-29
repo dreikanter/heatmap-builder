@@ -126,7 +126,7 @@ HeatmapBuilder.build_calendar(scores_by_date, {
 
 ### Predefined Color Palettes
 
-#### GitHub Green
+#### GitHub Green (Default)
 
 ```ruby
 # Linear
