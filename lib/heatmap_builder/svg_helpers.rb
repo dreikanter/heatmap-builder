@@ -57,56 +57,5 @@ module HeatmapBuilder
         fill: "none", stroke: border_color, stroke_width: border_width
       )
     end
-
-    def score_to_color(score, colors:)
-      return colors.first if score == 0
-
-      max_color_index = colors.length - 1
-      color_index = 1 + (score - 1) % max_color_index
-      colors[color_index]
-    end
-
-    def darker_color(hex_color, factor: 0.7)
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      r = (r * factor).to_i
-      g = (g * factor).to_i
-      b = (b * factor).to_i
-
-      "#%02x%02x%02x" % [r, g, b]
-    end
-
-    def text_color(background_color)
-      hex = background_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-      brightness = (r * 299 + g * 587 + b * 114) / 1000
-      (brightness > 128) ? "#000000" : "#ffffff"
-    end
-
-    def make_color_inactive(hex_color)
-      hex = hex_color.delete("#")
-      r = hex[0..1].to_i(16)
-      g = hex[2..3].to_i(16)
-      b = hex[4..5].to_i(16)
-
-      # Blend with light gray to make it appear duller/inactive
-      gray = 230
-      mix_ratio = 0.6 # 60% original color, 40% gray
-
-      r = blend_color_component(r, gray, mix_ratio)
-      g = blend_color_component(g, gray, mix_ratio)
-      b = blend_color_component(b, gray, mix_ratio)
-
-      "#%02x%02x%02x" % [r, g, b]
-    end
-
-    def blend_color_component(original, target, mix_ratio)
-      (original * mix_ratio + target * (1 - mix_ratio)).to_i
-    end
   end
 end

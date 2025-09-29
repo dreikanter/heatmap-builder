@@ -25,18 +25,25 @@ class LinearHeatmapBuilderTest < Minitest::Test
     assert_includes svg, "fill=\"#40c463\""
   end
 
-  def test_text_color_contrast
-    # Test with light background
+  def test_fixed_text_color
+    # Test with any background - text color should always be the default (#000000)
     light_colors = %w[#ffffff #ebedf0 #9be9a8]
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2], colors: light_colors)
     svg = builder.build
     assert_includes svg, "fill=\"#000000\""
 
-    # Test with dark background
+    # Test with dark background - text color should still be default
     dark_colors = %w[#000000 #216e39 #30a14e]
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2], colors: dark_colors)
     svg = builder.build
-    assert_includes svg, "fill=\"#ffffff\""
+    assert_includes svg, "fill=\"#000000\""
+  end
+
+  def test_custom_text_color
+    # Test that custom text color is respected
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], text_color: "#ff0000")
+    svg = builder.build
+    assert_includes svg, "fill=\"#ff0000\""
   end
 
   def test_custom_cell_spacing

@@ -51,7 +51,7 @@ module HeatmapBuilder
       text_element = svg_text(
         score,
         x: text_x, y: text_y,
-        font_size: options[:font_size], fill: text_color(color)
+        font_size: options[:font_size], fill: options[:text_color]
       )
 
       "#{colored_rect}#{border_rect}#{text_element}"
