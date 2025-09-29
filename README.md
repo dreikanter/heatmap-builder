@@ -81,6 +81,8 @@ HeatmapBuilder.build_linear(scores, {
 
   # Colors - can be an array of hex colors or a hash for OKLCH interpolation
   colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
+  # OR manually define color array:
+  # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
   # OR use OKLCH interpolation:
   # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
 })
@@ -98,6 +100,10 @@ HeatmapBuilder.build_calendar(scores_by_date, {
   font_size: 8,               # Font size for score text
   border_width: 1,            # Border width around each cell
   text_color: "#000000",      # Color of score text
+  # OR manually define color array:
+  # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
+  # OR use OKLCH interpolation:
+  # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
   colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
 
   # Calendar-specific options
