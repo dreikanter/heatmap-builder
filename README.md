@@ -129,14 +129,12 @@ HeatmapBuilder.build_calendar(scores_by_date, {
 #### GitHub Green (Default)
 
 ```ruby
-# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
 ```
 
 ![GitHub Green Linear](examples/linear_github_green.svg)
 
 ```ruby
-# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::GITHUB_GREEN)
 ```
 
@@ -145,14 +143,12 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::GITHUB_GREE
 #### Blue Ocean
 
 ```ruby
-# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
 ```
 
 ![Blue Ocean Linear](examples/linear_blue_ocean.svg)
 
 ```ruby
-# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
 ```
 
@@ -161,14 +157,12 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
 #### Warm Sunset
 
 ```ruby
-# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::WARM_SUNSET)
 ```
 
 ![Warm Sunset Linear](examples/linear_warm_sunset.svg)
 
 ```ruby
-# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
 ```
 
@@ -177,14 +171,12 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET
 #### Purple Vibes
 
 ```ruby
-# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Linear](examples/linear_purple_vibes.svg)
 
 ```ruby
-# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
@@ -193,14 +185,12 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::PURPLE_VIBE
 #### Red to Green
 
 ```ruby
-# Linear
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
 ```
 
 ![Red to Green Linear](examples/linear_red_to_green.svg)
 
 ```ruby
-# Calendar
 HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
 ```
 
