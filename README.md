@@ -8,11 +8,11 @@ A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-styl
 
 - GitHub-style calendar layouts for date-based data.
 - Linear heatmaps.
-- SVG format scales perfectly at any size.
-- Shows numeric values in each cell.
+- Vector-based output (SVG) for crisp rendering at any resolution.
+- Optional numeric values displayed in each cell.
 - Parametric everything: customize cell size, spacing, colors, fonts, etc.
 - Dynamic palette generation from two colors or manually-specified colors.
-- OKLCH color interpolation for superior color transitions and perceptual uniformity.
+- OKLCH color interpolation for clean color transitions and perceptual uniformity.
 - **Zero dependencies.**
 
 ## Installation
