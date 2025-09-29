@@ -10,3 +10,6 @@
 
 # Gem build artifacts
 *.gem
+
+# Development environment config
+mise.toml
