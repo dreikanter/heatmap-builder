@@ -16,7 +16,7 @@ end
 desc "Update test snapshots"
 task :update_snapshots do
   require "fileutils"
-  snapshots_dir = "test/snapshots"
+  snapshots_dir = File.expand_path("test/snapshots", __dir__)
 
   if Dir.exist?(snapshots_dir)
     puts "Removing existing snapshots..."
