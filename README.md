@@ -83,7 +83,7 @@ HeatmapBuilder.build_linear(scores, {
   text_color: "#000000",      # Color of score text
 
   # Colors - can be an array of hex colors or a hash for OKLCH interpolation
-  colors: HeatmapBuilder::GITHUB_GREEN,  # Array: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
+  colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
   # OR use OKLCH interpolation:
   # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
 })
@@ -118,13 +118,7 @@ HeatmapBuilder.build_calendar(scores_by_date, {
 
 #### Available Color Palettes
 
-```ruby
-HeatmapBuilder::GITHUB_GREEN   # %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
-HeatmapBuilder::BLUE_OCEAN     # %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9]
-HeatmapBuilder::WARM_SUNSET    # %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316]
-HeatmapBuilder::PURPLE_VIBES   # %w[#f3e8ff #d8b4fe #c084fc #a855f7 #9333ea]
-HeatmapBuilder::RED_TO_GREEN   # %w[#f5f5f5 #ff9999 #f7ad6a #d2c768 #99dd99]
-```
+Use predefined palettes like `HeatmapBuilder::GITHUB_GREEN`, `HeatmapBuilder::BLUE_OCEAN`, `HeatmapBuilder::WARM_SUNSET`, `HeatmapBuilder::PURPLE_VIBES`, or `HeatmapBuilder::RED_TO_GREEN`.
 
 ```ruby
 # Customize linear heatmap appearance
@@ -145,7 +139,7 @@ options = {
 svg = HeatmapBuilder.build_linear([1, 2, 3, 4, 5, 6, 7], options)
 ```
 
-TBD: Add generated SVG here
+![Large Cells Custom Options](examples/large_cells.svg)
 
 
 ```ruby
@@ -177,7 +171,7 @@ HeatmapBuilder includes a number of beautiful predefined color palettes:
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
 ```
 
-TBD: Add SVG example
+![GitHub Green Linear](examples/linear_github_green.svg)
 
 ```ruby
 HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
@@ -205,13 +199,35 @@ HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
 
 #### Calendar Heatmap Examples
 
-TBD: Add code example and SVG for default colors
+```ruby
+# Default GitHub Green calendar
+HeatmapBuilder.build_calendar(calendar_data)
+```
 
-TBD: Add code example to each SVG (assuming data already defined)
+![Default Calendar](examples/calendar_default.svg)
+
+```ruby
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
+```
 
 ![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
+
+```ruby
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
+```
+
 ![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
+
+```ruby
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
+```
+
 ![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
+
+```ruby
+HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
+```
+
 ![Red to Green Calendar](examples/calendar_red_to_green.svg)
 
 ### Dynamic Palettes Generation
@@ -233,7 +249,23 @@ The OKLCH color space ensures perceptually uniform color transitions, making gra
 
 ### I18n
 
-TBD: Add a note on i18n (can be done via custmizing day_labels and month_labels)
+Calendar heatmaps support internationalization by customizing the `day_labels` and `month_labels` options:
+
+```ruby
+# French calendar
+HeatmapBuilder.build_calendar(calendar_data, {
+  day_labels: %w[D L M M J V S],  # Dimanche, Lundi, Mardi, etc.
+  month_labels: %w[Jan Fév Mar Avr Mai Jun Jul Aoû Sep Oct Nov Déc]
+})
+
+# Spanish calendar
+HeatmapBuilder.build_calendar(calendar_data, {
+  day_labels: %w[D L M X J V S],  # Domingo, Lunes, Martes, etc.
+  month_labels: %w[Ene Feb Mar Abr May Jun Jul Ago Sep Oct Nov Dic]
+})
+```
+
+The `day_labels` array should contain 7 elements starting from Sunday, and `month_labels` should contain 12 elements for January through December.
 
 ## Development
 
