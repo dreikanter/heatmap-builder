@@ -121,11 +121,6 @@ HeatmapBuilder.build_calendar(scores_by_date, {
 })
 ```
 
-### Color Mapping
-
-- Score `0`: Uses the first color (typically light gray)
-- Score `1+`: Cycles through remaining colors based on score value
-
 ### Predefined Color Palettes
 
 #### GitHub Green (Default)
