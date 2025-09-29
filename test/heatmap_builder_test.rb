@@ -9,9 +9,14 @@ describe HeatmapBuilder do
     scores = [0, 1, 2, 3, 4]
     svg = HeatmapBuilder.generate(scores)
 
-    assert_includes svg, "<svg"
-    assert_includes svg, "xmlns=\"http://www.w3.org/2000/svg\""
-    assert_includes svg, "</svg>"
+    assert_matches_snapshot(svg, "linear_basic.svg")
+  end
+
+  it ".generate should create SVG with score text" do
+    scores = [5, 10, 15]
+    svg = HeatmapBuilder.generate(scores)
+
+    assert_matches_snapshot(svg, "linear_with_text.svg")
   end
 
   it ".generate should accept custom options" do
@@ -23,9 +28,7 @@ describe HeatmapBuilder do
     }
     svg = HeatmapBuilder.generate(scores, options)
 
-    assert_includes svg, "width=\"30\""  # cell_size only
-    assert_includes svg, "font-size=\"14\""
-    assert_includes svg, "fill=\"#ff0000\""
+    assert_matches_snapshot(svg, "linear_custom_options.svg")
   end
 
   it ".generate should include score text in SVG" do
@@ -39,8 +42,7 @@ describe HeatmapBuilder do
 
   it ".generate should handle empty scores array" do
     svg = HeatmapBuilder.generate([])
-    assert_includes svg, "<svg"
-    assert_includes svg, "</svg>"
+    assert_matches_snapshot(svg, "linear_empty.svg")
   end
 
   it ".generate should raise error for invalid scores" do
@@ -107,7 +109,7 @@ describe HeatmapBuilder do
     scores = [1]
     svg = HeatmapBuilder.build_linear(scores, text_color: "#ffffff")
 
-    assert_includes svg, "fill=\"#ffffff\""  # Custom text color
+    assert_matches_snapshot(svg, "linear_custom_text_color.svg")
   end
 
   # Tests for calendar heatmap

@@ -14,9 +14,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
   it "should build SVG with default options" do
     svg = @builder.build
 
-    assert_includes svg, "<svg"
-    assert_includes svg, "xmlns=\"http://www.w3.org/2000/svg\""
-    assert_includes svg, "</svg>"
+    assert_matches_snapshot(svg, "calendar_basic.svg")
   end
 
   it "should generate calendar grid with rect elements" do
