@@ -154,23 +154,45 @@ module HeatmapBuilder
         end
 
         # Add month label at start of each month, but only if the month overlaps with our specified timeframe
-        if current_date.month != last_month && !displayed_months[current_date.month]
+        if current_date.month != last_month && !displayed_months[current_date.year * 12 + current_date.month]
           # Check if this month has any days within our specified timeframe
           month_start = Date.new(current_date.year, current_date.month, 1)
           month_end = Date.new(current_date.year, current_date.month, -1)
 
           if month_start <= end_date && month_end >= start_date
-            x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
+            # Find the first week column that contains the first day of this month
+            first_day_of_month = Date.new(current_date.year, current_date.month, 1)
+
+            # Calculate which week column the first day falls in
+            days_from_calendar_start = (first_day_of_month - calendar_start_date).to_i
+            first_day_week_index = days_from_calendar_start / 7
+
+            # Calculate the x position for the first day's week column
+            first_day_x_offset = 0
+            temp_date = calendar_start_date
+            temp_week = 0
+            temp_last_month = nil
+
+            while temp_week < first_day_week_index
+              if temp_date.month != temp_last_month && !temp_last_month.nil?
+                first_day_x_offset += options[:month_spacing]
+              end
+              temp_last_month = temp_date.month
+              temp_date += 7
+              temp_week += 1
+            end
+
+            x = label_offset + first_day_week_index * (options[:cell_size] + options[:cell_spacing]) + first_day_x_offset + options[:cell_size] * 0.1
             y = options[:font_size] + 2
             month_name = options[:month_labels][current_date.month - 1]
             svg << svg_text(
               month_name,
               x: x, y: y,
-              font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
+              text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
             )
           end
 
-          displayed_months[current_date.month] = true
+          displayed_months[current_date.year * 12 + current_date.month] = true
         end
 
         last_month = current_date.month
