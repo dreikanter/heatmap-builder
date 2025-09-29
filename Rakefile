@@ -13,4 +13,19 @@ rescue LoadError
   # standard is not available
 end
 
+desc "Update test snapshots"
+task :update_snapshots do
+  require "fileutils"
+  snapshots_dir = "test/snapshots"
+
+  if Dir.exist?(snapshots_dir)
+    puts "Removing existing snapshots..."
+    FileUtils.rm_rf(Dir["#{snapshots_dir}/*"])
+  end
+
+  puts "Regenerating snapshots..."
+  ENV['UPDATE_SNAPSHOTS'] = '1'
+  Rake::Task[:test].invoke
+end
+
 task default: [:standard, :test]
