@@ -5,6 +5,10 @@ describe HeatmapBuilder::ColorHelpers do
     @builder = HeatmapBuilder::LinearHeatmapBuilder.new([1])
   end
 
+  def valid_hex_color
+    /^#[0-9a-f]{6}$/
+  end
+
   # Tests for OKLCH color conversion
   it "#rgb_to_oklch should convert RGB to OKLCH color space" do
     # Test with pure red

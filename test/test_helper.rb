@@ -28,7 +28,3 @@ def assert_matches_snapshot(actual_content, snapshot_name)
     assert true, "Generated snapshot: #{snapshot_name}"
   end
 end
-
-def valid_hex_color
-  /^#[0-9a-f]{6}$/
-end
