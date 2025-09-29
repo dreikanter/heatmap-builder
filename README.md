@@ -252,10 +252,10 @@ The OKLCH color space ensures perceptually uniform color transitions, making gra
 Calendar heatmaps support internationalization by customizing the `day_labels` and `month_labels` options:
 
 ```ruby
-# French calendar
+# Italian calendar
 HeatmapBuilder.build_calendar(calendar_data, {
-  day_labels: %w[D L M M J V S],  # Dimanche, Lundi, Mardi, etc.
-  month_labels: %w[Jan Fév Mar Avr Mai Jun Jul Aoû Sep Oct Nov Déc]
+  day_labels: %w[D L M M G V S],  # Domenica, Lunedì, Martedì, etc.
+  month_labels: %w[Gen Feb Mar Apr Mag Giu Lug Ago Set Ott Nov Dic]
 })
 
 # Spanish calendar
