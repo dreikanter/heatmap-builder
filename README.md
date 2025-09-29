@@ -1,5 +1,7 @@
 # HeatmapBuilder
 
+> ⚠️ This library is currently in active development. While functional, you may encounter bugs and breaking changes. Use with caution in production environments.
+
 A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-style calendar layouts and linear progress indicators. Perfect for Rails applications and any project that needs to display activity data in a visual format.
 
 ![GitHub-style Calendar](examples/calendar_github_style.svg)
@@ -259,7 +261,7 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 To generate all example SVG files you see in this readme:
 
 ```bash
-ruby examples/generate_samples.rb
+bin/generate_examples
 ```
 
 ## Contributing
@@ -272,4 +274,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the HeatmapBuilder project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/dreikanter/heatmap-builder/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the HeatmapBuilder project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/dreikanter/heatmap-builder/blob/main/CODE_OF_CONDUCT.md).
