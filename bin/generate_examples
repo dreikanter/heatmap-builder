@@ -10,268 +10,178 @@ def example_path(filename)
   File.join(EXAMPLES_DIR, filename)
 end
 
+def generate_example(filename, description, &block)
+  puts "Generating #{description}..."
+
+  filepath = example_path(filename)
+
+  if File.exist?(filepath)
+    puts "#{filepath} (skipped - already exists)"
+  else
+    svg = block.call
+    File.write(filepath, svg)
+    puts filepath
+  end
+  puts
+end
+
 def generate_sample_svgs
   # Set fixed random seed for reproducible examples
   srand(42)
 
   Dir.mkdir(EXAMPLES_DIR) unless Dir.exist?(EXAMPLES_DIR)
 
-  puts "Generating basic weekly progress..."
-
   weekly_scores = [0, 1, 3, 2, 4, 1, 0]
-  svg = HeatmapBuilder.generate(weekly_scores, cell_size: 18)
-  filepath = example_path("weekly_progress.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating large cells example..."
+  generate_example("weekly_progress.svg", "basic weekly progress") do
+    HeatmapBuilder.generate(weekly_scores, cell_size: 18)
+  end
 
   large_cell_scores = [1, 2, 3, 4, 5, 6, 7]
-  svg = HeatmapBuilder.generate(large_cell_scores, {
-    cell_size: 35,
-    cell_spacing: 1,
-    font_size: 20
-  })
-
-  filepath = example_path("large_cells.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
+  generate_example("large_cells.svg", "large cells example") do
+    HeatmapBuilder.generate(large_cell_scores, {
+      cell_size: 35,
+      cell_spacing: 1,
+      font_size: 20
+    })
+  end
 
   puts "Generating linear heatmaps with different palettes..."
+  puts
 
   linear_scores = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-  # GitHub Green palette (default)
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::GITHUB_GREEN,
-    cell_size: 18
-  })
+  generate_example("linear_github_green.svg", "linear with GitHub Green palette") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::GITHUB_GREEN,
+      cell_size: 18
+    })
+  end
 
-  filepath = example_path("linear_github_green.svg")
-  File.write(filepath, svg)
+  generate_example("linear_blue_ocean.svg", "linear with Blue Ocean palette") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::BLUE_OCEAN,
+      cell_size: 18
+    })
+  end
 
-  puts filepath
-  puts
+  generate_example("linear_warm_sunset.svg", "linear with Warm Sunset palette") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::WARM_SUNSET,
+      cell_size: 18
+    })
+  end
 
-  # Blue Ocean palette
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::BLUE_OCEAN,
-    cell_size: 18
-  })
+  generate_example("linear_purple_vibes.svg", "linear with Purple Vibes palette") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::PURPLE_VIBES,
+      cell_size: 18
+    })
+  end
 
-  filepath = example_path("linear_blue_ocean.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  # Warm Sunset palette
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::WARM_SUNSET,
-    cell_size: 18
-  })
-
-  filepath = example_path("linear_warm_sunset.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  # Purple Vibes palette
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::PURPLE_VIBES,
-    cell_size: 18
-  })
-
-  filepath = example_path("linear_purple_vibes.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  # Red to Green palette
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::RED_TO_GREEN,
-    cell_size: 18
-  })
-
-  filepath = example_path("linear_red_to_green.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating GitHub-style calendar..."
+  generate_example("linear_red_to_green.svg", "linear with Red to Green palette") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::RED_TO_GREEN,
+      cell_size: 18
+    })
+  end
 
   calendar_data = sample_calendar_data
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    cell_size: 14,
-    month_spacing: 0
-  })
 
-  filepath = example_path("calendar_github_style.svg")
-  File.write(filepath, svg)
+  generate_example("calendar_github_style.svg", "GitHub-style calendar") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      cell_size: 14,
+      month_spacing: 0
+    })
+  end
 
-  puts filepath
-  puts
+  generate_example("calendar_default.svg", "default colors calendar") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      cell_size: 14,
+      month_spacing: 0
+    })
+  end
 
-  puts "Generating default colors calendar..."
+  generate_example("calendar_blue_ocean.svg", "calendar with Blue Ocean palette") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      colors: HeatmapBuilder::BLUE_OCEAN,
+      cell_size: 14,
+      month_spacing: 0
+    })
+  end
 
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    cell_size: 14,
-    month_spacing: 0
-  })
+  generate_example("calendar_warm_sunset.svg", "calendar with Warm Sunset palette") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      colors: HeatmapBuilder::WARM_SUNSET,
+      cell_size: 14,
+      month_spacing: 0
+    })
+  end
 
-  filepath = example_path("calendar_default.svg")
-  File.write(filepath, svg)
+  generate_example("calendar_purple_vibes.svg", "calendar with Purple Vibes palette") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      colors: HeatmapBuilder::PURPLE_VIBES,
+      cell_size: 14,
+      month_spacing: 0
+    })
+  end
 
-  puts filepath
-  puts
+  generate_example("calendar_red_to_green.svg", "calendar with Red to Green palette") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      colors: HeatmapBuilder::RED_TO_GREEN,
+      cell_size: 14,
+      month_spacing: 0
+    })
+  end
 
-  puts "Generating calendar with Blue Ocean palette..."
+  generate_example("calendar_sunday_start.svg", "calendar with Sunday start") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      cell_size: 14,
+      start_of_week: :sunday,
+      month_spacing: 0
+    })
+  end
 
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    colors: HeatmapBuilder::BLUE_OCEAN,
-    cell_size: 14,
-    month_spacing: 0
-  })
+  generate_example("calendar_with_outside_cells.svg", "calendar with outside cells") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      cell_size: 14,
+      show_outside_cells: true,
+      month_spacing: 0
+    })
+  end
 
-  filepath = example_path("calendar_blue_ocean.svg")
-  File.write(filepath, svg)
+  generate_example("linear_rounded_corners.svg", "linear with rounded corners") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::GITHUB_GREEN,
+      cell_size: 18,
+      corner_radius: 2
+    })
+  end
 
-  puts filepath
-  puts
+  generate_example("linear_rounded_corners_max_radius.svg", "linear with rounded corners (max radius)") do
+    HeatmapBuilder.build_linear(linear_scores, {
+      colors: HeatmapBuilder::GITHUB_GREEN,
+      cell_size: 18,
+      corner_radius: 9
+    })
+  end
 
-  puts "Generating calendar with Warm Sunset palette..."
+  generate_example("calendar_rounded_corners.svg", "calendar with rounded corners") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      cell_size: 14,
+      corner_radius: 2,
+      month_spacing: 0
+    })
+  end
 
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    colors: HeatmapBuilder::WARM_SUNSET,
-    cell_size: 14,
-    month_spacing: 0
-  })
+  generate_example("calendar_rounded_corners_max_radius.svg", "calendar with rounded corners (max radius)") do
+    HeatmapBuilder.build_calendar(calendar_data, {
+      cell_size: 14,
+      corner_radius: 7,
+      month_spacing: 0
+    })
+  end
 
-  filepath = example_path("calendar_warm_sunset.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating calendar with Purple Vibes palette..."
-
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    colors: HeatmapBuilder::PURPLE_VIBES,
-    cell_size: 14,
-    month_spacing: 0
-  })
-
-  filepath = example_path("calendar_purple_vibes.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating calendar with Red to Green palette..."
-
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    colors: HeatmapBuilder::RED_TO_GREEN,
-    cell_size: 14,
-    month_spacing: 0
-  })
-
-  filepath = example_path("calendar_red_to_green.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating calendar with Sunday start..."
-
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    cell_size: 14,
-    start_of_week: :sunday,
-    month_spacing: 0
-  })
-
-  filepath = example_path("calendar_sunday_start.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating calendar with outside cells..."
-
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    cell_size: 14,
-    show_outside_cells: true,
-    month_spacing: 0
-  })
-
-  filepath = example_path("calendar_with_outside_cells.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating linear with rounded corners..."
-
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::GITHUB_GREEN,
-    cell_size: 18,
-    corner_radius: 2
-  })
-
-  filepath = example_path("linear_rounded_corners.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating linear with rounded corners (max radius)..."
-
-  svg = HeatmapBuilder.build_linear(linear_scores, {
-    colors: HeatmapBuilder::GITHUB_GREEN,
-    cell_size: 18,
-    corner_radius: 9
-  })
-
-  filepath = example_path("linear_rounded_corners_max_radius.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating calendar with rounded corners..."
-
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    cell_size: 14,
-    corner_radius: 2,
-    month_spacing: 0
-  })
-
-  filepath = example_path("calendar_rounded_corners.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-  puts
-
-  puts "Generating calendar with rounded corners (max radius)..."
-
-  svg = HeatmapBuilder.build_calendar(calendar_data, {
-    cell_size: 14,
-    corner_radius: 7,
-    month_spacing: 0
-  })
-
-  filepath = example_path("calendar_rounded_corners_max_radius.svg")
-  File.write(filepath, svg)
-
-  puts filepath
-
-  puts "\nDone"
+  puts "Done"
 end
 
 def sample_calendar_data
