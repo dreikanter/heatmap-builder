@@ -74,7 +74,7 @@ module HeatmapBuilder
       end
 
       # Clamp value to boundaries
-      clamped_value = [[value, value_min].max, value_max].min
+      clamped_value = value.clamp(value_min, value_max)
 
       # Default linear distribution formula
       if value_min == value_max
