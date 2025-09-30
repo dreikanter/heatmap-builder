@@ -27,7 +27,21 @@ def assert_matches_snapshot(actual_content, snapshot_name)
 
   if File.exist?(snapshot_path)
     expected = File.read(snapshot_path)
-    assert_equal expected, actual_content, "Snapshot mismatch for #{snapshot_name}"
+    if expected != actual_content
+      # Provide concise diff message without dumping full SVG
+      expected_size = expected.bytesize
+      actual_size = actual_content.bytesize
+      expected_preview = expected[0..100].gsub("\n", " ")
+      actual_preview = actual_content[0..100].gsub("\n", " ")
+
+      message = "Snapshot mismatch for #{snapshot_name}\n"
+      message += "Expected size: #{expected_size} bytes, Actual size: #{actual_size} bytes\n"
+      message += "Expected preview: #{expected_preview}...\n"
+      message += "Actual preview: #{actual_preview}...\n"
+      message += "Run with UPDATE_SNAPSHOTS=1 to update snapshots"
+
+      flunk message
+    end
   else
     flunk "missing snapshot; run with UPDATE_SNAPSHOTS=1 to regenerate snapshots"
   end
