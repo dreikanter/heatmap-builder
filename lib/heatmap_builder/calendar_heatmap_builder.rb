@@ -3,6 +3,7 @@ require_relative "builder"
 
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
+    VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
     def build
       svg_content = []
 
@@ -63,9 +64,8 @@ module HeatmapBuilder
         end
       end
 
-      valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
-      unless valid_start_days.include?(options[:start_of_week])
-        raise Error, "start_of_week must be one of: #{valid_start_days.join(", ")}"
+      unless VALID_START_DAYS.include?(options[:start_of_week])
+        raise Error, "start_of_week must be one of: #{VALID_START_DAYS.join(", ")}"
       end
     end
 
