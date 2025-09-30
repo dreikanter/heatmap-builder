@@ -90,4 +90,128 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
 
     assert_includes svg, 'rx="6"'
   end
+
+  # Tests for value-based calendar heatmap generation
+  it "should convert values to scores using default linear formula" do
+    date_values = {
+      Date.new(2024, 1, 1) => 0,
+      Date.new(2024, 1, 2) => 50,
+      Date.new(2024, 1, 3) => 100
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      values: date_values,
+      value_min: 0,
+      value_max: 100
+    )
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+    assert_includes svg, "</svg>"
+  end
+
+  it "should handle missing dates by normalizing to minimum" do
+    date_values = {
+      Date.new(2024, 1, 1) => 50,
+      Date.new(2024, 1, 3) => 100
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      values: date_values,
+      value_min: 0,
+      value_max: 100
+    )
+    svg = builder.build
+
+    # Date 2024-01-02 is missing, should use minimum value (score 0)
+    assert_includes svg, "<svg"
+  end
+
+  it "should auto-calculate value_min and value_max from calendar data" do
+    date_values = {
+      Date.new(2024, 1, 1) => 10,
+      Date.new(2024, 1, 2) => 20,
+      Date.new(2024, 1, 3) => 30
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
+
+  it "should accept custom value_to_score callable for calendar" do
+    # Custom formula: always return score 2
+    custom_fn = ->(value:, date:, min:, max:, num_scores:) { 2 }
+
+    date_values = {
+      Date.new(2024, 1, 1) => 10,
+      Date.new(2024, 1, 2) => 20
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      values: date_values,
+      value_to_score: custom_fn
+    )
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
+
+  it "should pass date parameter to custom value_to_score" do
+    received_params = []
+    custom_fn = ->(value:, date:, min:, max:, num_scores:) {
+      received_params << {value: value, date: date, min: min, max: max, num_scores: num_scores}
+      0
+    }
+
+    date1 = Date.new(2024, 1, 1)
+    date2 = Date.new(2024, 1, 2)
+    date_values = {
+      date1 => 10,
+      date2 => 20
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      values: date_values,
+      value_min: 0,
+      value_max: 100,
+      value_to_score: custom_fn
+    )
+    builder.build
+
+    assert_equal 2, received_params.length
+    assert_equal 10, received_params[0][:value]
+    assert_equal date1, received_params[0][:date]
+    assert_equal 0, received_params[0][:min]
+    assert_equal 100, received_params[0][:max]
+  end
+
+  it "should handle string date keys in values hash" do
+    date_values = {
+      "2024-01-01" => 10,
+      "2024-01-02" => 20
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
+
+  it "should raise error if both scores and values provided for calendar" do
+    assert_raises(HeatmapBuilder::Error) do
+      HeatmapBuilder::CalendarHeatmapBuilder.new(
+        scores: {Date.new(2024, 1, 1) => 1},
+        values: {Date.new(2024, 1, 1) => 10}
+      )
+    end
+  end
+
+  it "should handle empty values hash for calendar" do
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: {})
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
 end
