@@ -28,11 +28,7 @@ module HeatmapBuilder
     end
 
     def computed_scores
-      @computed_scores ||= if scores
-        scores
-      else
-        values.map.with_index { |value, index| value_to_score(value, index) }
-      end
+      @computed_scores ||= scores || values.map.with_index { |value, index| value_to_score(value, index) }
     end
 
     def value_to_score(value, index)
