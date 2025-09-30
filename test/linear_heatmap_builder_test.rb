@@ -101,7 +101,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], corner_radius: 0)
     svg = builder.build
 
-    refute_includes svg, 'rx='
+    refute_includes svg, "rx="
   end
 
   it "should normalize corner_radius to maximum allowed value" do
@@ -115,6 +115,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], corner_radius: -5)
     svg = builder.build
 
-    refute_includes svg, 'rx='
+    refute_includes svg, "rx="
   end
 end
