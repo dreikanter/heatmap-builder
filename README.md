@@ -261,12 +261,6 @@ rake
 rake update_snapshots
 ```
 
-The test suite uses snapshot testing to verify SVG output. When you make changes that affect the generated SVG, use `rake update_snapshots` to regenerate the expected outputs.
-
-### Installing and Building
-
-To install this gem onto your local machine, run `bundle exec rake install`.
-
 To generate all example SVG files you see in this readme:
 
 ```bash
