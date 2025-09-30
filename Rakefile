@@ -24,7 +24,7 @@ task :update_snapshots do
   end
 
   puts "Regenerating snapshots..."
-  ENV['UPDATE_SNAPSHOTS'] = '1'
+  ENV["UPDATE_SNAPSHOTS"] = "1"
   Rake::Task[:test].invoke
 end
 

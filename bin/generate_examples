@@ -210,6 +210,64 @@ def generate_sample_svgs
   filepath = example_path("calendar_with_outside_cells.svg")
   File.write(filepath, svg)
 
+  puts filepath
+  puts
+
+  puts "Generating linear with rounded corners..."
+
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::GITHUB_GREEN,
+    cell_size: 18,
+    corner_radius: 2
+  })
+
+  filepath = example_path("linear_rounded_corners.svg")
+  File.write(filepath, svg)
+
+  puts filepath
+  puts
+
+  puts "Generating linear with rounded corners (max radius)..."
+
+  svg = HeatmapBuilder.build_linear(linear_scores, {
+    colors: HeatmapBuilder::GITHUB_GREEN,
+    cell_size: 18,
+    corner_radius: 9
+  })
+
+  filepath = example_path("linear_rounded_corners_max_radius.svg")
+  File.write(filepath, svg)
+
+  puts filepath
+  puts
+
+  puts "Generating calendar with rounded corners..."
+
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    cell_size: 14,
+    corner_radius: 2,
+    month_spacing: 0
+  })
+
+  filepath = example_path("calendar_rounded_corners.svg")
+  File.write(filepath, svg)
+
+  puts filepath
+  puts
+
+  puts "Generating calendar with rounded corners (max radius)..."
+
+  svg = HeatmapBuilder.build_calendar(calendar_data, {
+    cell_size: 14,
+    corner_radius: 7,
+    month_spacing: 0
+  })
+
+  filepath = example_path("calendar_rounded_corners_max_radius.svg")
+  File.write(filepath, svg)
+
+  puts filepath
+
   puts "\nDone"
 end
 

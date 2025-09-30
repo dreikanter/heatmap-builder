@@ -17,8 +17,10 @@ module HeatmapBuilder
       end
     end
 
-    def svg_rect(x:, y:, width:, height:, **attributes)
-      svg_element("rect", {x: x, y: y, width: width, height: height}.merge(attributes))
+    def svg_rect(x:, y:, width:, height:, rx: nil, **attributes)
+      attrs = {x: x, y: y, width: width, height: height}
+      attrs[:rx] = rx if rx && rx > 0
+      svg_element("rect", attrs.merge(attributes))
     end
 
     def svg_text(content, x:, y:, **attributes)
@@ -41,19 +43,20 @@ module HeatmapBuilder
       key.to_s.tr("_", "-")
     end
 
-    def cell_border(x, y, color, cell_size:, border_width:, darker_color_method:)
+    def cell_border(x, y, color, cell_size:, border_width:, corner_radius:, darker_color_method:)
       return "" unless border_width > 0
 
-      # Inset the border rect by half the stroke width so stroke stays inside
       inset = border_width / 2.0
       border_x = x + inset
       border_y = y + inset
       border_size = cell_size - border_width
       border_color = darker_color_method.call(color)
+      border_radius = (corner_radius > 0) ? [corner_radius - inset, 0].max : 0
 
       svg_rect(
         x: border_x, y: border_y,
         width: border_size, height: border_size,
+        rx: border_radius,
         fill: "none", stroke: border_color, stroke_width: border_width
       )
     end

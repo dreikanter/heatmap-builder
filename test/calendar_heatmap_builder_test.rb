@@ -76,4 +76,18 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new({})
     assert builder.build
   end
+
+  it "should apply corner_radius to cells" do
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores, corner_radius: 2)
+    svg = builder.build
+
+    assert_includes svg, 'rx="2"'
+  end
+
+  it "should normalize corner_radius to maximum allowed value" do
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores, cell_size: 12, corner_radius: 100)
+    svg = builder.build
+
+    assert_includes svg, 'rx="6"'
+  end
 end

@@ -23,16 +23,15 @@ module HeatmapBuilder
     end
 
     def cell_svg(score, index)
-      # Calculate x position - each cell takes cell_size + spacing
       x = index * (options[:cell_size] + options[:cell_spacing])
       y = 0
 
       color = score_to_color(score, colors: options[:colors])
 
-      # Create colored square (full cell size)
       colored_rect = svg_rect(
         x: x, y: y,
         width: options[:cell_size], height: options[:cell_size],
+        rx: options[:corner_radius],
         fill: color
       )
 
@@ -40,12 +39,11 @@ module HeatmapBuilder
         x, y, color,
         cell_size: options[:cell_size],
         border_width: options[:border_width],
+        corner_radius: options[:corner_radius],
         darker_color_method: method(:darker_color)
       )
 
-      # Calculate text position (center of cell)
       text_x = x + options[:cell_size] / 2
-      # For better vertical centering: cell center + font_size * 0.35 (accounts for baseline)
       text_y = y + options[:cell_size] / 2 + options[:font_size] * 0.35
 
       text_element = svg_text(

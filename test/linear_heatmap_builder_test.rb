@@ -89,4 +89,32 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     assert_includes svg, 'fill="#9be9a8"'
     assert_includes svg, 'fill="#40c463"'
   end
+
+  it "should apply corner_radius to cells" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], corner_radius: 3)
+    svg = builder.build
+
+    assert_includes svg, 'rx="3"'
+  end
+
+  it "should not include rx attribute when corner_radius is 0" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], corner_radius: 0)
+    svg = builder.build
+
+    refute_includes svg, "rx="
+  end
+
+  it "should normalize corner_radius to maximum allowed value" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], cell_size: 10, corner_radius: 100)
+    svg = builder.build
+
+    assert_includes svg, 'rx="5"'
+  end
+
+  it "should normalize negative corner_radius to 0" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], corner_radius: -5)
+    svg = builder.build
+
+    refute_includes svg, "rx="
+  end
 end
