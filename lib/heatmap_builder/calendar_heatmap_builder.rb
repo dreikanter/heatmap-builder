@@ -107,23 +107,21 @@ module HeatmapBuilder
     end
 
     def value_min
-      @value_min ||= if options[:value_min]
-        options[:value_min]
-      else
-        # Calculate from actual values, treating nil as 0
-        non_nil_values = values.values.compact
-        non_nil_values.empty? ? 0 : non_nil_values.min
-      end
+      @value_min ||= options[:value_min] || calculated_min_from_values
     end
 
     def value_max
-      @value_max ||= if options[:value_max]
-        options[:value_max]
-      else
-        # Calculate from actual values, treating nil as 0
-        non_nil_values = values.values.compact
-        non_nil_values.empty? ? 0 : non_nil_values.max
-      end
+      @value_max ||= options[:value_max] || calculated_max_from_values
+    end
+
+    def calculated_min_from_values
+      non_nil_values = values.values.compact
+      non_nil_values.empty? ? 0 : non_nil_values.min
+    end
+
+    def calculated_max_from_values
+      non_nil_values = values.values.compact
+      non_nil_values.empty? ? 0 : non_nil_values.max
     end
 
     def num_scores
