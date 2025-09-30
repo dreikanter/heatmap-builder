@@ -18,28 +18,12 @@ module HeatmapBuilder
     def validate_options!
       super
 
-      # Validate that only one of scores or values is provided
-      if scores && values
-        raise Error, "cannot provide both scores and values"
-      end
-
-      unless scores || values
-        raise Error, "must provide either scores or values"
-      end
-
       if scores
         raise Error, "scores must be an array" unless scores.is_a?(Array)
       end
 
       if values
         raise Error, "values must be an array" unless values.is_a?(Array)
-
-        # Validate value_min and value_max
-        if options[:value_min] && options[:value_max]
-          if options[:value_min] > options[:value_max]
-            raise Error, "value_min must be less than or equal to value_max"
-          end
-        end
       end
     end
 

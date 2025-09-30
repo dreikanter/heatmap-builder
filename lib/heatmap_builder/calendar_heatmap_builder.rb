@@ -40,28 +40,12 @@ module HeatmapBuilder
     def validate_options!
       super
 
-      # Validate that only one of scores or values is provided
-      if scores && values
-        raise Error, "cannot provide both scores and values"
-      end
-
-      unless scores || values
-        raise Error, "must provide either scores or values"
-      end
-
       if scores
         raise Error, "scores must be a hash" unless scores.is_a?(Hash)
       end
 
       if values
         raise Error, "values must be a hash" unless values.is_a?(Hash)
-
-        # Validate value_min and value_max
-        if options[:value_min] && options[:value_max]
-          if options[:value_min] > options[:value_max]
-            raise Error, "value_min must be less than or equal to value_max"
-          end
-        end
       end
 
       unless VALID_START_DAYS.include?(options[:start_of_week])
