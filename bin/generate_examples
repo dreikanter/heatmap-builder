@@ -11,6 +11,9 @@ def example_path(filename)
 end
 
 def generate_sample_svgs
+  # Set fixed random seed for reproducible examples
+  srand(42)
+
   Dir.mkdir(EXAMPLES_DIR) unless Dir.exist?(EXAMPLES_DIR)
 
   puts "Generating basic weekly progress..."
