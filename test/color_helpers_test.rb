@@ -2,7 +2,7 @@ require "test_helper"
 
 describe HeatmapBuilder::ColorHelpers do
   before do
-    @builder = HeatmapBuilder::LinearHeatmapBuilder.new([1])
+    @builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1])
   end
 
   def valid_hex_color

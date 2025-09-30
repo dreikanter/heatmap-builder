@@ -23,8 +23,9 @@ module HeatmapBuilder
       text_color: "#000000"
     }.freeze
 
-    def initialize(data, options = {})
-      @data = data
+    def initialize(scores: nil, values: nil, **options)
+      @scores = scores
+      @values = values
       @options = default_options.merge(options)
       normalize_options!
       validate_options!
@@ -36,7 +37,7 @@ module HeatmapBuilder
 
     private
 
-    attr_reader :data, :options
+    attr_reader :scores, :values, :options
 
     def normalize_options!
       max_radius = (options[:cell_size] / 2.0).floor
@@ -48,6 +49,28 @@ module HeatmapBuilder
       raise Error, "cell_size must be positive" unless options[:cell_size] > 0
       raise Error, "font_size must be positive" unless options[:font_size] > 0
       validate_colors_option!
+      validate_scores_or_values!
+      validate_value_boundaries! if values
+    end
+
+    def validate_scores_or_values!
+      # Validate that only one of scores or values is provided
+      if scores && values
+        raise Error, "cannot provide both scores and values"
+      end
+
+      unless scores || values
+        raise Error, "must provide either scores or values"
+      end
+    end
+
+    def validate_value_boundaries!
+      # Validate value_min and value_max
+      if options[:value_min] && options[:value_max]
+        if options[:value_min] > options[:value_max]
+          raise Error, "value_min must be less than or equal to value_max"
+        end
+      end
     end
 
     def validate_colors_option!

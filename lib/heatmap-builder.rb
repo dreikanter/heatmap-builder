@@ -15,12 +15,12 @@ module HeatmapBuilder
   PURPLE_VIBES = Builder::PURPLE_VIBES
   RED_TO_GREEN = Builder::RED_TO_GREEN
 
-  def self.build_linear(scores, options = {})
-    LinearHeatmapBuilder.new(scores, options).build
+  def self.build_linear(scores: nil, values: nil, **options)
+    LinearHeatmapBuilder.new(scores: scores, values: values, **options).build
   end
 
-  def self.build_calendar(scores_by_date, options = {})
-    CalendarHeatmapBuilder.new(scores_by_date, options).build
+  def self.build_calendar(scores: nil, values: nil, **options)
+    CalendarHeatmapBuilder.new(scores: scores, values: values, **options).build
   end
 
   # Backward compatibility aliases
