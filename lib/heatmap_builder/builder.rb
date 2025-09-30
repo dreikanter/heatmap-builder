@@ -18,6 +18,7 @@ module HeatmapBuilder
       cell_spacing: 1,
       font_size: 8,
       border_width: 1,
+      corner_radius: 0,
       colors: GITHUB_GREEN,
       text_color: "#000000"
     }.freeze
@@ -25,6 +26,7 @@ module HeatmapBuilder
     def initialize(data, options = {})
       @data = data
       @options = default_options.merge(options)
+      normalize_options!
       validate_options!
     end
 
@@ -35,6 +37,11 @@ module HeatmapBuilder
     private
 
     attr_reader :data, :options
+
+    def normalize_options!
+      max_radius = (options[:cell_size] / 2.0).floor
+      @options[:corner_radius] = [[options[:corner_radius], 0].max, max_radius].min
+    end
 
     # Override in subclasses to add specific validations by calling super first
     def validate_options!

@@ -96,15 +96,14 @@ module HeatmapBuilder
     def cell_svg(score, x, y, inactive = false)
       color = score_to_color(score, colors: options[:colors])
 
-      # Make inactive cells duller by reducing opacity
       if inactive
         color = make_color_inactive(color)
       end
 
-      # Create colored square
       colored_rect = svg_rect(
         x: x, y: y,
         width: options[:cell_size], height: options[:cell_size],
+        rx: options[:corner_radius],
         fill: color
       )
 
@@ -112,6 +111,7 @@ module HeatmapBuilder
         x, y, color,
         cell_size: options[:cell_size],
         border_width: options[:border_width],
+        corner_radius: options[:corner_radius],
         darker_color_method: ->(c) { darker_color(c, factor: 0.9) }
       )
 
