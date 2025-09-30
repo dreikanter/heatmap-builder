@@ -277,14 +277,14 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::RED
 Generate custom color palettes from any two colors using OKLCH color space for superior color interpolation:
 
 ```ruby
-# Generate a 5-step palette from an electric cyan to hot magenta
+# Generate a 5-step palette from electric cyan to hot magenta
 neon_gradient = {
   from: "#00FFFF",
   to: "#FF1493",
   steps: 5
 }
 
-svg = HeatmapBuilder.build_calendar(scores: calendar_data, colors: neon_gradient)
+svg = HeatmapBuilder.build_linear(scores: scores, colors: neon_gradient)
 ```
 
 ![Neon Gradient Linear](examples/linear_neon_gradient.svg)
