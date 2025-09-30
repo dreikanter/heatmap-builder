@@ -193,7 +193,7 @@ def sample_calendar_data
   (start_date..end_date).each_with_object({}) do |date, data|
     day_of_year = date.yday
     seasonal_factor = Math.sin((day_of_year - 80) * Math::PI / 362.0 / 2) # Peak in summer
-    base_score = (seasonal_factor * 1.5 + 2).round
+    base_score = (seasonal_factor * 1.8 + 2.4).round
 
     score = rand(0..base_score)
     score = score / 2 if [0, 6].include?(date.wday) # Weekend reduction
