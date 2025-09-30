@@ -26,8 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2025-09-19
 
+Initial release with core heatmap visualization capabilities.
+
 ### Added
-- Initial release of HeatmapBuilder gem
 - Linear heatmap generation with `HeatmapBuilder.generate()`
 - Calendar heatmap generation with `HeatmapBuilder.generate_calendar()`
 - GitHub-style color schemes and styling
