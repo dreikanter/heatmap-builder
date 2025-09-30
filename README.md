@@ -162,9 +162,10 @@ All options have defaults and are optional:
 ```ruby
 HeatmapBuilder.build_calendar(
   # Data - provide either scores OR values (not both)
+  # Keys can be Date objects or date strings ('2024-01-01')
   scores: { '2024-01-01' => 2, '2024-01-02' => 4 },  # Pre-calculated scores (0 to num_colors-1)
   # OR
-  values: { Date.new(2024, 1, 1) => 45.2, Date.new(2024, 1, 2) => 78.5 },  # Arbitrary numeric values
+  values: { '2024-01-01' => 45.2, '2024-01-02' => 78.5 },  # Arbitrary numeric values
 
   # Value-to-Score Options (only used with values:)
   value_min: 0,               # Minimum boundary (defaults to actual min)
