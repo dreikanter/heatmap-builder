@@ -43,10 +43,10 @@ require 'heatmap-builder'
 
 # Generate SVG for daily scores
 scores = [0, 1, 2, 3, 4, 5, 2, 1]
-svg = HeatmapBuilder.build_linear(scores)
+svg = HeatmapBuilder.build_linear(scores: scores)
 
 # In a Rails view
-<%= raw HeatmapBuilder.build_linear(@daily_scores) %>
+<%= raw HeatmapBuilder.build_linear(scores: @daily_scores) %>
 ```
 
 ![Weekly Progress](examples/weekly_progress.svg)
@@ -62,10 +62,61 @@ scores_by_date = {
   # ... more dates
 }
 
-svg = HeatmapBuilder.build_calendar(scores_by_date)
+svg = HeatmapBuilder.build_calendar(scores: scores_by_date)
 ```
 
 ![GitHub-style Calendar](examples/calendar_github_style.svg)
+
+### Using Raw Values Instead of Scores
+
+Instead of providing pre-calculated scores, you can provide arbitrary numeric values and let the builder calculate scores automatically using linear distribution:
+
+```ruby
+# Linear heatmap with automatic score calculation
+values = [10, 25, 50, 75, 100]
+svg = HeatmapBuilder.build_linear(
+  values: values,
+  value_min: 0,    # Optional: explicitly set minimum (defaults to actual min)
+  value_max: 100   # Optional: explicitly set maximum (defaults to actual max)
+)
+
+# Calendar heatmap with automatic score calculation
+values_by_date = {
+  Date.new(2024, 1, 1) => 45.2,
+  Date.new(2024, 1, 2) => 78.5,
+  Date.new(2024, 1, 3) => 12.0
+}
+
+svg = HeatmapBuilder.build_calendar(
+  values: values_by_date,
+  value_min: 0,
+  value_max: 100
+)
+```
+
+The builder will automatically:
+- Calculate min/max boundaries from your data if not specified
+- Map values to color scores using linear distribution
+- Clamp values outside the boundaries
+- Handle nil values by treating them as the minimum boundary
+
+You can also provide a custom value-to-score conversion function:
+
+```ruby
+# Custom scoring logic
+custom_formula = ->(value:, index:, min:, max:, num_scores:) {
+  # Your custom logic here
+  # Must return integer between 0 and num_scores-1
+  ((value - min) / (max - min) * (num_scores - 1)).floor
+}
+
+svg = HeatmapBuilder.build_linear(
+  values: [10, 20, 30],
+  value_to_score: custom_formula
+)
+```
+
+For calendar heatmaps, the callable receives `date:` parameter instead of `index:`.
 
 ## Configuration
 
@@ -74,7 +125,17 @@ svg = HeatmapBuilder.build_calendar(scores_by_date)
 All options have defaults and are optional:
 
 ```ruby
-HeatmapBuilder.build_linear(scores, {
+HeatmapBuilder.build_linear(
+  # Data - provide either scores OR values (not both)
+  scores: [0, 1, 2, 3, 4],    # Pre-calculated scores (0 to num_colors-1)
+  # OR
+  values: [10, 25, 50, 75, 100],  # Arbitrary numeric values
+
+  # Value-to-Score Options (only used with values:)
+  value_min: 0,               # Minimum boundary (defaults to actual min)
+  value_max: 100,             # Maximum boundary (defaults to actual max)
+  value_to_score: ->(value:, index:, min:, max:, num_scores:) { ... },  # Custom conversion function
+
   # Appearance
   cell_size: 10,              # Size of each square in pixels
   cell_spacing: 1,            # Space between squares in pixels
@@ -89,7 +150,7 @@ HeatmapBuilder.build_linear(scores, {
   # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
   # OR use OKLCH interpolation:
   # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
-})
+)
 ```
 
 ### Calendar Heatmap Options
@@ -97,7 +158,17 @@ HeatmapBuilder.build_linear(scores, {
 All options have defaults and are optional:
 
 ```ruby
-HeatmapBuilder.build_calendar(scores_by_date, {
+HeatmapBuilder.build_calendar(
+  # Data - provide either scores OR values (not both)
+  scores: { '2024-01-01' => 2, '2024-01-02' => 4 },  # Pre-calculated scores (0 to num_colors-1)
+  # OR
+  values: { Date.new(2024, 1, 1) => 45.2, Date.new(2024, 1, 2) => 78.5 },  # Arbitrary numeric values
+
+  # Value-to-Score Options (only used with values:)
+  value_min: 0,               # Minimum boundary (defaults to actual min)
+  value_max: 100,             # Maximum boundary (defaults to actual max)
+  value_to_score: ->(value:, date:, min:, max:, num_scores:) { ... },  # Custom conversion function
+
   # Appearance
   cell_size: 12,              # Size of each square in pixels
   cell_spacing: 1,            # Space between squares in pixels
@@ -105,11 +176,13 @@ HeatmapBuilder.build_calendar(scores_by_date, {
   border_width: 1,            # Border width around each cell
   corner_radius: 0,           # Corner radius for rounded cells (0 for square, max: floor(cell_size/2))
   text_color: "#000000",      # Color of score text
+
+  # Colors - can be an array of hex colors or a hash for OKLCH interpolation
+  colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
   # OR manually define color array:
   # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
   # OR use OKLCH interpolation:
   # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
-  colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
 
   # Calendar-specific options
   start_of_week: :monday,     # :sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday
@@ -121,7 +194,7 @@ HeatmapBuilder.build_calendar(scores_by_date, {
   # Internationalization
   day_labels: %w[S M T W T F S],  # Day abbreviations starting from Sunday
   month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]  # Month abbreviations
-})
+)
 ```
 
 ### Predefined Color Palettes
@@ -129,13 +202,13 @@ HeatmapBuilder.build_calendar(scores_by_date, {
 #### GitHub Green (Default)
 
 ```ruby
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::GITHUB_GREEN)
+HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::GITHUB_GREEN)
 ```
 
 ![GitHub Green Linear](examples/linear_github_green.svg)
 
 ```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::GITHUB_GREEN)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::GITHUB_GREEN)
 ```
 
 ![Default Calendar](examples/calendar_default.svg)
@@ -143,13 +216,13 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::GITHUB_GREE
 #### Blue Ocean
 
 ```ruby
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::BLUE_OCEAN)
+HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::BLUE_OCEAN)
 ```
 
 ![Blue Ocean Linear](examples/linear_blue_ocean.svg)
 
 ```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
 ```
 
 ![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
@@ -157,13 +230,13 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
 #### Warm Sunset
 
 ```ruby
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::WARM_SUNSET)
+HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::WARM_SUNSET)
 ```
 
 ![Warm Sunset Linear](examples/linear_warm_sunset.svg)
 
 ```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
 ```
 
 ![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
@@ -171,13 +244,13 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::WARM_SUNSET
 #### Purple Vibes
 
 ```ruby
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::PURPLE_VIBES)
+HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Linear](examples/linear_purple_vibes.svg)
 
 ```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
@@ -185,13 +258,13 @@ HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::PURPLE_VIBE
 #### Red to Green
 
 ```ruby
-HeatmapBuilder.build_linear(scores, colors: HeatmapBuilder::RED_TO_GREEN)
+HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::RED_TO_GREEN)
 ```
 
 ![Red to Green Linear](examples/linear_red_to_green.svg)
 
 ```ruby
-HeatmapBuilder.build_calendar(calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
 ```
 
 ![Red to Green Calendar](examples/calendar_red_to_green.svg)
@@ -208,7 +281,7 @@ neon_gradient = {
   steps: 5
 }
 
-svg = HeatmapBuilder.build_calendar(calendar_data, colors: neon_gradient)
+svg = HeatmapBuilder.build_calendar(scores: calendar_data, colors: neon_gradient)
 ```
 
 ![Neon Gradient Linear](examples/linear_neon_gradient.svg)
@@ -223,10 +296,11 @@ A typical value is around 2 pixels for a subtle rounded effect:
 
 ```ruby
 # Linear heatmap with rounded corners
-HeatmapBuilder.build_linear(scores, {
+HeatmapBuilder.build_linear(
+  scores: scores,
   corner_radius: 2,
   cell_size: 18
-})
+)
 ```
 
 ![Linear Rounded Corners](examples/linear_rounded_corners.svg)
@@ -235,10 +309,11 @@ The `corner_radius` value must be between 0 (square corners) and `floor(cell_siz
 
 ```ruby
 # Linear heatmap with max radius rounded corners - circular cells
-HeatmapBuilder.build_linear(scores, {
-  corner_radius: 2,
+HeatmapBuilder.build_linear(
+  scores: scores,
+  corner_radius: 9,
   cell_size: 18
-})
+)
 ```
 
 ![Linear Rounded Corners](examples/linear_rounded_corners_max_radius.svg)
@@ -247,20 +322,22 @@ Calendar heatmap examples:
 
 ```ruby
 # Calendar heatmap with rounded corners
-HeatmapBuilder.build_calendar(calendar_data, {
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
   corner_radius: 2,
   cell_size: 14
-})
+)
 ```
 
 ![Calendar Rounded Corners](examples/calendar_rounded_corners.svg)
 
 ```ruby
 # Calendar heatmap with max radius rounded corners - circular cells
-HeatmapBuilder.build_calendar(calendar_data, {
-  corner_radius: 2,
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
+  corner_radius: 7,
   cell_size: 14
-})
+)
 ```
 
 ![Calendar Rounded Corners](examples/calendar_rounded_corners_max_radius.svg)
@@ -271,28 +348,32 @@ Calendar heatmaps support internationalization by customizing the `day_labels` a
 
 ```ruby
 # French calendar
-HeatmapBuilder.build_calendar(calendar_data, {
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
   day_labels: %w[D L M M J V S],  # Dimanche, Lundi, Mardi, etc.
   month_labels: %w[Jan Fév Mar Avr Mai Jun Jul Aoû Sep Oct Nov Déc]
-})
+)
 
 # German calendar
-HeatmapBuilder.build_calendar(calendar_data, {
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
   day_labels: %w[S M D M D F S],  # Sonntag, Montag, Dienstag, etc.
   month_labels: %w[Jan Feb Mär Apr Mai Jun Jul Aug Sep Okt Nov Dez]
-})
+)
 
 # Italian calendar
-HeatmapBuilder.build_calendar(calendar_data, {
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
   day_labels: %w[D L M M G V S],  # Domenica, Lunedì, Martedì, etc.
   month_labels: %w[Gen Feb Mar Apr Mag Giu Lug Ago Set Ott Nov Dic]
-})
+)
 
 # Spanish calendar
-HeatmapBuilder.build_calendar(calendar_data, {
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
   day_labels: %w[D L M X J V S],  # Domingo, Lunes, Martes, etc.
   month_labels: %w[Ene Feb Mar Abr May Jun Jul Ago Sep Oct Nov Dic]
-})
+)
 ```
 
 The `day_labels` array should contain 7 elements starting from Sunday, and `month_labels` should contain 12 elements for January through December.
