@@ -12,6 +12,8 @@ A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-styl
 - Linear heatmaps.
 - Vector-based output (SVG) for crisp rendering at any resolution.
 - Optional numeric values displayed in each cell.
+- **Use pre-calculated scores or raw numeric values** - automatic mapping to color scales.
+- Custom value-to-score conversion functions for advanced scoring logic.
 - Parametric everything: customize cell size, spacing, colors, fonts, etc.
 - Rounded corners (and circular cells, if you're into that kind of thing).
 - Dynamic palette generation from two colors or manually-specified colors.
@@ -69,7 +71,9 @@ svg = HeatmapBuilder.build_calendar(scores: scores_by_date)
 
 ### Using Raw Values Instead of Scores
 
-Instead of providing pre-calculated scores, you can provide arbitrary numeric values and let the builder calculate scores automatically using linear distribution:
+A **score** is an integer (0 to N-1) that maps directly to a color in your palette. For example, with 5 colors, valid scores are 0-4.
+
+Instead of pre-calculating scores, you can provide raw numeric values (like 45.2, 78, 1000) and let the builder automatically map them to scores using linear distribution:
 
 ```ruby
 # Linear heatmap with automatic score calculation
@@ -117,8 +121,6 @@ svg = HeatmapBuilder.build_linear(
 ```
 
 For calendar heatmaps, the callable receives `date:` parameter instead of `index:`.
-
-## Configuration
 
 ### Linear Heatmap Options
 
