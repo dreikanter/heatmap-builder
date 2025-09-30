@@ -207,7 +207,12 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
   end
 
   it "should handle empty values hash for calendar" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: {})
+    # Use a fixed date to avoid snapshot changing daily
+    date_values = {
+      Date.new(2024, 1, 1) => 0
+    }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
     svg = builder.build
 
     assert_matches_snapshot(svg, "calendar_values_empty.svg")
