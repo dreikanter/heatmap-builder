@@ -18,13 +18,17 @@ require "fileutils"
 def assert_matches_snapshot(actual_content, snapshot_name)
   snapshot_path = File.join(__dir__, "snapshots", snapshot_name)
 
-  if File.exist?(snapshot_path) && !ENV['UPDATE_SNAPSHOTS']
+  if ENV["UPDATE_SNAPSHOTS"]
+    FileUtils.mkdir_p(File.dirname(snapshot_path))
+    File.write(snapshot_path, actual_content)
+    skip "Generated snapshot: #{snapshot_name}"
+    return
+  end
+
+  if File.exist?(snapshot_path)
     expected = File.read(snapshot_path)
     assert_equal expected, actual_content, "Snapshot mismatch for #{snapshot_name}"
   else
-    FileUtils.mkdir_p(File.dirname(snapshot_path))
-    File.write(snapshot_path, actual_content)
-    puts "📸 Snapshot: #{snapshot_name}"
-    assert true, "Generated snapshot: #{snapshot_name}"
+    flunk "missing snapshot; run with UPDATE_SNAPSHOTS=1 to regenerate snapshots"
   end
 end
