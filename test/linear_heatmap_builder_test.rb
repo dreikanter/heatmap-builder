@@ -117,4 +117,125 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
 
     refute_includes svg, "rx="
   end
+
+  # Tests for value-based heatmap generation
+  it "should convert values to scores using default linear formula" do
+    # Values 0, 50, 100 should map to scores 0, 2, 4 (with 5 colors)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [0, 50, 100], value_min: 0, value_max: 100)
+    svg = builder.build
+
+    # Should generate valid SVG
+    assert_includes svg, "<svg"
+    assert_includes svg, "</svg>"
+  end
+
+  it "should handle nil values by normalizing to minimum" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [nil, 50, 100], value_min: 0, value_max: 100)
+    svg = builder.build
+
+    # Should not raise error and generate SVG
+    assert_includes svg, "<svg"
+  end
+
+  it "should auto-calculate value_min and value_max from data" do
+    # Values 10, 20, 30 - should calculate min=10, max=30
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [10, 20, 30])
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
+
+  it "should clamp values below value_min" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [-10, 50, 100], value_min: 0, value_max: 100)
+    svg = builder.build
+
+    # Should not raise error
+    assert_includes svg, "<svg"
+  end
+
+  it "should clamp values above value_max" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [0, 50, 150], value_min: 0, value_max: 100)
+    svg = builder.build
+
+    # Should not raise error
+    assert_includes svg, "<svg"
+  end
+
+  it "should handle all values equal (min == max)" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [50, 50, 50], value_min: 50, value_max: 50)
+    svg = builder.build
+
+    # Should assign score 0 to all
+    assert_includes svg, "<svg"
+  end
+
+  it "should raise error if value_min > value_max" do
+    assert_raises(HeatmapBuilder::Error) do
+      HeatmapBuilder::LinearHeatmapBuilder.new(values: [1, 2, 3], value_min: 100, value_max: 0)
+    end
+  end
+
+  it "should raise error if both scores and values provided" do
+    assert_raises(HeatmapBuilder::Error) do
+      HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2, 3], values: [10, 20, 30])
+    end
+  end
+
+  it "should accept custom value_to_score callable" do
+    # Custom formula: always return score 2
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 2 }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20, 30],
+      value_to_score: custom_fn
+    )
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
+
+  it "should validate custom value_to_score returns valid integer" do
+    # Custom formula returns invalid value
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 999 }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20, 30],
+      value_to_score: custom_fn
+    )
+
+    assert_raises(HeatmapBuilder::Error) do
+      builder.build
+    end
+  end
+
+  it "should pass correct parameters to custom value_to_score" do
+    received_params = []
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) {
+      received_params << {value: value, index: index, min: min, max: max, num_scores: num_scores}
+      0
+    }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20],
+      value_min: 0,
+      value_max: 100,
+      value_to_score: custom_fn
+    )
+    builder.build
+
+    assert_equal 2, received_params.length
+    assert_equal 10, received_params[0][:value]
+    assert_equal 0, received_params[0][:index]
+    assert_equal 0, received_params[0][:min]
+    assert_equal 100, received_params[0][:max]
+    assert_equal 5, received_params[0][:num_scores]  # Default GITHUB_GREEN has 5 colors
+  end
+
+  it "should handle empty values array" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [])
+    svg = builder.build
+
+    # Should generate empty SVG with width 0
+    assert_includes svg, "<svg"
+  end
 end
