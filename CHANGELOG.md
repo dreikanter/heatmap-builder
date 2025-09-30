@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for raw numeric values with automatic score calculation using linear distribution
+- `values:` parameter as alternative to `scores:` for both linear and calendar heatmaps
+- `value_min:` and `value_max:` options for explicit boundary control
+- `value_to_score:` option for custom value-to-score conversion functions
+- Automatic boundary detection from input data when not explicitly specified
+
+### Changed
+- **BREAKING**: API now uses keyword arguments (`scores:`, `values:`, etc.) instead of positional arguments
+- Refactored common validation logic into base Builder class
+
 ## [0.1.0] - 2025-09-19
 
 ### Added
