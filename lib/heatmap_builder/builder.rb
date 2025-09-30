@@ -23,8 +23,9 @@ module HeatmapBuilder
       text_color: "#000000"
     }.freeze
 
-    def initialize(data, options = {})
-      @data = data
+    def initialize(scores: nil, values: nil, **options)
+      @scores = scores
+      @values = values
       @options = default_options.merge(options)
       normalize_options!
       validate_options!
@@ -36,7 +37,7 @@ module HeatmapBuilder
 
     private
 
-    attr_reader :data, :options
+    attr_reader :scores, :values, :options
 
     def normalize_options!
       max_radius = (options[:cell_size] / 2.0).floor

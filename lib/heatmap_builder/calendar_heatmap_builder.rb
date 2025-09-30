@@ -28,8 +28,6 @@ module HeatmapBuilder
 
     private
 
-    alias_method :scores_by_date, :data
-
     def start_date
       @start_date ||= parse_date_range.first
     end
@@ -40,7 +38,23 @@ module HeatmapBuilder
 
     def validate_options!
       super
-      raise Error, "scores_by_date must be a hash" unless data.is_a?(Hash)
+
+      # Validate that only one of scores or values is provided
+      if scores && values
+        raise Error, "cannot provide both scores and values"
+      end
+
+      unless scores || values
+        raise Error, "must provide either scores or values"
+      end
+
+      if scores
+        raise Error, "scores must be a hash" unless scores.is_a?(Hash)
+      end
+
+      if values
+        raise Error, "values must be a hash" unless values.is_a?(Hash)
+      end
 
       valid_start_days = %i[sunday monday tuesday wednesday thursday friday saturday]
       unless valid_start_days.include?(options[:start_of_week])
@@ -48,8 +62,18 @@ module HeatmapBuilder
       end
     end
 
+    def scores_by_date
+      @scores_by_date ||= if scores
+        scores
+      else
+        # Compute scores from values - placeholder for now
+        {}
+      end
+    end
+
     def parse_date_range
-      dates = scores_by_date.keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
+      data_keys = (scores || values || {}).keys
+      dates = data_keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
       return [Date.today - 365, Date.today] if dates.empty?
 
       [dates.min, dates.max]

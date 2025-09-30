@@ -2,11 +2,11 @@ require "test_helper"
 
 describe HeatmapBuilder::LinearHeatmapBuilder do
   before do
-    @builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3])
+    @builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2, 3])
   end
 
   it "should use default options when none provided" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1])
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1])
     svg = builder.build
 
     assert_includes svg, "width=\"10\""  # cell_size only
@@ -15,7 +15,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "#score_to_color should map scores to appropriate colors" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2, 3, 4, 5])
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [0, 1, 2, 3, 4, 5])
     svg = builder.build
 
     # Score 0 should use first color (gray)
@@ -29,26 +29,26 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   it "should use fixed text color regardless of background" do
     # Test with any background - text color should always be the default (#000000)
     light_colors = %w[#ffffff #ebedf0 #9be9a8]
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2], colors: light_colors)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [0, 1, 2], colors: light_colors)
     svg = builder.build
     assert_includes svg, "fill=\"#000000\""
 
     # Test with dark background - text color should still be default
     dark_colors = %w[#000000 #216e39 #30a14e]
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([0, 1, 2], colors: dark_colors)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [0, 1, 2], colors: dark_colors)
     svg = builder.build
     assert_includes svg, "fill=\"#000000\""
   end
 
   it "should respect custom text color when provided" do
     # Test that custom text color is respected
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], text_color: "#ff0000")
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], text_color: "#ff0000")
     svg = builder.build
     assert_includes svg, "fill=\"#ff0000\""
   end
 
   it "should apply custom cell spacing" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], cell_spacing: 5)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2], cell_spacing: 5)
     svg = builder.build
 
     # Second cell should be at x = cell_size + spacing = 10 + 5 = 15
@@ -56,7 +56,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should calculate correct SVG dimensions" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3],
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2, 3],
       cell_size: 15, cell_spacing: 3, border_width: 1)
     svg = builder.build
 
@@ -68,21 +68,21 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
 
   it "should raise errors for invalid inputs" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::LinearHeatmapBuilder.new("invalid")
+      HeatmapBuilder::LinearHeatmapBuilder.new(scores: "invalid")
     end
 
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::LinearHeatmapBuilder.new([1], cell_size: 0)
+      HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], cell_size: 0)
     end
 
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::LinearHeatmapBuilder.new([1], colors: [])
+      HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], colors: [])
     end
   end
 
   it "should cycle through colors for large scores" do
     colors = %w[#ebedf0 #9be9a8 #40c463]
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2, 3], colors: colors)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2, 3], colors: colors)
     svg = builder.build
 
     # Scores should cycle through non-zero colors
@@ -91,28 +91,28 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should apply corner_radius to cells" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], corner_radius: 3)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2], corner_radius: 3)
     svg = builder.build
 
     assert_includes svg, 'rx="3"'
   end
 
   it "should not include rx attribute when corner_radius is 0" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1, 2], corner_radius: 0)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1, 2], corner_radius: 0)
     svg = builder.build
 
     refute_includes svg, "rx="
   end
 
   it "should normalize corner_radius to maximum allowed value" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], cell_size: 10, corner_radius: 100)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], cell_size: 10, corner_radius: 100)
     svg = builder.build
 
     assert_includes svg, 'rx="5"'
   end
 
   it "should normalize negative corner_radius to 0" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new([1], corner_radius: -5)
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], corner_radius: -5)
     svg = builder.build
 
     refute_includes svg, "rx="

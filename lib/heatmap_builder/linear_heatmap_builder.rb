@@ -3,23 +3,50 @@ require_relative "builder"
 module HeatmapBuilder
   class LinearHeatmapBuilder < Builder
     def build
-      svg_content = scores.map.with_index do |score, index|
+      svg_content = computed_scores.map.with_index do |score, index|
         cell_svg(score, index)
       end.join
 
       svg_container(
-        width: scores.length * options[:cell_size] + (scores.length - 1) * options[:cell_spacing],
+        width: computed_scores.length * options[:cell_size] + (computed_scores.length - 1) * options[:cell_spacing],
         height: options[:cell_size]
       ) { svg_content }
     end
 
     private
 
-    alias_method :scores, :data
-
     def validate_options!
       super
-      raise Error, "scores must be an array" unless data.is_a?(Array)
+
+      # Validate that only one of scores or values is provided
+      if scores && values
+        raise Error, "cannot provide both scores and values"
+      end
+
+      unless scores || values
+        raise Error, "must provide either scores or values"
+      end
+
+      if scores
+        raise Error, "scores must be an array" unless scores.is_a?(Array)
+      end
+
+      if values
+        raise Error, "values must be an array" unless values.is_a?(Array)
+      end
+    end
+
+    def computed_scores
+      @computed_scores ||= if scores
+        scores
+      else
+        values.map.with_index { |value, index| value_to_score(value, index) }
+      end
+    end
+
+    def value_to_score(value, index)
+      # Placeholder - will implement in next step
+      0
     end
 
     def cell_svg(score, index)
