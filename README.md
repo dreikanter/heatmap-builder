@@ -13,6 +13,7 @@ A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-styl
 - Vector-based output (SVG) for crisp rendering at any resolution.
 - Optional numeric values displayed in each cell.
 - Parametric everything: customize cell size, spacing, colors, fonts, etc.
+- Rounded corners (and circular cells, if you're into that kind of thing).
 - Dynamic palette generation from two colors or manually-specified colors.
 - OKLCH color interpolation for clean color transitions and perceptual uniformity.
 - **Zero dependencies.**
