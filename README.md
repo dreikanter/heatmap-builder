@@ -79,6 +79,7 @@ HeatmapBuilder.build_linear(scores, {
   cell_spacing: 1,            # Space between squares in pixels
   font_size: 8,               # Font size for score text
   border_width: 1,            # Border width around each cell
+  corner_radius: 0,           # Corner radius for rounded cells (0 for square, max: floor(cell_size/2))
   text_color: "#000000",      # Color of score text
 
   # Colors - can be an array of hex colors or a hash for OKLCH interpolation
@@ -101,6 +102,7 @@ HeatmapBuilder.build_calendar(scores_by_date, {
   cell_spacing: 1,            # Space between squares in pixels
   font_size: 8,               # Font size for score text
   border_width: 1,            # Border width around each cell
+  corner_radius: 0,           # Corner radius for rounded cells (0 for square, max: floor(cell_size/2))
   text_color: "#000000",      # Color of score text
   # OR manually define color array:
   # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
@@ -211,6 +213,32 @@ svg = HeatmapBuilder.build_calendar(calendar_data, colors: neon_gradient)
 ![Neon Gradient Linear](examples/linear_neon_gradient.svg)
 
 The OKLCH color space ensures perceptually uniform color transitions, making gradients appear smooth and natural to the human eye.
+
+### Rounded Corners
+
+Both linear and calendar heatmaps support rounded corners using the `corner_radius` option:
+
+```ruby
+# Linear heatmap with rounded corners
+HeatmapBuilder.build_linear(scores, {
+  corner_radius: 2,
+  cell_size: 18
+})
+```
+
+![Linear Rounded Corners](examples/linear_rounded_corners.svg)
+
+```ruby
+# Calendar heatmap with rounded corners
+HeatmapBuilder.build_calendar(calendar_data, {
+  corner_radius: 2,
+  cell_size: 14
+})
+```
+
+![Calendar Rounded Corners](examples/calendar_rounded_corners.svg)
+
+The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)` (circular cells for square cells). A typical value is around 2 pixels for a subtle rounded effect.
 
 ### I18n
 
