@@ -216,7 +216,9 @@ The OKLCH color space ensures perceptually uniform color transitions, making gra
 
 ### Rounded Corners
 
-Both linear and calendar heatmaps support rounded corners using the `corner_radius` option:
+Both linear and calendar heatmaps support rounded corners using the `corner_radius` option.
+
+A typical value is around 2 pixels for a subtle rounded effect:
 
 ```ruby
 # Linear heatmap with rounded corners
@@ -228,6 +230,20 @@ HeatmapBuilder.build_linear(scores, {
 
 ![Linear Rounded Corners](examples/linear_rounded_corners.svg)
 
+The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Maximum radius value render circular cells:
+
+```ruby
+# Linear heatmap with max radius rounded corners - circular cells
+HeatmapBuilder.build_linear(scores, {
+  corner_radius: 2,
+  cell_size: 18
+})
+```
+
+![Linear Rounded Corners](examples/linear_rounded_corners_max_radius.svg)
+
+Calendar heatmap examples:
+
 ```ruby
 # Calendar heatmap with rounded corners
 HeatmapBuilder.build_calendar(calendar_data, {
@@ -238,7 +254,15 @@ HeatmapBuilder.build_calendar(calendar_data, {
 
 ![Calendar Rounded Corners](examples/calendar_rounded_corners.svg)
 
-The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)` (circular cells for square cells). A typical value is around 2 pixels for a subtle rounded effect.
+```ruby
+# Calendar heatmap with max radius rounded corners - circular cells
+HeatmapBuilder.build_calendar(calendar_data, {
+  corner_radius: 2,
+  cell_size: 14
+})
+```
+
+![Calendar Rounded Corners](examples/calendar_rounded_corners_max_radius.svg)
 
 ### I18n
 
