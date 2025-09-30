@@ -106,8 +106,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     )
     svg = builder.build
 
-    assert_includes svg, "<svg"
-    assert_includes svg, "</svg>"
+    assert_matches_snapshot(svg, "calendar_values_default_formula.svg")
   end
 
   it "should handle missing dates by normalizing to minimum" do
@@ -123,8 +122,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     )
     svg = builder.build
 
-    # Date 2024-01-02 is missing, should use minimum value (score 0)
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "calendar_values_missing_dates.svg")
   end
 
   it "should auto-calculate value_min and value_max from calendar data" do
@@ -137,7 +135,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
     svg = builder.build
 
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "calendar_values_auto_boundaries.svg")
   end
 
   it "should accept custom value_to_score callable for calendar" do
@@ -155,7 +153,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     )
     svg = builder.build
 
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "calendar_values_custom_formula.svg")
   end
 
   it "should pass date parameter to custom value_to_score" do
@@ -196,7 +194,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
     svg = builder.build
 
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "calendar_values_string_dates.svg")
   end
 
   it "should raise error if both scores and values provided for calendar" do
@@ -212,6 +210,6 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: {})
     svg = builder.build
 
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "calendar_values_empty.svg")
   end
 end

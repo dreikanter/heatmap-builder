@@ -120,53 +120,45 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
 
   # Tests for value-based heatmap generation
   it "should convert values to scores using default linear formula" do
-    # Values 0, 50, 100 should map to scores 0, 2, 4 (with 5 colors)
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [0, 50, 100], value_min: 0, value_max: 100)
     svg = builder.build
 
-    # Should generate valid SVG
-    assert_includes svg, "<svg"
-    assert_includes svg, "</svg>"
+    assert_matches_snapshot(svg, "linear_values_default_formula.svg")
   end
 
   it "should handle nil values by normalizing to minimum" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [nil, 50, 100], value_min: 0, value_max: 100)
     svg = builder.build
 
-    # Should not raise error and generate SVG
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_with_nil.svg")
   end
 
   it "should auto-calculate value_min and value_max from data" do
-    # Values 10, 20, 30 - should calculate min=10, max=30
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [10, 20, 30])
     svg = builder.build
 
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_auto_boundaries.svg")
   end
 
   it "should clamp values below value_min" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [-10, 50, 100], value_min: 0, value_max: 100)
     svg = builder.build
 
-    # Should not raise error
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_clamp_min.svg")
   end
 
   it "should clamp values above value_max" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [0, 50, 150], value_min: 0, value_max: 100)
     svg = builder.build
 
-    # Should not raise error
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_clamp_max.svg")
   end
 
   it "should handle all values equal (min == max)" do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [50, 50, 50], value_min: 50, value_max: 50)
     svg = builder.build
 
-    # Should assign score 0 to all
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_equal.svg")
   end
 
   it "should raise error if value_min > value_max" do
@@ -191,7 +183,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     )
     svg = builder.build
 
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_custom_formula.svg")
   end
 
   it "should validate custom value_to_score returns valid integer" do
@@ -235,7 +227,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [])
     svg = builder.build
 
-    # Should generate empty SVG with width 0
-    assert_includes svg, "<svg"
+    assert_matches_snapshot(svg, "linear_values_empty.svg")
   end
 end
