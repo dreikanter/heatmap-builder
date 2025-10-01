@@ -1,4 +1,5 @@
 require "date"
+require "set"
 require_relative "builder"
 require_relative "value_conversion"
 
@@ -186,67 +187,77 @@ module HeatmapBuilder
       return "" unless options[:show_month_labels]
 
       svg = ""
-      current_date = calendar_start_date
-      week_index = 0
-      last_month = nil
-      displayed_months = {}
-      current_x_offset = 0
-      calendar_end_date = calendar_end_date_with_full_weeks
+      displayed_months = Set.new
 
-      while current_date <= calendar_end_date
-        # Check if we need to add month spacing
-        if current_date.month != last_month && !last_month.nil?
-          current_x_offset += options[:month_spacing]
+      each_week do |current_date, _week_index|
+        month_key = current_date.year * 12 + current_date.month
+
+        if should_display_month_label?(current_date, displayed_months, month_key)
+          svg << render_month_label(current_date)
+          displayed_months.add(month_key)
         end
-
-        # Add month label at start of each month, but only if the month overlaps with our specified timeframe
-        if current_date.month != last_month && !displayed_months[current_date.year * 12 + current_date.month]
-          # Check if this month has any days within our specified timeframe
-          month_start = Date.new(current_date.year, current_date.month, 1)
-          month_end = Date.new(current_date.year, current_date.month, -1)
-
-          if month_start <= end_date && month_end >= start_date
-            # Find the first week column that contains the first day of this month
-            first_day_of_month = Date.new(current_date.year, current_date.month, 1)
-
-            # Calculate which week column the first day falls in
-            days_from_calendar_start = (first_day_of_month - calendar_start_date).to_i
-            first_day_week_index = days_from_calendar_start / 7
-
-            # Calculate the x position for the first day's week column
-            first_day_x_offset = 0
-            temp_date = calendar_start_date
-            temp_week = 0
-            temp_last_month = nil
-
-            while temp_week < first_day_week_index
-              if temp_date.month != temp_last_month && !temp_last_month.nil?
-                first_day_x_offset += options[:month_spacing]
-              end
-              temp_last_month = temp_date.month
-              temp_date += 7
-              temp_week += 1
-            end
-
-            x = dow_label_offset + first_day_week_index * (options[:cell_size] + options[:cell_spacing]) + first_day_x_offset + options[:cell_size] * 0.1
-            y = options[:font_size] + 2
-            month_name = options[:month_labels][current_date.month - 1]
-            svg << svg_text(
-              month_name,
-              x: x, y: y,
-              text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
-            )
-          end
-
-          displayed_months[current_date.year * 12 + current_date.month] = true
-        end
-
-        last_month = current_date.month
-        current_date += 7
-        week_index += 1
       end
 
       svg
+    end
+
+    def should_display_month_label?(current_date, displayed_months, month_key)
+      return false if displayed_months.include?(month_key)
+
+      month_start = Date.new(current_date.year, current_date.month, 1)
+      month_end = Date.new(current_date.year, current_date.month, -1)
+
+      month_start <= end_date && month_end >= start_date
+    end
+
+    def render_month_label(current_date)
+      first_day_of_month = Date.new(current_date.year, current_date.month, 1)
+      x_position = calculate_month_label_x(first_day_of_month)
+      y_position = options[:font_size] + 2
+      month_name = options[:month_labels][current_date.month - 1]
+
+      svg_text(
+        month_name,
+        x: x_position, y: y_position,
+        text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
+      )
+    end
+
+    def calculate_month_label_x(first_day_of_month)
+      days_from_start = (first_day_of_month - calendar_start_date).to_i
+      week_index = days_from_start / 7
+      x_offset = calculate_x_offset_for_week(week_index)
+
+      dow_label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + x_offset + options[:cell_size] * 0.1
+    end
+
+    def calculate_x_offset_for_week(target_week_index)
+      x_offset = 0
+      last_month = nil
+
+      each_week do |current_date, week_index|
+        break if week_index >= target_week_index
+
+        if current_date.month != last_month && !last_month.nil?
+          x_offset += options[:month_spacing]
+        end
+
+        last_month = current_date.month
+      end
+
+      x_offset
+    end
+
+    def each_week
+      current_date = calendar_start_date
+      week_index = 0
+
+      while current_date <= calendar_end_date_with_full_weeks
+        yield current_date, week_index
+
+        current_date += 7
+        week_index += 1
+      end
     end
 
     # Find the start of the week containing start_date
