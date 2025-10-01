@@ -18,8 +18,8 @@ module HeatmapBuilder
       raise NotImplementedError, "Subclasses must implement #calculated_max_from_values"
     end
 
-    def num_scores
-      @num_scores ||= begin
+    def color_count
+      @color_count ||= begin
         colors_option = options[:colors]
         if colors_option.is_a?(Array)
           colors_option.length
@@ -39,12 +39,12 @@ module HeatmapBuilder
           value: value,
           min: value_min,
           max: value_max,
-          num_scores: num_scores,
+          num_scores: color_count,
           **params
         )
 
-        unless score.is_a?(Integer) && score >= 0 && score < num_scores
-          raise Error, "value_to_score must return an integer between 0 and #{num_scores - 1}, got #{score.inspect}"
+        unless score.is_a?(Integer) && score >= 0 && score < color_count
+          raise Error, "value_to_score must return an integer between 0 and #{color_count - 1}, got #{score.inspect}"
         end
 
         return score
@@ -57,7 +57,7 @@ module HeatmapBuilder
       else
         range = value_max - value_min
         normalized = (clamped_value - value_min).to_f / range
-        (normalized * (num_scores - 1)).floor
+        (normalized * (color_count - 1)).floor
       end
     end
   end
