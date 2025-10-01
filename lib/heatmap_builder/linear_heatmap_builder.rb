@@ -18,13 +18,8 @@ module HeatmapBuilder
     def validate_options!
       super
 
-      if scores
-        raise Error, "scores must be an array" unless scores.is_a?(Array)
-      end
-
-      if values
-        raise Error, "values must be an array" unless values.is_a?(Array)
-      end
+      raise Error, "scores must be an array" if scores && !scores.is_a?(Array)
+      raise Error, "values must be an array" if values && !values.is_a?(Array)
     end
 
     def computed_scores
