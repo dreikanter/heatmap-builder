@@ -45,8 +45,8 @@ module HeatmapBuilder
 
     # Override in subclasses to add specific validations by calling super first
     def validate_options!
-      raise Error, "cell_size must be positive" unless options[:cell_size] > 0
-      raise Error, "font_size must be positive" unless options[:font_size] > 0
+      raise Error, "cell_size must be positive" unless options[:cell_size].positive?
+      raise Error, "font_size must be positive" unless options[:font_size].positive?
       validate_colors_option!
       validate_scores_or_values!
       validate_value_boundaries! if values
