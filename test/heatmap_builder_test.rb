@@ -5,24 +5,24 @@ describe HeatmapBuilder do
     refute_nil ::HeatmapBuilder::VERSION
   end
 
-  it ".generate should create basic SVG" do
+  it ".build_linear should create basic SVG" do
     scores = [0, 1, 2, 3, 4]
-    svg = HeatmapBuilder.generate(scores: scores)
+    svg = HeatmapBuilder.build_linear(scores: scores)
 
     assert_matches_snapshot(svg, "linear_basic.svg")
   end
 
-  it ".generate should create SVG with score text" do
+  it ".build_linear should create SVG with score text" do
     scores = [5, 10, 15]
-    svg = HeatmapBuilder.generate(scores: scores)
+    svg = HeatmapBuilder.build_linear(scores: scores)
 
     assert_matches_snapshot(svg, "linear_with_text.svg")
   end
 
-  it ".generate should accept custom options" do
+  it ".build_linear should accept custom options" do
     scores = [1, 2, 3]
 
-    svg = HeatmapBuilder.generate(
+    svg = HeatmapBuilder.build_linear(
       scores: scores,
       cell_size: 30,
       font_size: 14,
@@ -32,33 +32,26 @@ describe HeatmapBuilder do
     assert_matches_snapshot(svg, "linear_custom_options.svg")
   end
 
-  it ".generate should include score text in SVG" do
-    scores = [5, 10, 15]
-    svg = HeatmapBuilder.generate(scores: scores)
-
-    assert_matches_snapshot(svg, "linear_score_text.svg")
-  end
-
-  it ".generate should handle empty scores array" do
-    svg = HeatmapBuilder.generate(scores: [])
+  it ".build_linear should handle empty scores array" do
+    svg = HeatmapBuilder.build_linear(scores: [])
     assert_matches_snapshot(svg, "linear_empty.svg")
   end
 
-  it ".generate should raise error for invalid scores" do
+  it ".build_linear should raise error for invalid scores" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder.generate(scores: "not an array")
+      HeatmapBuilder.build_linear(scores: "not an array")
     end
   end
 
-  it ".generate should raise error for invalid cell size" do
+  it ".build_linear should raise error for invalid cell size" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder.generate(scores: [1, 2, 3], cell_size: -1)
+      HeatmapBuilder.build_linear(scores: [1, 2, 3], cell_size: -1)
     end
   end
 
-  it ".generate should raise error for insufficient colors" do
+  it ".build_linear should raise error for insufficient colors" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder.generate(scores: [1, 2, 3], colors: ["#ffffff"])
+      HeatmapBuilder.build_linear(scores: [1, 2, 3], colors: ["#ffffff"])
     end
   end
 
@@ -125,14 +118,26 @@ describe HeatmapBuilder do
     end
   end
 
-  # Tests for backward compatibility aliases
-  it ".generate alias should work for backward compatibility" do
+  # Tests for backward compatibility
+  it ".generate should work and show deprecation warning" do
     scores = [1, 2, 3]
-    assert_equal HeatmapBuilder.build(scores: scores), HeatmapBuilder.generate(scores: scores)
+    svg = nil
+    _out, err = capture_io do
+      svg = HeatmapBuilder.generate(scores, {cell_size: 20})
+    end
+
+    assert_includes err, "DEPRECATION"
+    assert_matches_snapshot(svg, "linear_backward_compat.svg")
   end
 
-  it ".generate_calendar alias should work for backward compatibility" do
+  it ".generate_calendar should work and show deprecation warning" do
     scores_by_date = {"2024-01-01" => 1}
-    assert_equal HeatmapBuilder.build_calendar(scores: scores_by_date), HeatmapBuilder.generate_calendar(scores: scores_by_date)
+    svg = nil
+    _out, err = capture_io do
+      svg = HeatmapBuilder.generate_calendar(scores_by_date, {cell_size: 15})
+    end
+
+    assert_includes err, "DEPRECATION"
+    assert_matches_snapshot(svg, "calendar_backward_compat.svg")
   end
 end
