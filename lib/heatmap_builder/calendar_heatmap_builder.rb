@@ -186,14 +186,14 @@ module HeatmapBuilder
       return "" unless options[:show_month_labels]
 
       svg = ""
-      last_month_key = nil
+      last_month = nil
 
       each_week do |current_date, _week_index|
-        month_key = current_date.year * 12 + current_date.month
+        current_month = [current_date.year, current_date.month]
 
-        if month_key != last_month_key && month_overlaps_timeframe?(current_date)
+        if current_month != last_month && month_overlaps_timeframe?(current_date)
           svg << render_month_label(current_date)
-          last_month_key = month_key
+          last_month = current_month
         end
       end
 
