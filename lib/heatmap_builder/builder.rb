@@ -40,7 +40,7 @@ module HeatmapBuilder
 
     def normalize_options!
       max_radius = (options[:cell_size] / 2.0).floor
-      @options[:corner_radius] = [[options[:corner_radius], 0].max, max_radius].min # standard:disable Style/ComparableClamp (max/min is cleaner than clamp in this case)
+      @options[:corner_radius] = options[:corner_radius].clamp(0, max_radius)
     end
 
     # Override in subclasses to add specific validations by calling super first
