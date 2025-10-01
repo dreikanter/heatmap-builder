@@ -293,14 +293,14 @@ module HeatmapBuilder
       svg
     end
 
+    # Find the start of the week containing start_date
     def calendar_start_date
-      # Find the start of the week containing start_date
       days_back = (start_date.wday - week_start_wday) % 7
       start_date - days_back
     end
 
+    # Find the end of the week containing end_date
     def calendar_end_date_with_full_weeks
-      # Find the end of the week containing end_date
       days_forward = (6 - (end_date.wday - week_start_wday)) % 7
       end_date + days_forward
     end
