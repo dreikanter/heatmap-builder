@@ -210,7 +210,7 @@ module HeatmapBuilder
     def render_month_label(current_date)
       first_day_of_month = Date.new(current_date.year, current_date.month, 1)
       x_position = calculate_month_label_x(first_day_of_month)
-      y_position = options[:font_size] + 2
+      y_position = options[:font_size] * 1.25
       month_name = options[:month_labels][current_date.month - 1]
 
       svg_text(
@@ -287,7 +287,7 @@ module HeatmapBuilder
     end
 
     def month_label_offset
-      options[:show_month_labels] ? options[:font_size] + 5 : 0
+      options[:show_month_labels] ? options[:font_size] * 1.625 : 0
     end
 
     def months_in_range
