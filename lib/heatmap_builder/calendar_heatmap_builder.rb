@@ -44,15 +44,11 @@ module HeatmapBuilder
     private
 
     def start_date
-      @start_date ||= date_range.first
+      @start_date ||= parsed_date_range.first
     end
 
     def end_date
-      @end_date ||= date_range.last
-    end
-
-    def date_range
-      @date_range ||= parse_date_range
+      @end_date ||= parsed_date_range.last
     end
 
     def validate_options!
@@ -93,12 +89,14 @@ module HeatmapBuilder
       non_nil_values.empty? ? 0 : non_nil_values.max
     end
 
-    def parse_date_range
-      data_keys = (scores || values || {}).keys
-      dates = data_keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
-      return [Date.today - 365, Date.today] if dates.empty?
+    def parsed_date_range
+      @parsed_date_range ||= begin
+        data_keys = (scores || values || {}).keys
+        dates = data_keys.map { |d| d.is_a?(Date) ? d : Date.parse(d.to_s) }
+        return [Date.today - 365, Date.today] if dates.empty?
 
-      [dates.min, dates.max]
+        [dates.min, dates.max]
+      end
     end
 
     def calendar_cells_svg
