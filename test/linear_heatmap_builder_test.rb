@@ -148,7 +148,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should accept custom value_to_score callable" do
-    # Custom formula: always return score 2
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { 2 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
@@ -161,7 +160,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns valid integer" do
-    # Custom formula returns invalid value (out of range)
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { 999 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
@@ -175,7 +173,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns integer not float" do
-    # Custom formula returns float instead of integer
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { 1.5 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
@@ -189,7 +186,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns non-negative integer" do
-    # Custom formula returns negative integer
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { -1 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
