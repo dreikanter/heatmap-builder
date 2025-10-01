@@ -203,4 +203,21 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
 
     assert_matches_snapshot(svg, "linear_values_empty.svg")
   end
+
+  it "should work with hash-based color palette" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      scores: [0, 1, 2],
+      colors: {from: "#ffffff", to: "#ff0000", steps: 3}
+    )
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+    assert_includes svg, "</svg>"
+  end
+
+  it "should raise error for invalid colors option" do
+    assert_raises(HeatmapBuilder::Error) do
+      HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], colors: "invalid")
+    end
+  end
 end

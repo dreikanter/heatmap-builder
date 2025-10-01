@@ -41,4 +41,12 @@ describe HeatmapBuilder do
     assert_includes err, "DEPRECATION"
     assert_matches_snapshot(svg, "calendar_backward_compat.svg")
   end
+
+  it "Builder base class should raise NotImplementedError for build" do
+    builder = HeatmapBuilder::Builder.new(scores: [1])
+
+    assert_raises(NotImplementedError) do
+      builder.build
+    end
+  end
 end
