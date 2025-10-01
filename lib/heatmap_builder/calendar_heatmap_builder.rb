@@ -44,11 +44,15 @@ module HeatmapBuilder
     private
 
     def start_date
-      @start_date ||= parse_date_range.first
+      @start_date ||= date_range.first
     end
 
     def end_date
-      @end_date ||= parse_date_range.last
+      @end_date ||= date_range.last
+    end
+
+    def date_range
+      @date_range ||= parse_date_range
     end
 
     def validate_options!
