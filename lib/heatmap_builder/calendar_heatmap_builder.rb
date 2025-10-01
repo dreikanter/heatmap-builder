@@ -341,7 +341,7 @@ module HeatmapBuilder
       DEFAULT_OPTIONS.merge({
         cell_size: 12,
         start_of_week: :monday,
-        month_spacing: 5, # extra vertical space between months
+        month_spacing: 5, # extra horizontal space between months
         show_month_labels: true,
         show_day_labels: true,
         show_outside_cells: false, # show cells outside the timeframe with inactive styling
