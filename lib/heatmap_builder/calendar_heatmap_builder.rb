@@ -54,13 +54,8 @@ module HeatmapBuilder
     def validate_options!
       super
 
-      if scores
-        raise Error, "scores must be a hash" unless scores.is_a?(Hash)
-      end
-
-      if values
-        raise Error, "values must be a hash" unless values.is_a?(Hash)
-      end
+      raise Error, "scores must be a hash" if scores && !scores.is_a?(Hash)
+      raise Error, "values must be a hash" if values && !values.is_a?(Hash)
 
       unless VALID_START_DAYS.include?(options[:start_of_week])
         raise Error, "start_of_week must be one of: #{VALID_START_DAYS.join(", ")}"
@@ -141,7 +136,7 @@ module HeatmapBuilder
     end
 
     def cell_svg(score, x, y, inactive = false)
-      color = score_to_color(score, colors: options[:colors])
+      color = score_to_color(score, colors: color_palette)
 
       if inactive
         color = make_color_inactive(color)
