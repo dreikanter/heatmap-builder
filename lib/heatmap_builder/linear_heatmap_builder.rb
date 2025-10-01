@@ -4,6 +4,7 @@ require_relative "value_conversion"
 module HeatmapBuilder
   class LinearHeatmapBuilder < Builder
     include ValueConversion
+
     def build
       svg_content = computed_scores.map.with_index do |score, index|
         cell_svg(score, index)
@@ -55,8 +56,7 @@ module HeatmapBuilder
         x, y, color,
         cell_size: options[:cell_size],
         border_width: options[:border_width],
-        corner_radius: options[:corner_radius],
-        darker_color_method: method(:darker_color)
+        corner_radius: options[:corner_radius]
       )
 
       text_x = x + options[:cell_size] / 2

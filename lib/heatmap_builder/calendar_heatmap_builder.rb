@@ -5,6 +5,7 @@ require_relative "value_conversion"
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
     include ValueConversion
+
     VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
 
     WEEK_START_WDAY = {
@@ -157,15 +158,10 @@ module HeatmapBuilder
         x, y, color,
         cell_size: options[:cell_size],
         border_width: options[:border_width],
-        corner_radius: options[:corner_radius],
-        darker_color_method: method(:darker_border_color)
+        corner_radius: options[:corner_radius]
       )
 
       "#{colored_rect}#{border_rect}"
-    end
-
-    def darker_border_color(color)
-      darker_color(color, factor: 0.9)
     end
 
     def day_labels_svg
