@@ -64,12 +64,9 @@ module HeatmapBuilder
     end
 
     def validate_value_boundaries!
-      # Validate value_min and value_max
-      if options[:value_min] && options[:value_max]
-        if options[:value_min] > options[:value_max]
-          raise Error, "value_min must be less than or equal to value_max"
-        end
-      end
+      return unless options[:value_min] && options[:value_max]
+      return unless options[:value_min] > options[:value_max]
+      raise Error, "value_min must be less than or equal to value_max"
     end
 
     def validate_colors_option!
