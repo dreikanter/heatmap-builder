@@ -6,7 +6,6 @@ module HeatmapBuilder
     include SvgHelpers
     include ColorHelpers
 
-    # Predefined color palettes
     GITHUB_GREEN = %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39].freeze
     BLUE_OCEAN = %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9].freeze
     WARM_SUNSET = %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316].freeze
@@ -53,8 +52,8 @@ module HeatmapBuilder
       validate_value_boundaries! if values
     end
 
+    # Validate that only one of scores or values is provided
     def validate_scores_or_values!
-      # Validate that only one of scores or values is provided
       if scores && values
         raise Error, "cannot provide both scores and values"
       end
