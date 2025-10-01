@@ -49,4 +49,58 @@ describe HeatmapBuilder do
       builder.build
     end
   end
+
+  describe "Builder validations" do
+    it "should raise error for non-positive cell_size" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], cell_size: 0)
+      end
+
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], cell_size: -5)
+      end
+    end
+
+    it "should raise error for non-positive font_size" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], font_size: 0)
+      end
+
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], font_size: -3)
+      end
+    end
+
+    it "should raise error for colors array with less than 2 colors" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], colors: ["#ffffff"])
+      end
+    end
+
+    it "should raise error for colors hash missing required keys" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], colors: {from: "#ffffff", to: "#000000"})
+      end
+
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], colors: {from: "#ffffff", steps: 3})
+      end
+
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], colors: {to: "#000000", steps: 3})
+      end
+    end
+
+    it "should raise error for steps not being an Integer" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], colors: {from: "#ffffff", to: "#000000", steps: "3"})
+      end
+    end
+
+    it "should raise error for steps less than 2" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Builder.new(scores: [1], colors: {from: "#ffffff", to: "#000000", steps: 1})
+      end
+    end
+  end
 end

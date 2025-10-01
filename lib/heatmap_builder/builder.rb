@@ -26,8 +26,8 @@ module HeatmapBuilder
       @scores = scores
       @values = values
       @options = default_options.merge(options)
-      normalize_options!
       validate_options!
+      normalize_options!
     end
 
     def build
