@@ -1,5 +1,4 @@
 require "date"
-require "set"
 require_relative "builder"
 require_relative "value_conversion"
 
@@ -187,23 +186,21 @@ module HeatmapBuilder
       return "" unless options[:show_month_labels]
 
       svg = ""
-      displayed_months = Set.new
+      last_month_key = nil
 
       each_week do |current_date, _week_index|
         month_key = current_date.year * 12 + current_date.month
 
-        if should_display_month_label?(current_date, displayed_months, month_key)
+        if month_key != last_month_key && month_overlaps_timeframe?(current_date)
           svg << render_month_label(current_date)
-          displayed_months.add(month_key)
+          last_month_key = month_key
         end
       end
 
       svg
     end
 
-    def should_display_month_label?(current_date, displayed_months, month_key)
-      return false if displayed_months.include?(month_key)
-
+    def month_overlaps_timeframe?(current_date)
       month_start = Date.new(current_date.year, current_date.month, 1)
       month_end = Date.new(current_date.year, current_date.month, -1)
 
