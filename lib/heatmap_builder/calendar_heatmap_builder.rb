@@ -209,15 +209,18 @@ module HeatmapBuilder
 
     def render_month_label(current_date)
       first_day_of_month = Date.new(current_date.year, current_date.month, 1)
-      x_position = calculate_month_label_x(first_day_of_month)
-      y_position = options[:font_size] * 1.25
       month_name = options[:month_labels][current_date.month - 1]
 
       svg_text(
         month_name,
-        x: x_position, y: y_position,
+        x: calculate_month_label_x(first_day_of_month),
+        y: calculate_month_label_y,
         text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
       )
+    end
+
+    def calculate_month_label_y
+      options[:font_size] * 1.25
     end
 
     def calculate_month_label_x(first_day_of_month)
