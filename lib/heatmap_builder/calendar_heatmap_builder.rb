@@ -158,10 +158,14 @@ module HeatmapBuilder
         cell_size: options[:cell_size],
         border_width: options[:border_width],
         corner_radius: options[:corner_radius],
-        darker_color_method: ->(c) { darker_color(c, factor: 0.9) }
+        darker_color_method: method(:darker_border_color)
       )
 
       "#{colored_rect}#{border_rect}"
+    end
+
+    def darker_border_color(color)
+      darker_color(color, factor: 0.9)
     end
 
     def day_labels_svg
