@@ -7,12 +7,10 @@ module HeatmapBuilder
     def build
       svg_content = []
 
-      # Add day labels if enabled
       if options[:show_day_labels]
         svg_content << day_labels_svg
       end
 
-      # Add month labels and cells
       svg_content << calendar_cells_svg
 
       if options[:show_month_labels]
@@ -59,7 +57,6 @@ module HeatmapBuilder
       @scores_by_date ||= if scores
         scores
       else
-        # Compute scores from values for all dates in range
         result = {}
         current_date = start_date
 
@@ -73,11 +70,11 @@ module HeatmapBuilder
       end
     end
 
+    # Converts a raw value to a score bucket using linear distribution
+    # Nil values are normalized to the minimum boundary
     def date_value_to_score(value, date)
-      # Normalize nil to minimum boundary
       value = value_min if value.nil?
 
-      # Get the custom converter if provided
       if options[:value_to_score]
         score = options[:value_to_score].call(
           value: value,
@@ -87,7 +84,6 @@ module HeatmapBuilder
           num_scores: num_scores
         )
 
-        # Validate score is in range
         unless score.is_a?(Integer) && score >= 0 && score < num_scores
           raise Error, "value_to_score must return an integer between 0 and #{num_scores - 1}, got #{score.inspect}"
         end
@@ -95,12 +91,10 @@ module HeatmapBuilder
         return score
       end
 
-      # Clamp value to boundaries
       clamped_value = value.clamp(value_min, value_max)
 
-      # Default linear distribution formula
       if value_min == value_max
-        0  # All values are the same, return score 0
+        0
       else
         range = value_max - value_min
         normalized = (clamped_value - value_min).to_f / range
