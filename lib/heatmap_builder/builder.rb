@@ -52,7 +52,6 @@ module HeatmapBuilder
       validate_value_boundaries! if values
     end
 
-    # Validate that only one of scores or values is provided
     def validate_scores_or_values!
       if scores && values
         raise Error, "cannot provide both scores and values"
@@ -83,7 +82,6 @@ module HeatmapBuilder
       end
     end
 
-    # Override in subclasses to provide specific default options
     def default_options
       DEFAULT_OPTIONS
     end
