@@ -161,8 +161,36 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns valid integer" do
-    # Custom formula returns invalid value
+    # Custom formula returns invalid value (out of range)
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { 999 }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20, 30],
+      value_to_score: custom_fn
+    )
+
+    assert_raises(HeatmapBuilder::Error) do
+      builder.build
+    end
+  end
+
+  it "should validate custom value_to_score returns integer not float" do
+    # Custom formula returns float instead of integer
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 1.5 }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20, 30],
+      value_to_score: custom_fn
+    )
+
+    assert_raises(HeatmapBuilder::Error) do
+      builder.build
+    end
+  end
+
+  it "should validate custom value_to_score returns non-negative integer" do
+    # Custom formula returns negative integer
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) { -1 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
       values: [10, 20, 30],
@@ -202,6 +230,13 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     svg = builder.build
 
     assert_matches_snapshot(svg, "linear_values_empty.svg")
+  end
+
+  it "should handle all nil values" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [nil, nil, nil])
+    svg = builder.build
+
+    assert_includes svg, "<svg"
   end
 
   it "should work with hash-based color palette" do
