@@ -4,6 +4,17 @@ require_relative "builder"
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
     VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
+
+    WEEK_START_WDAY = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6
+    }.freeze
+
     def build
       svg_content = []
 
@@ -302,15 +313,7 @@ module HeatmapBuilder
     end
 
     def week_start_wday
-      case options[:start_of_week]
-      when :sunday then 0
-      when :monday then 1
-      when :tuesday then 2
-      when :wednesday then 3
-      when :thursday then 4
-      when :friday then 5
-      when :saturday then 6
-      end
+      WEEK_START_WDAY[options[:start_of_week]]
     end
 
     def day_names_for_week_start
