@@ -19,10 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Snapshot testing for comprehensive test coverage
 
 ### Changed
-- **BREAKING**: API now uses keyword arguments (`scores:`, `values:`, etc.) instead of positional arguments
+- Primary API now uses keyword arguments (`scores:`, `values:`, etc.) for clarity and flexibility
 - Refactored common validation logic into base Builder class
 - Improved test suite with Minitest specs syntax
 - Enhanced README with configuration reference and examples
+
+### Deprecated
+- `HeatmapBuilder.generate(scores, options)` - use `HeatmapBuilder.build_linear(scores: scores, **options)` instead
+- `HeatmapBuilder.generate_calendar(scores, options)` - use `HeatmapBuilder.build_calendar(scores: scores, **options)` instead
+- Old API still works with deprecation warnings for backward compatibility
 
 ## [0.1.0] - 2025-09-19
 
