@@ -31,8 +31,8 @@ def assert_matches_snapshot(actual_content, snapshot_name)
       # Provide concise diff message without dumping full SVG
       expected_size = expected.bytesize
       actual_size = actual_content.bytesize
-      expected_preview = expected[0..100].gsub("\n", " ")
-      actual_preview = actual_content[0..100].gsub("\n", " ")
+      expected_preview = expected[0..100].tr("\n", " ")
+      actual_preview = actual_content[0..100].tr("\n", " ")
 
       message = "Snapshot mismatch for #{snapshot_name}\n"
       message += "Expected size: #{expected_size} bytes, Actual size: #{actual_size} bytes\n"

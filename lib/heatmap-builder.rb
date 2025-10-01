@@ -23,10 +23,16 @@ module HeatmapBuilder
     CalendarHeatmapBuilder.new(scores: scores, values: values, **options).build
   end
 
-  # Backward compatibility aliases
-  class << self
-    alias_method :build, :build_linear
-    alias_method :generate, :build_linear
-    alias_method :generate_calendar, :build_calendar
+  # Backward compatibility methods for v0.1.0 API
+  def self.generate(scores, options = {})
+    warn "[DEPRECATION] `HeatmapBuilder.generate(scores, options)` is deprecated and will be removed in v1.0.0. " \
+         "Use `HeatmapBuilder.build_linear(scores: scores, **options)` instead."
+    build_linear(scores: scores, **options)
+  end
+
+  def self.generate_calendar(scores, options = {})
+    warn "[DEPRECATION] `HeatmapBuilder.generate_calendar(scores_by_date, options)` is deprecated and will be removed in v1.0.0. " \
+         "Use `HeatmapBuilder.build_calendar(scores: scores_by_date, **options)` instead."
+    build_calendar(scores: scores, **options)
   end
 end

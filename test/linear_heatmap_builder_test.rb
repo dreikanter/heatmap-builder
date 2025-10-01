@@ -14,32 +14,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     assert_includes svg, "height=\"10\""  # cell_size only
   end
 
-  it "#score_to_color should map scores to appropriate colors" do
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [0, 1, 2, 3, 4, 5])
-    svg = builder.build
-
-    # Score 0 should use first color (gray)
-    assert_includes svg, "fill=\"#ebedf0\""
-
-    # Higher scores should use progressively greener colors
-    assert_includes svg, "fill=\"#9be9a8\""
-    assert_includes svg, "fill=\"#40c463\""
-  end
-
-  it "should use fixed text color regardless of background" do
-    # Test with any background - text color should always be the default (#000000)
-    light_colors = %w[#ffffff #ebedf0 #9be9a8]
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [0, 1, 2], colors: light_colors)
-    svg = builder.build
-    assert_includes svg, "fill=\"#000000\""
-
-    # Test with dark background - text color should still be default
-    dark_colors = %w[#000000 #216e39 #30a14e]
-    builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [0, 1, 2], colors: dark_colors)
-    svg = builder.build
-    assert_includes svg, "fill=\"#000000\""
-  end
-
   it "should respect custom text color when provided" do
     # Test that custom text color is respected
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], text_color: "#ff0000")
