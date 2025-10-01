@@ -50,14 +50,14 @@ module HeatmapBuilder
       key.to_s.tr("_", "-")
     end
 
-    def cell_border(x, y, color, cell_size:, border_width:, corner_radius:, darker_color_method:)
+    def cell_border(x, y, color, cell_size:, border_width:, corner_radius:)
       return "" unless border_width > 0
 
       inset = border_width / 2.0
       border_x = x + inset
       border_y = y + inset
       border_size = cell_size - border_width
-      border_color = darker_color_method.call(color)
+      border_color = darker_color(color)
       border_radius = (corner_radius > 0) ? [corner_radius - inset, 0].max : 0
 
       svg_rect(

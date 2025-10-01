@@ -1,6 +1,7 @@
 require_relative "heatmap_builder/version"
 require_relative "heatmap_builder/svg_helpers"
 require_relative "heatmap_builder/color_helpers"
+require_relative "heatmap_builder/value_conversion"
 require_relative "heatmap_builder/builder"
 require_relative "heatmap_builder/linear_heatmap_builder"
 require_relative "heatmap_builder/calendar_heatmap_builder"
