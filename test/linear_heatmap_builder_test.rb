@@ -148,7 +148,6 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should accept custom value_to_score callable" do
-    # Custom formula: always return score 2
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { 2 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
@@ -161,8 +160,33 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns valid integer" do
-    # Custom formula returns invalid value
     custom_fn = ->(value:, index:, min:, max:, num_scores:) { 999 }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20, 30],
+      value_to_score: custom_fn
+    )
+
+    assert_raises(HeatmapBuilder::Error) do
+      builder.build
+    end
+  end
+
+  it "should validate custom value_to_score returns integer not float" do
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 1.5 }
+
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      values: [10, 20, 30],
+      value_to_score: custom_fn
+    )
+
+    assert_raises(HeatmapBuilder::Error) do
+      builder.build
+    end
+  end
+
+  it "should validate custom value_to_score returns non-negative integer" do
+    custom_fn = ->(value:, index:, min:, max:, num_scores:) { -1 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
       values: [10, 20, 30],
@@ -202,5 +226,29 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     svg = builder.build
 
     assert_matches_snapshot(svg, "linear_values_empty.svg")
+  end
+
+  it "should handle all nil values" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(values: [nil, nil, nil])
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+  end
+
+  it "should work with hash-based color palette" do
+    builder = HeatmapBuilder::LinearHeatmapBuilder.new(
+      scores: [0, 1, 2],
+      colors: {from: "#ffffff", to: "#ff0000", steps: 3}
+    )
+    svg = builder.build
+
+    assert_includes svg, "<svg"
+    assert_includes svg, "</svg>"
+  end
+
+  it "should raise error for invalid colors option" do
+    assert_raises(HeatmapBuilder::Error) do
+      HeatmapBuilder::LinearHeatmapBuilder.new(scores: [1], colors: "invalid")
+    end
   end
 end
