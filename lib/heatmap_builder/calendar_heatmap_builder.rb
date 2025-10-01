@@ -4,15 +4,24 @@ require_relative "builder"
 module HeatmapBuilder
   class CalendarHeatmapBuilder < Builder
     VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
+
+    WEEK_START_WDAY = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6
+    }.freeze
+
     def build
       svg_content = []
 
-      # Add day labels if enabled
       if options[:show_day_labels]
         svg_content << day_labels_svg
       end
 
-      # Add month labels and cells
       svg_content << calendar_cells_svg
 
       if options[:show_month_labels]
@@ -21,8 +30,10 @@ module HeatmapBuilder
 
       weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
       month_spacing_total = (months_in_range - 1) * options[:month_spacing]
-      width = label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
-      height = day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
+
+      cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
+      width = dow_label_offset + weeks_count * cell_size_with_spacing + month_spacing_total
+      height = month_label_offset + 7 * cell_size_with_spacing
 
       svg_container(width: width, height: height) { svg_content.join }
     end
@@ -57,7 +68,6 @@ module HeatmapBuilder
       @scores_by_date ||= if scores
         scores
       else
-        # Compute scores from values for all dates in range
         result = {}
         current_date = start_date
 
@@ -71,11 +81,11 @@ module HeatmapBuilder
       end
     end
 
+    # Converts a raw value to a score bucket using linear distribution
+    # Nil values are normalized to the minimum boundary
     def date_value_to_score(value, date)
-      # Normalize nil to minimum boundary
       value = value_min if value.nil?
 
-      # Get the custom converter if provided
       if options[:value_to_score]
         score = options[:value_to_score].call(
           value: value,
@@ -85,7 +95,6 @@ module HeatmapBuilder
           num_scores: num_scores
         )
 
-        # Validate score is in range
         unless score.is_a?(Integer) && score >= 0 && score < num_scores
           raise Error, "value_to_score must return an integer between 0 and #{num_scores - 1}, got #{score.inspect}"
         end
@@ -93,12 +102,10 @@ module HeatmapBuilder
         return score
       end
 
-      # Clamp value to boundaries
       clamped_value = value.clamp(value_min, value_max)
 
-      # Default linear distribution formula
       if value_min == value_max
-        0  # All values are the same, return score 0
+        0
       else
         range = value_max - value_min
         normalized = (clamped_value - value_min).to_f / range
@@ -162,8 +169,8 @@ module HeatmapBuilder
 
         # Generate week column - always fill all 7 days
         7.times do |day_index|
-          x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
-          y = day_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
+          x = dow_label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
+          y = month_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
 
           if current_date.between?(start_date, end_date)
             # Active cell within the specified timeframe
@@ -215,7 +222,7 @@ module HeatmapBuilder
       svg = ""
 
       day_names.each_with_index do |day_name, index|
-        y = day_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
+        y = month_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
         svg << svg_text(
           day_name,
           x: options[:font_size], y: y,
@@ -272,7 +279,7 @@ module HeatmapBuilder
               temp_week += 1
             end
 
-            x = label_offset + first_day_week_index * (options[:cell_size] + options[:cell_spacing]) + first_day_x_offset + options[:cell_size] * 0.1
+            x = dow_label_offset + first_day_week_index * (options[:cell_size] + options[:cell_spacing]) + first_day_x_offset + options[:cell_size] * 0.1
             y = options[:font_size] + 2
             month_name = options[:month_labels][current_date.month - 1]
             svg << svg_text(
@@ -293,28 +300,20 @@ module HeatmapBuilder
       svg
     end
 
+    # Find the start of the week containing start_date
     def calendar_start_date
-      # Find the start of the week containing start_date
       days_back = (start_date.wday - week_start_wday) % 7
       start_date - days_back
     end
 
+    # Find the end of the week containing end_date
     def calendar_end_date_with_full_weeks
-      # Find the end of the week containing end_date
       days_forward = (6 - (end_date.wday - week_start_wday)) % 7
       end_date + days_forward
     end
 
     def week_start_wday
-      case options[:start_of_week]
-      when :sunday then 0
-      when :monday then 1
-      when :tuesday then 2
-      when :wednesday then 3
-      when :thursday then 4
-      when :friday then 5
-      when :saturday then 6
-      end
+      WEEK_START_WDAY[options[:start_of_week]]
     end
 
     def day_names_for_week_start
@@ -326,11 +325,11 @@ module HeatmapBuilder
       options[:month_spacing] / (options[:cell_size] + options[:cell_spacing])
     end
 
-    def label_offset
+    def dow_label_offset
       options[:show_day_labels] ? options[:font_size] * 2 : 0
     end
 
-    def day_label_offset
+    def month_label_offset
       options[:show_month_labels] ? options[:font_size] + 5 : 0
     end
 
@@ -342,7 +341,7 @@ module HeatmapBuilder
       DEFAULT_OPTIONS.merge({
         cell_size: 12,
         start_of_week: :monday,
-        month_spacing: 5, # extra vertical space between months
+        month_spacing: 5, # extra horizontal space between months
         show_month_labels: true,
         show_day_labels: true,
         show_outside_cells: false, # show cells outside the timeframe with inactive styling

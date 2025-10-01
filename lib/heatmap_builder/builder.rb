@@ -6,7 +6,6 @@ module HeatmapBuilder
     include SvgHelpers
     include ColorHelpers
 
-    # Predefined color palettes
     GITHUB_GREEN = %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39].freeze
     BLUE_OCEAN = %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9].freeze
     WARM_SUNSET = %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316].freeze
@@ -41,20 +40,19 @@ module HeatmapBuilder
 
     def normalize_options!
       max_radius = (options[:cell_size] / 2.0).floor
-      @options[:corner_radius] = [[options[:corner_radius], 0].max, max_radius].min # standard:disable Style/ComparableClamp (max/min is cleaner than clamp in this case)
+      @options[:corner_radius] = options[:corner_radius].clamp(0, max_radius)
     end
 
     # Override in subclasses to add specific validations by calling super first
     def validate_options!
-      raise Error, "cell_size must be positive" unless options[:cell_size] > 0
-      raise Error, "font_size must be positive" unless options[:font_size] > 0
+      raise Error, "cell_size must be positive" unless options[:cell_size].positive?
+      raise Error, "font_size must be positive" unless options[:font_size].positive?
       validate_colors_option!
       validate_scores_or_values!
       validate_value_boundaries! if values
     end
 
     def validate_scores_or_values!
-      # Validate that only one of scores or values is provided
       if scores && values
         raise Error, "cannot provide both scores and values"
       end
@@ -65,12 +63,9 @@ module HeatmapBuilder
     end
 
     def validate_value_boundaries!
-      # Validate value_min and value_max
-      if options[:value_min] && options[:value_max]
-        if options[:value_min] > options[:value_max]
-          raise Error, "value_min must be less than or equal to value_max"
-        end
-      end
+      return unless options[:value_min] && options[:value_max]
+      return unless options[:value_min] > options[:value_max]
+      raise Error, "value_min must be less than or equal to value_max"
     end
 
     def validate_colors_option!
@@ -87,7 +82,6 @@ module HeatmapBuilder
       end
     end
 
-    # Override in subclasses to provide specific default options
     def default_options
       DEFAULT_OPTIONS
     end
