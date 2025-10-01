@@ -32,8 +32,8 @@ module HeatmapBuilder
       month_spacing_total = (months_in_range - 1) * options[:month_spacing]
 
       cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
-      width = label_offset + weeks_count * cell_size_with_spacing + month_spacing_total
-      height = day_label_offset + 7 * cell_size_with_spacing
+      width = dow_label_offset + weeks_count * cell_size_with_spacing + month_spacing_total
+      height = month_label_offset + 7 * cell_size_with_spacing
 
       svg_container(width: width, height: height) { svg_content.join }
     end
@@ -169,8 +169,8 @@ module HeatmapBuilder
 
         # Generate week column - always fill all 7 days
         7.times do |day_index|
-          x = label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
-          y = day_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
+          x = dow_label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
+          y = month_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
 
           if current_date.between?(start_date, end_date)
             # Active cell within the specified timeframe
@@ -222,7 +222,7 @@ module HeatmapBuilder
       svg = ""
 
       day_names.each_with_index do |day_name, index|
-        y = day_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
+        y = month_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
         svg << svg_text(
           day_name,
           x: options[:font_size], y: y,
@@ -279,7 +279,7 @@ module HeatmapBuilder
               temp_week += 1
             end
 
-            x = label_offset + first_day_week_index * (options[:cell_size] + options[:cell_spacing]) + first_day_x_offset + options[:cell_size] * 0.1
+            x = dow_label_offset + first_day_week_index * (options[:cell_size] + options[:cell_spacing]) + first_day_x_offset + options[:cell_size] * 0.1
             y = options[:font_size] + 2
             month_name = options[:month_labels][current_date.month - 1]
             svg << svg_text(
@@ -325,11 +325,11 @@ module HeatmapBuilder
       options[:month_spacing] / (options[:cell_size] + options[:cell_spacing])
     end
 
-    def label_offset
+    def dow_label_offset
       options[:show_day_labels] ? options[:font_size] * 2 : 0
     end
 
-    def day_label_offset
+    def month_label_offset
       options[:show_month_labels] ? options[:font_size] + 5 : 0
     end
 
