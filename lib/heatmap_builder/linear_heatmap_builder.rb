@@ -31,11 +31,11 @@ module HeatmapBuilder
       @computed_scores ||= scores || values.map.with_index { |value, index| value_to_score(value, index) }
     end
 
+    # Converts a raw value to a score bucket using linear distribution
+    # Nil values are normalized to the minimum boundary
     def value_to_score(value, index)
-      # Normalize nil to minimum boundary
       value = value_min if value.nil?
 
-      # Get the custom converter if provided
       if options[:value_to_score]
         score = options[:value_to_score].call(
           value: value,
@@ -45,7 +45,6 @@ module HeatmapBuilder
           num_scores: num_scores
         )
 
-        # Validate score is in range
         unless score.is_a?(Integer) && score >= 0 && score < num_scores
           raise Error, "value_to_score must return an integer between 0 and #{num_scores - 1}, got #{score.inspect}"
         end
@@ -53,12 +52,10 @@ module HeatmapBuilder
         return score
       end
 
-      # Clamp value to boundaries
       clamped_value = value.clamp(value_min, value_max)
 
-      # Default linear distribution formula
       if value_min == value_max
-        0  # All values are the same, return score 0
+        0
       else
         range = value_max - value_min
         normalized = (clamped_value - value_min).to_f / range
