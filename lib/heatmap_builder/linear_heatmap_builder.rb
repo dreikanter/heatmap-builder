@@ -43,7 +43,7 @@ module HeatmapBuilder
       x = index * (options[:cell_size] + options[:cell_spacing])
       y = 0
 
-      color = score_to_color(score, colors: options[:colors])
+      color = score_to_color(score, colors: color_palette)
 
       colored_rect = svg_rect(
         x: x, y: y,

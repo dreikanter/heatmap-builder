@@ -85,5 +85,16 @@ module HeatmapBuilder
     def default_options
       DEFAULT_OPTIONS
     end
+
+    def color_palette
+      @color_palette ||= begin
+        colors_option = options[:colors]
+        if colors_option.is_a?(Hash)
+          generate_color_palette(colors_option[:from], colors_option[:to], colors_option[:steps])
+        else
+          colors_option
+        end
+      end
+    end
   end
 end
