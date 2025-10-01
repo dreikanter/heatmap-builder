@@ -21,8 +21,10 @@ module HeatmapBuilder
 
       weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
       month_spacing_total = (months_in_range - 1) * options[:month_spacing]
-      width = label_offset + weeks_count * (options[:cell_size] + options[:cell_spacing]) + month_spacing_total
-      height = day_label_offset + 7 * (options[:cell_size] + options[:cell_spacing])
+
+      cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
+      width = label_offset + weeks_count * cell_size_with_spacing + month_spacing_total
+      height = day_label_offset + 7 * cell_size_with_spacing
 
       svg_container(width: width, height: height) { svg_content.join }
     end
