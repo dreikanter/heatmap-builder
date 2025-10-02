@@ -69,6 +69,75 @@ svg = HeatmapBuilder.build_calendar(scores: scores_by_date)
 
 ![GitHub-style Calendar](examples/calendar_github_style.svg)
 
+### Linear Heatmap Options
+
+You must provide either `scores:` or `values:` (but not both). All other options are optional keyword arguments with sensible defaults.
+
+**Data options:**
+
+- `scores` - Array of pre-calculated scores (integers from 0 to number of colors minus 1). Required if `values` is not provided.
+- `values` - Array of arbitrary numeric values to be automatically mapped to scores. Required if `scores` is not provided. See [Using Raw Values Instead of Scores](#using-raw-values-instead-of-scores).
+
+**Value-to-score conversion options** (only used with `values:`):
+
+- `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
+- `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
+- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `index:`, `min:`, `max:`, `max_score:` parameters and must return an integer between 0 and `max_score`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
+
+**Appearance options:**
+
+- `cell_size` - Size of each square in pixels. Defaults to 10.
+- `cell_spacing` - Space between squares in pixels. Defaults to 1.
+- `font_size` - Font size for score text in pixels. Defaults to 8.
+- `border_width` - Border width around each cell in pixels. Defaults to 1.
+- `corner_radius` - Corner radius for rounded cells. Must be between 0 (square corners) and `floor(cell_size/2)` (circular cells). Values outside this range are automatically clamped. Defaults to 0.
+- `text_color` - Color of score text as a hex string. Defaults to `"#000000"` (black).
+
+**Color options:**
+
+- `colors` - Color palette for the heatmap. Can be a predefined palette constant (e.g., `HeatmapBuilder::GITHUB_GREEN`), an array of hex color strings (e.g., `%w[#ebedf0 #9be9a8 #40c463]`), or a hash for OKLCH interpolation (e.g., `{ from: "#ebedf0", to: "#216e39", steps: 5 }`). Defaults to `HeatmapBuilder::GITHUB_GREEN`. See [Predefined Color Palettes](#predefined-color-palettes) and [Dynamic Palettes Generation](#dynamic-palettes-generation).
+
+### Calendar Heatmap Options
+
+You must provide either `scores:` or `values:` (but not both). All other options are optional keyword arguments with sensible defaults.
+
+**Data options:**
+
+- `scores` - Hash of pre-calculated scores by date (integers from 0 to number of colors minus 1). Keys can be Date objects or date strings (e.g., `'2024-01-01'`). Required if `values` is not provided.
+- `values` - Hash of arbitrary numeric values by date to be automatically mapped to scores. Keys can be Date objects or date strings. Required if `scores` is not provided. See [Using Raw Values Instead of Scores](#using-raw-values-instead-of-scores).
+
+**Value-to-score conversion options** (only used with `values:`):
+
+- `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
+- `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
+- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `date:`, `min:`, `max:`, `max_score:` parameters and must return an integer between 0 and `max_score`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
+
+**Appearance options:**
+
+- `cell_size` - Size of each square in pixels. Defaults to 12.
+- `cell_spacing` - Space between squares in pixels. Defaults to 1.
+- `font_size` - Font size for labels in pixels. Defaults to 8.
+- `border_width` - Border width around each cell in pixels. Defaults to 1.
+- `corner_radius` - Corner radius for rounded cells. Must be between 0 (square corners) and `floor(cell_size/2)` (circular cells). Values outside this range are automatically clamped. Defaults to 0.
+- `text_color` - Color of label text as a hex string. Defaults to `"#000000"` (black).
+
+**Color options:**
+
+- `colors` - Color palette for the heatmap. Can be a predefined palette constant (e.g., `HeatmapBuilder::GITHUB_GREEN`), an array of hex color strings (e.g., `%w[#ebedf0 #9be9a8 #40c463]`), or a hash for OKLCH interpolation (e.g., `{ from: "#ebedf0", to: "#216e39", steps: 5 }`). Defaults to `HeatmapBuilder::GITHUB_GREEN`. See [Predefined Color Palettes](#predefined-color-palettes) and [Dynamic Palettes Generation](#dynamic-palettes-generation).
+
+**Calendar-specific options:**
+
+- `start_of_week` - First day of the week. One of `:sunday`, `:monday`, `:tuesday`, `:wednesday`, `:thursday`, `:friday`, `:saturday`. Defaults to `:monday`.
+- `month_spacing` - Extra horizontal space between months in pixels. Defaults to 5.
+- `show_month_labels` - Show month names at the top of the calendar. Defaults to `true`.
+- `show_day_labels` - Show day abbreviations on the left side of the calendar. Defaults to `true`.
+- `show_outside_cells` - Show cells outside the date range with inactive styling. Defaults to `false`.
+
+**Internationalization options:**
+
+- `day_labels` - Array of day abbreviations starting from Sunday (7 elements). Defaults to `%w[S M T W T F S]`. See [I18n](#i18n).
+- `month_labels` - Array of month abbreviations from January to December (12 elements). Defaults to `%w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]`. See [I18n](#i18n).
+
 ### Using Raw Values Instead of Scores
 
 A **score** is an integer (0 to N-1) that maps directly to a color in your palette. For example, with 5 colors, valid scores are 0-4.
@@ -104,99 +173,48 @@ The builder will automatically:
 - Clamp values outside the boundaries
 - Handle nil values by treating them as the minimum boundary
 
-You can also provide a custom value-to-score conversion function:
+### Custom Scoring Logic
+
+By default, values are mapped to scores using linear distribution. You can provide a custom value-to-score conversion function for different behaviors like logarithmic scales, exponential curves, or custom thresholds.
+
+The callable receives these parameters:
+- `value:` - The current value being converted
+- `index:` or `date:` - The position in the data (linear heatmaps use `index:`, calendar heatmaps use `date:`)
+- `min:` - The minimum boundary value
+- `max:` - The maximum boundary value
+- `max_score:` - The maximum valid score (color palette length minus 1)
+
+The function must return an integer between 0 and `max_score`.
+
+Custom scoring logic - linear distribution example:
 
 ```ruby
-# Custom scoring logic
-custom_formula = ->(value:, index:, min:, max:, num_scores:) {
-  # Your custom logic here
-  # Must return integer between 0 and num_scores-1
-  ((value - min) / (max - min) * (num_scores - 1)).floor
+linear_formula = ->(value:, index:, min:, max:, max_score:) {
+  ((value - min) / (max - min) * max_score).round
 }
 
 svg = HeatmapBuilder.build_linear(
   values: [10, 20, 30],
-  value_to_score: custom_formula
+  value_to_score: linear_formula
 )
 ```
 
-For calendar heatmaps, the callable receives `date:` parameter instead of `index:`.
-
-### Linear Heatmap Options
-
-All options have defaults and are optional:
+Logarithmic scale for data with wide range (e.g., 1 to 10000):
 
 ```ruby
-HeatmapBuilder.build_linear(
-  # Data - provide either scores OR values (not both)
-  scores: [0, 1, 2, 3, 4],    # Pre-calculated scores (0 to num_colors-1)
-  # OR
-  values: [10, 25, 50, 75, 100],  # Arbitrary numeric values
+logarithmic_formula = ->(value:, index:, min:, max:, max_score:) {
+  return 0 if value <= 0 || min <= 0
 
-  # Value-to-Score Options (only used with values:)
-  value_min: 0,               # Minimum boundary (defaults to actual min)
-  value_max: 100,             # Maximum boundary (defaults to actual max)
-  value_to_score: ->(value:, index:, min:, max:, num_scores:) { ... },  # Custom conversion function
+  log_value = Math.log10(value)
+  log_min = Math.log10(min)
+  log_max = Math.log10(max)
 
-  # Appearance
-  cell_size: 10,              # Size of each square in pixels
-  cell_spacing: 1,            # Space between squares in pixels
-  font_size: 8,               # Font size for score text
-  border_width: 1,            # Border width around each cell
-  corner_radius: 0,           # Corner radius for rounded cells (0 for square, max: floor(cell_size/2))
-  text_color: "#000000",      # Color of score text
+  ((log_value - log_min) / (log_max - log_min) * max_score).round.clamp(0, max_score)
+}
 
-  # Colors - can be an array of hex colors or a hash for OKLCH interpolation
-  colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
-  # OR manually define color array:
-  # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
-  # OR use OKLCH interpolation:
-  # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
-)
-```
-
-### Calendar Heatmap Options
-
-All options have defaults and are optional:
-
-```ruby
-HeatmapBuilder.build_calendar(
-  # Data - provide either scores OR values (not both)
-  # Keys can be Date objects or date strings ('2024-01-01')
-  scores: { '2024-01-01' => 2, '2024-01-02' => 4 },  # Pre-calculated scores (0 to num_colors-1)
-  # OR
-  values: { '2024-01-01' => 45.2, '2024-01-02' => 78.5 },  # Arbitrary numeric values
-
-  # Value-to-Score Options (only used with values:)
-  value_min: 0,               # Minimum boundary (defaults to actual min)
-  value_max: 100,             # Maximum boundary (defaults to actual max)
-  value_to_score: ->(value:, date:, min:, max:, num_scores:) { ... },  # Custom conversion function
-
-  # Appearance
-  cell_size: 12,              # Size of each square in pixels
-  cell_spacing: 1,            # Space between squares in pixels
-  font_size: 8,               # Font size for score text
-  border_width: 1,            # Border width around each cell
-  corner_radius: 0,           # Corner radius for rounded cells (0 for square, max: floor(cell_size/2))
-  text_color: "#000000",      # Color of score text
-
-  # Colors - can be an array of hex colors or a hash for OKLCH interpolation
-  colors: HeatmapBuilder::GITHUB_GREEN,  # Use predefined palette
-  # OR manually define color array:
-  # colors: %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39]
-  # OR use OKLCH interpolation:
-  # colors: { from: "#ebedf0", to: "#216e39", steps: 5 }
-
-  # Calendar-specific options
-  start_of_week: :monday,     # :sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday
-  month_spacing: 5,           # Extra space between months in pixels
-  show_month_labels: true,    # Show month names at top
-  show_day_labels: true,      # Show day abbreviations on left
-  show_outside_cells: false,  # Show inactive cells outside date range
-
-  # Internationalization
-  day_labels: %w[S M T W T F S],  # Day abbreviations starting from Sunday
-  month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]  # Month abbreviations
+svg = HeatmapBuilder.build_linear(
+  values: [1, 10, 100, 1000, 10000],
+  value_to_score: logarithmic_formula
 )
 ```
 
@@ -308,7 +326,7 @@ HeatmapBuilder.build_linear(
 
 ![Linear Rounded Corners](examples/linear_rounded_corners.svg)
 
-The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Maximum radius value render circular cells:
+The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Values outside this range are automatically clamped to the valid range (negative values become 0, values exceeding the maximum become `floor(cell_size/2)`). Maximum radius values render circular cells:
 
 ```ruby
 # Linear heatmap with max radius rounded corners - circular cells

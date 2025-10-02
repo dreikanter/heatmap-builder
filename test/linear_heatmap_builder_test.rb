@@ -148,7 +148,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should accept custom value_to_score callable" do
-    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 2 }
+    custom_fn = ->(value:, index:, min:, max:, max_score:) { 2 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
       values: [10, 20, 30],
@@ -160,7 +160,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns valid integer" do
-    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 999 }
+    custom_fn = ->(value:, index:, min:, max:, max_score:) { 999 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
       values: [10, 20, 30],
@@ -173,7 +173,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns integer not float" do
-    custom_fn = ->(value:, index:, min:, max:, num_scores:) { 1.5 }
+    custom_fn = ->(value:, index:, min:, max:, max_score:) { 1.5 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
       values: [10, 20, 30],
@@ -186,7 +186,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
   end
 
   it "should validate custom value_to_score returns non-negative integer" do
-    custom_fn = ->(value:, index:, min:, max:, num_scores:) { -1 }
+    custom_fn = ->(value:, index:, min:, max:, max_score:) { -1 }
 
     builder = HeatmapBuilder::LinearHeatmapBuilder.new(
       values: [10, 20, 30],
@@ -200,8 +200,8 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
 
   it "should pass correct parameters to custom value_to_score" do
     received_params = []
-    custom_fn = ->(value:, index:, min:, max:, num_scores:) {
-      received_params << {value: value, index: index, min: min, max: max, num_scores: num_scores}
+    custom_fn = ->(value:, index:, min:, max:, max_score:) {
+      received_params << {value: value, index: index, min: min, max: max, max_score: max_score}
       0
     }
 
@@ -218,7 +218,7 @@ describe HeatmapBuilder::LinearHeatmapBuilder do
     assert_equal 0, received_params[0][:index]
     assert_equal 0, received_params[0][:min]
     assert_equal 100, received_params[0][:max]
-    assert_equal 5, received_params[0][:num_scores]  # Default GITHUB_GREEN has 5 colors
+    assert_equal 4, received_params[0][:max_score]  # Default GITHUB_GREEN has 5 colors (max_score = 4)
   end
 
   it "should handle empty values array" do
