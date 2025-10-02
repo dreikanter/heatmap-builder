@@ -17,8 +17,8 @@ module HeatmapBuilder
 
   # Builds a linear (single-row) heatmap visualization.
   #
-  # @param scores [Array<Integer>, nil] Pre-calculated score values (0 to num_colors-1)
-  # @param values [Array<Numeric>, nil] Raw numeric values to be mapped to scores
+  # @param scores [Array<Integer>, nil] Pre-calculated score values (0 to num_colors-1). Required unless values provided.
+  # @param values [Array<Numeric>, nil] Raw numeric values to be mapped to scores. Required unless scores provided.
   # @param options [Hash] Customization options
   # @return [String] SVG markup
   # @see https://github.com/dreikanter/heatmap-builder#linear-heatmaps Full documentation
@@ -31,8 +31,8 @@ module HeatmapBuilder
 
   # Builds a calendar (GitHub-style) heatmap visualization.
   #
-  # @param scores [Hash<Date, Integer>, Hash<String, Integer>, nil] Pre-calculated score values by date
-  # @param values [Hash<Date, Numeric>, Hash<String, Numeric>, nil] Raw numeric values by date
+  # @param scores [Hash<Date, Integer>, Hash<String, Integer>, nil] Pre-calculated score values by date. Required unless values provided.
+  # @param values [Hash<Date, Numeric>, Hash<String, Numeric>, nil] Raw numeric values by date. Required unless scores provided.
   # @param options [Hash] Customization options
   # @return [String] SVG markup
   # @see https://github.com/dreikanter/heatmap-builder#calendar-heatmaps Full documentation
