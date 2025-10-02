@@ -91,7 +91,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 - `font_size` - Font size for score text in pixels. Defaults to 8.
 - `border_width` - Border width around each cell in pixels. Defaults to 1.
 - `corner_radius` - Corner radius for rounded cells. Must be between 0 (square corners) and `floor(cell_size/2)` (circular cells). Values outside this range are automatically clamped. Defaults to 0.
-- `text_color` - Color of score text as a hex string. Defaults to `"#000000"`.
+- `text_color` - Color of score text as a hex string. Defaults to `"#000000"` (black).
 
 **Color options:**
 
@@ -119,7 +119,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 - `font_size` - Font size for labels in pixels. Defaults to 8.
 - `border_width` - Border width around each cell in pixels. Defaults to 1.
 - `corner_radius` - Corner radius for rounded cells. Must be between 0 (square corners) and `floor(cell_size/2)` (circular cells). Values outside this range are automatically clamped. Defaults to 0.
-- `text_color` - Color of label text as a hex string. Defaults to `"#000000"`.
+- `text_color` - Color of label text as a hex string. Defaults to `"#000000"` (black).
 
 **Color options:**
 
