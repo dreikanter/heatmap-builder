@@ -186,6 +186,8 @@ The callable receives these parameters:
 
 The function must return an integer between 0 and `num_scores - 1`.
 
+**Custom scoring logic - linear distribution example:**
+
 ```ruby
 # Linear distribution (this is the default behavior)
 linear_formula = ->(value:, index:, min:, max:, num_scores:) {
@@ -196,8 +198,11 @@ svg = HeatmapBuilder.build_linear(
   values: [10, 20, 30],
   value_to_score: linear_formula
 )
+```
 
-# Logarithmic scale for data with wide range (e.g., 1 to 10000)
+**Logarithmic scale for data with wide range (e.g., 1 to 10000):**
+
+```ruby
 logarithmic_formula = ->(value:, index:, min:, max:, num_scores:) {
   return 0 if value <= 0 || min <= 0
 
