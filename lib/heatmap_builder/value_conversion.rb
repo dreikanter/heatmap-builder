@@ -57,7 +57,7 @@ module HeatmapBuilder
       else
         range = value_max - value_min
         normalized = (clamped_value - value_min).to_f / range
-        (normalized * (color_count - 1)).floor
+        (normalized * (color_count - 1)).round
       end
     end
   end

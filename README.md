@@ -190,7 +190,7 @@ Custom scoring logic - linear distribution example:
 
 ```ruby
 linear_formula = ->(value:, index:, min:, max:, max_score:) {
-  ((value - min) / (max - min) * max_score).floor
+  ((value - min) / (max - min) * max_score).round
 }
 
 svg = HeatmapBuilder.build_linear(
@@ -209,7 +209,7 @@ logarithmic_formula = ->(value:, index:, min:, max:, max_score:) {
   log_min = Math.log10(min)
   log_max = Math.log10(max)
 
-  ((log_value - log_min) / (log_max - log_min) * max_score).floor.clamp(0, max_score)
+  ((log_value - log_min) / (log_max - log_min) * max_score).round.clamp(0, max_score)
 }
 
 svg = HeatmapBuilder.build_linear(
