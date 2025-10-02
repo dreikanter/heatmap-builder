@@ -308,7 +308,7 @@ HeatmapBuilder.build_linear(
 
 ![Linear Rounded Corners](examples/linear_rounded_corners.svg)
 
-The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Maximum radius value render circular cells:
+The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Values outside this range are automatically clamped to the valid range (negative values become 0, values exceeding the maximum become `floor(cell_size/2)`). Maximum radius values render circular cells:
 
 ```ruby
 # Linear heatmap with max radius rounded corners - circular cells
