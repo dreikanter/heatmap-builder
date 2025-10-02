@@ -18,10 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dynamic color palette generation using OKLCH color space interpolation
 - Rounded corners support for heatmap cells via `corner_radius` option
 - Test coverage reporting with SimpleCov
-- Snapshot testing for comprehensive test coverage
+- Snapshot testing for visual regression testing
 - YARD documentation for public API methods
 - Logarithmic scale example for custom scoring logic
-- Comprehensive options documentation in README with bullet lists
+- Detailed options documentation in README with bullet lists
 
 ### Changed
 - Primary API now uses keyword arguments (`scores:`, `values:`, etc.) for clarity and flexibility
