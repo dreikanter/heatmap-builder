@@ -107,7 +107,7 @@ The builder will automatically:
 You can also provide a custom value-to-score conversion function:
 
 ```ruby
-# Custom scoring logic
+# Custom scoring logic - linear distribution
 custom_formula = ->(value:, index:, min:, max:, num_scores:) {
   # Your custom logic here
   # Must return integer between 0 and num_scores-1
@@ -117,6 +117,22 @@ custom_formula = ->(value:, index:, min:, max:, num_scores:) {
 svg = HeatmapBuilder.build_linear(
   values: [10, 20, 30],
   value_to_score: custom_formula
+)
+
+# Logarithmic scale for data with wide range (e.g., 1 to 10000)
+logarithmic_formula = ->(value:, index:, min:, max:, num_scores:) {
+  return 0 if value <= 0 || min <= 0
+
+  log_value = Math.log10(value)
+  log_min = Math.log10(min)
+  log_max = Math.log10(max)
+
+  ((log_value - log_min) / (log_max - log_min) * (num_scores - 1)).floor.clamp(0, num_scores - 1)
+}
+
+svg = HeatmapBuilder.build_linear(
+  values: [1, 10, 100, 1000, 10000],
+  value_to_score: logarithmic_formula
 )
 ```
 
