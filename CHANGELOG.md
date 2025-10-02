@@ -29,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved test suite with Minitest specs syntax
 - Enhanced README with better organization and forward references
 - Renamed `num_scores` parameter to `max_score` for better clarity in custom scoring functions
-- Changed value-to-score calculation from `floor` to `round` for better score distribution
 - Automatic corner radius clamping to valid range
 
 ### Deprecated
