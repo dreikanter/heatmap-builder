@@ -82,7 +82,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 
 - `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
 - `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
-- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `index:`, `min:`, `max:`, `num_scores:` parameters and must return an integer between 0 and `num_scores - 1`. See [Using Raw Values Instead of Scores](#using-raw-values-instead-of-scores) for details.
+- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `index:`, `min:`, `max:`, `num_scores:` parameters and must return an integer between 0 and `num_scores - 1`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
 
 **Appearance options:**
 
@@ -110,7 +110,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 
 - `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
 - `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
-- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `date:`, `min:`, `max:`, `num_scores:` parameters and must return an integer between 0 and `num_scores - 1`. See [Using Raw Values Instead of Scores](#using-raw-values-instead-of-scores) for details.
+- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `date:`, `min:`, `max:`, `num_scores:` parameters and must return an integer between 0 and `num_scores - 1`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
 
 **Appearance options:**
 
@@ -173,19 +173,28 @@ The builder will automatically:
 - Clamp values outside the boundaries
 - Handle nil values by treating them as the minimum boundary
 
-You can also provide a custom value-to-score conversion function:
+### Custom Scoring Logic
+
+By default, values are mapped to scores using linear distribution. You can provide a custom value-to-score conversion function for different behaviors like logarithmic scales, exponential curves, or custom thresholds.
+
+The callable receives these parameters:
+- `value:` - The current value being converted
+- `index:` or `date:` - The position in the data (linear heatmaps use `index:`, calendar heatmaps use `date:`)
+- `min:` - The minimum boundary value
+- `max:` - The maximum boundary value
+- `num_scores:` - The number of available scores (length of color palette)
+
+The function must return an integer between 0 and `num_scores - 1`.
 
 ```ruby
-# Custom scoring logic - linear distribution
-custom_formula = ->(value:, index:, min:, max:, num_scores:) {
-  # Your custom logic here
-  # Must return integer between 0 and num_scores-1
+# Linear distribution (this is the default behavior)
+linear_formula = ->(value:, index:, min:, max:, num_scores:) {
   ((value - min) / (max - min) * (num_scores - 1)).floor
 }
 
 svg = HeatmapBuilder.build_linear(
   values: [10, 20, 30],
-  value_to_score: custom_formula
+  value_to_score: linear_formula
 )
 
 # Logarithmic scale for data with wide range (e.g., 1 to 10000)
@@ -204,8 +213,6 @@ svg = HeatmapBuilder.build_linear(
   value_to_score: logarithmic_formula
 )
 ```
-
-For calendar heatmaps, the callable receives `date:` parameter instead of `index:`.
 
 ### Predefined Color Palettes
 
