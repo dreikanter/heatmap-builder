@@ -140,7 +140,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
 
   it "should accept custom value_to_score callable for calendar" do
     # Custom formula: always return score 2
-    custom_fn = ->(value:, date:, min:, max:, num_scores:) { 2 }
+    custom_fn = ->(value:, date:, min:, max:, max_score:) { 2 }
 
     date_values = {
       Date.new(2024, 1, 1) => 10,
@@ -158,8 +158,8 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
 
   it "should pass date parameter to custom value_to_score" do
     received_params = []
-    custom_fn = ->(value:, date:, min:, max:, num_scores:) {
-      received_params << {value: value, date: date, min: min, max: max, num_scores: num_scores}
+    custom_fn = ->(value:, date:, min:, max:, max_score:) {
+      received_params << {value: value, date: date, min: min, max: max, max_score: max_score}
       0
     }
 

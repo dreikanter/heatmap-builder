@@ -82,7 +82,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 
 - `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
 - `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
-- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `index:`, `min:`, `max:`, `num_scores:` parameters and must return an integer between 0 and `num_scores - 1`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
+- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `index:`, `min:`, `max:`, `max_score:` parameters and must return an integer between 0 and `max_score`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
 
 **Appearance options:**
 
@@ -110,7 +110,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 
 - `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
 - `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
-- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `date:`, `min:`, `max:`, `num_scores:` parameters and must return an integer between 0 and `num_scores - 1`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
+- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `date:`, `min:`, `max:`, `max_score:` parameters and must return an integer between 0 and `max_score`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
 
 **Appearance options:**
 
@@ -182,15 +182,15 @@ The callable receives these parameters:
 - `index:` or `date:` - The position in the data (linear heatmaps use `index:`, calendar heatmaps use `date:`)
 - `min:` - The minimum boundary value
 - `max:` - The maximum boundary value
-- `num_scores:` - The number of available scores (length of color palette)
+- `max_score:` - The maximum valid score (color palette length minus 1)
 
-The function must return an integer between 0 and `num_scores - 1`.
+The function must return an integer between 0 and `max_score`.
 
 Custom scoring logic - linear distribution example:
 
 ```ruby
-linear_formula = ->(value:, index:, min:, max:, num_scores:) {
-  ((value - min) / (max - min) * (num_scores - 1)).floor
+linear_formula = ->(value:, index:, min:, max:, max_score:) {
+  ((value - min) / (max - min) * max_score).floor
 }
 
 svg = HeatmapBuilder.build_linear(
@@ -202,14 +202,14 @@ svg = HeatmapBuilder.build_linear(
 Logarithmic scale for data with wide range (e.g., 1 to 10000):
 
 ```ruby
-logarithmic_formula = ->(value:, index:, min:, max:, num_scores:) {
+logarithmic_formula = ->(value:, index:, min:, max:, max_score:) {
   return 0 if value <= 0 || min <= 0
 
   log_value = Math.log10(value)
   log_min = Math.log10(min)
   log_max = Math.log10(max)
 
-  ((log_value - log_min) / (log_max - log_min) * (num_scores - 1)).floor.clamp(0, num_scores - 1)
+  ((log_value - log_min) / (log_max - log_min) * max_score).floor.clamp(0, max_score)
 }
 
 svg = HeatmapBuilder.build_linear(

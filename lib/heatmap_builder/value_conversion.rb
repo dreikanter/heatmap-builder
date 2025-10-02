@@ -39,7 +39,7 @@ module HeatmapBuilder
           value: value,
           min: value_min,
           max: value_max,
-          num_scores: color_count,
+          max_score: color_count - 1,
           **params
         )
 
