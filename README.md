@@ -69,75 +69,6 @@ svg = HeatmapBuilder.build_calendar(scores: scores_by_date)
 
 ![GitHub-style Calendar](examples/calendar_github_style.svg)
 
-### Using Raw Values Instead of Scores
-
-A **score** is an integer (0 to N-1) that maps directly to a color in your palette. For example, with 5 colors, valid scores are 0-4.
-
-Instead of pre-calculating scores, you can provide raw numeric values (like 45.2, 78, 1000) and let the builder automatically map them to scores using linear distribution:
-
-```ruby
-# Linear heatmap with automatic score calculation
-values = [10, 25, 50, 75, 100]
-svg = HeatmapBuilder.build_linear(
-  values: values,
-  value_min: 0,    # Optional: explicitly set minimum (defaults to actual min)
-  value_max: 100   # Optional: explicitly set maximum (defaults to actual max)
-)
-
-# Calendar heatmap with automatic score calculation
-values_by_date = {
-  Date.new(2024, 1, 1) => 45.2,
-  Date.new(2024, 1, 2) => 78.5,
-  Date.new(2024, 1, 3) => 12.0
-}
-
-svg = HeatmapBuilder.build_calendar(
-  values: values_by_date,
-  value_min: 0,
-  value_max: 100
-)
-```
-
-The builder will automatically:
-- Calculate min/max boundaries from your data if not specified
-- Map values to color scores using linear distribution
-- Clamp values outside the boundaries
-- Handle nil values by treating them as the minimum boundary
-
-You can also provide a custom value-to-score conversion function:
-
-```ruby
-# Custom scoring logic - linear distribution
-custom_formula = ->(value:, index:, min:, max:, num_scores:) {
-  # Your custom logic here
-  # Must return integer between 0 and num_scores-1
-  ((value - min) / (max - min) * (num_scores - 1)).floor
-}
-
-svg = HeatmapBuilder.build_linear(
-  values: [10, 20, 30],
-  value_to_score: custom_formula
-)
-
-# Logarithmic scale for data with wide range (e.g., 1 to 10000)
-logarithmic_formula = ->(value:, index:, min:, max:, num_scores:) {
-  return 0 if value <= 0 || min <= 0
-
-  log_value = Math.log10(value)
-  log_min = Math.log10(min)
-  log_max = Math.log10(max)
-
-  ((log_value - log_min) / (log_max - log_min) * (num_scores - 1)).floor.clamp(0, num_scores - 1)
-}
-
-svg = HeatmapBuilder.build_linear(
-  values: [1, 10, 100, 1000, 10000],
-  value_to_score: logarithmic_formula
-)
-```
-
-For calendar heatmaps, the callable receives `date:` parameter instead of `index:`.
-
 ### Linear Heatmap Options
 
 You must provide either `scores:` or `values:` (but not both). All other options are optional keyword arguments with sensible defaults.
@@ -206,6 +137,75 @@ You must provide either `scores:` or `values:` (but not both). All other options
 
 - `day_labels` - Array of day abbreviations starting from Sunday (7 elements). Defaults to `%w[S M T W T F S]`. See [I18n](#i18n).
 - `month_labels` - Array of month abbreviations from January to December (12 elements). Defaults to `%w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]`. See [I18n](#i18n).
+
+### Using Raw Values Instead of Scores
+
+A **score** is an integer (0 to N-1) that maps directly to a color in your palette. For example, with 5 colors, valid scores are 0-4.
+
+Instead of pre-calculating scores, you can provide raw numeric values (like 45.2, 78, 1000) and let the builder automatically map them to scores using linear distribution:
+
+```ruby
+# Linear heatmap with automatic score calculation
+values = [10, 25, 50, 75, 100]
+svg = HeatmapBuilder.build_linear(
+  values: values,
+  value_min: 0,    # Optional: explicitly set minimum (defaults to actual min)
+  value_max: 100   # Optional: explicitly set maximum (defaults to actual max)
+)
+
+# Calendar heatmap with automatic score calculation
+values_by_date = {
+  Date.new(2024, 1, 1) => 45.2,
+  Date.new(2024, 1, 2) => 78.5,
+  Date.new(2024, 1, 3) => 12.0
+}
+
+svg = HeatmapBuilder.build_calendar(
+  values: values_by_date,
+  value_min: 0,
+  value_max: 100
+)
+```
+
+The builder will automatically:
+- Calculate min/max boundaries from your data if not specified
+- Map values to color scores using linear distribution
+- Clamp values outside the boundaries
+- Handle nil values by treating them as the minimum boundary
+
+You can also provide a custom value-to-score conversion function:
+
+```ruby
+# Custom scoring logic - linear distribution
+custom_formula = ->(value:, index:, min:, max:, num_scores:) {
+  # Your custom logic here
+  # Must return integer between 0 and num_scores-1
+  ((value - min) / (max - min) * (num_scores - 1)).floor
+}
+
+svg = HeatmapBuilder.build_linear(
+  values: [10, 20, 30],
+  value_to_score: custom_formula
+)
+
+# Logarithmic scale for data with wide range (e.g., 1 to 10000)
+logarithmic_formula = ->(value:, index:, min:, max:, num_scores:) {
+  return 0 if value <= 0 || min <= 0
+
+  log_value = Math.log10(value)
+  log_min = Math.log10(min)
+  log_max = Math.log10(max)
+
+  ((log_value - log_min) / (log_max - log_min) * (num_scores - 1)).floor.clamp(0, num_scores - 1)
+}
+
+svg = HeatmapBuilder.build_linear(
+  values: [1, 10, 100, 1000, 10000],
+  value_to_score: logarithmic_formula
+)
+```
+
+For calendar heatmaps, the callable receives `date:` parameter instead of `index:`.
 
 ### Predefined Color Palettes
 
