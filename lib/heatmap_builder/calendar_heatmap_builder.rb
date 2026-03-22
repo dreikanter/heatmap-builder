@@ -1,10 +1,34 @@
 require "date"
-require_relative "builder"
+require_relative "svg_helpers"
+require_relative "color_helpers"
 require_relative "value_conversion"
 
 module HeatmapBuilder
-  class CalendarHeatmapBuilder < Builder
+  class CalendarHeatmapBuilder
+    include SvgHelpers
     include ValueConversion
+
+    GITHUB_GREEN = %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39].freeze
+    BLUE_OCEAN = %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9].freeze
+    WARM_SUNSET = %w[#fef3e2 #fed7aa #fdba74 #fb923c #f97316].freeze
+    PURPLE_VIBES = %w[#f3e8ff #d8b4fe #c084fc #a855f7 #9333ea].freeze
+    RED_TO_GREEN = %w[#f5f5f5 #ff9999 #f7ad6a #d2c768 #99dd99].freeze
+
+    DEFAULT_OPTIONS = {
+      cell_size: 12,
+      cell_spacing: 1,
+      font_size: 8,
+      border_width: 1,
+      corner_radius: 0,
+      colors: GITHUB_GREEN,
+      start_of_week: :monday,
+      month_spacing: 0,
+      show_month_labels: true,
+      show_day_labels: true,
+      show_outside_cells: false,
+      day_labels: %w[S M T W T F S],
+      month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]
+    }.freeze
 
     VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
 
@@ -23,6 +47,14 @@ module HeatmapBuilder
       friday: 5,
       saturday: 6
     }.freeze
+
+    def initialize(scores: nil, values: nil, **options)
+      @scores = scores
+      @values = values
+      @options = DEFAULT_OPTIONS.merge(options)
+      validate_options!
+      normalize_options!
+    end
 
     def build
       svg_content = []
@@ -46,16 +78,19 @@ module HeatmapBuilder
 
     private
 
-    def start_date
-      @start_date ||= parsed_date_range.first
-    end
+    attr_reader :scores, :values, :options
 
-    def end_date
-      @end_date ||= parsed_date_range.last
+    def normalize_options!
+      max_radius = (options[:cell_size] / 2.0).floor
+      @options[:corner_radius] = options[:corner_radius].clamp(0, max_radius)
     end
 
     def validate_options!
-      super
+      raise Error, "cell_size must be positive" unless options[:cell_size].positive?
+      raise Error, "font_size must be positive" unless options[:font_size].positive?
+      validate_colors_option!
+      validate_scores_or_values!
+      validate_value_boundaries! if values
 
       raise Error, "scores must be a hash" if scores && !scores.is_a?(Hash)
       raise Error, "values must be a hash" if values && !values.is_a?(Hash)
@@ -63,6 +98,55 @@ module HeatmapBuilder
       unless VALID_START_DAYS.include?(options[:start_of_week])
         raise Error, "start_of_week must be one of: #{VALID_START_DAYS.join(", ")}"
       end
+    end
+
+    def validate_scores_or_values!
+      if scores && values
+        raise Error, "cannot provide both scores and values"
+      end
+
+      unless scores || values
+        raise Error, "must provide either scores or values"
+      end
+    end
+
+    def validate_value_boundaries!
+      return unless options[:value_min] && options[:value_max]
+      return unless options[:value_min] > options[:value_max]
+      raise Error, "value_min must be less than or equal to value_max"
+    end
+
+    def validate_colors_option!
+      colors = options[:colors]
+
+      if colors.is_a?(Array)
+        raise Error, "must have at least 2 colors" unless colors.length >= 2
+      elsif colors.is_a?(Hash)
+        raise Error, "colors hash must have from, to, and steps keys" unless colors.key?(:from) && colors.key?(:to) && colors.key?(:steps)
+        raise Error, "steps must be a number" unless colors[:steps].is_a?(Integer)
+        raise Error, "steps must be at least 2" unless colors[:steps] >= 2
+      else
+        raise Error, "colors must be an array or hash with from/to/steps"
+      end
+    end
+
+    def color_palette
+      @color_palette ||= begin
+        colors_option = options[:colors]
+        if colors_option.is_a?(Hash)
+          ColorHelpers.generate_color_palette(colors_option[:from], colors_option[:to], colors_option[:steps])
+        else
+          colors_option
+        end
+      end
+    end
+
+    def start_date
+      @start_date ||= parsed_date_range.first
+    end
+
+    def end_date
+      @end_date ||= parsed_date_range.last
     end
 
     def scores_by_date
@@ -302,19 +386,6 @@ module HeatmapBuilder
 
     def month_label_offset
       options[:show_month_labels] ? options[:font_size] * MONTH_LABEL_HEIGHT_RATIO : 0
-    end
-
-    def default_options
-      DEFAULT_OPTIONS.merge({
-        cell_size: 12,
-        start_of_week: :monday,
-        month_spacing: 0, # extra horizontal space between months
-        show_month_labels: true,
-        show_day_labels: true,
-        show_outside_cells: false, # show cells outside the timeframe with inactive styling
-        day_labels: %w[S M T W T F S], # day abbreviations starting from Sunday
-        month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec] # month abbreviations
-      })
     end
   end
 end
