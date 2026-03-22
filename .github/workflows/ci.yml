@@ -23,9 +23,7 @@ jobs:
         bundler-cache: true
 
     - name: Run tests
-      run: |
-        bundle exec ruby -Ilib:test test/heatmap_builder_test.rb
-        bundle exec ruby -Ilib:test test/calendar_heatmap_builder_test.rb
+      run: bundle exec rake test
 
   lint:
     runs-on: ubuntu-latest
