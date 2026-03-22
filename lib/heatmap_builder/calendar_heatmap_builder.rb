@@ -31,10 +31,8 @@ module HeatmapBuilder
         svg_content << month_labels_svg
       end
 
-      weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
-
       cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
-      width = dow_label_offset + weeks_count * cell_size_with_spacing + total_month_spacing
+      width = dow_label_offset + total_column_count * cell_size_with_spacing + total_month_spacing
       height = month_label_offset + 7 * cell_size_with_spacing
 
       svg_container(width: width, height: height) { svg_content.join }
@@ -101,43 +99,73 @@ module HeatmapBuilder
     def calendar_cells_svg
       svg = ""
       current_date = calendar_start_date
-      week_index = 0
+      column_index = 0
       last_month = nil
       current_x_offset = 0
       calendar_end_date = calendar_end_date_with_full_weeks
+      split_enabled = options[:month_spacing] > 0
 
       while current_date <= calendar_end_date
-        # Check if we need to add month spacing
-        # Use end-of-week month to avoid spurious gaps when the calendar
-        # extends into a month before start_date due to week alignment
-        end_of_week = current_date + 6
-        end_of_week_month = end_of_week.month
-        if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(end_of_week)
-          current_x_offset += options[:month_spacing]
-        end
-        last_month = end_of_week_month
+        week_start = current_date
+        week_end = current_date + 6
+        spans_boundary = split_enabled && week_start.month != week_end.month
 
-        # Generate week column - always fill all 7 days
-        7.times do |day_index|
-          x = dow_label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + current_x_offset
-          y = month_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
+        if spans_boundary
+          # Find the day_index where the month changes
+          split_at = (0..6).find { |i| (week_start + i).month != week_start.month }
+          new_month_date = week_start + split_at
 
-          if current_date.between?(start_date, end_date)
-            # Active cell within the specified timeframe
-            score = scores_by_date[current_date] || scores_by_date[current_date.to_s] || 0
-            svg << cell_svg(score, x, y, false)
-          elsif options[:show_outside_cells]
-            # Inactive cell outside the specified timeframe
-            svg << cell_svg(0, x, y, true)
+          # Column A: old month days (day_index 0..split_at-1)
+          split_at.times do |day_index|
+            svg << render_cell(current_date, column_index, day_index, current_x_offset)
+            current_date += 1
           end
+          column_index += 1
 
-          current_date += 1
+          # Add month spacing between the two partial columns
+          if last_month && month_overlaps_timeframe?(new_month_date)
+            current_x_offset += options[:month_spacing]
+          end
+          last_month = new_month_date.month
+
+          # Column B: new month days (day_index split_at..6)
+          (split_at..6).each do |day_index|
+            svg << render_cell(current_date, column_index, day_index, current_x_offset)
+            current_date += 1
+          end
+          column_index += 1
+        else
+          # No split: check for month spacing based on end-of-week month
+          end_of_week_month = week_end.month
+          if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(week_end)
+            current_x_offset += options[:month_spacing]
+          end
+          last_month = end_of_week_month
+
+          # Render all 7 days in a single column
+          7.times do |day_index|
+            svg << render_cell(current_date, column_index, day_index, current_x_offset)
+            current_date += 1
+          end
+          column_index += 1
         end
-
-        week_index += 1
       end
 
       svg
+    end
+
+    def render_cell(current_date, column_index, day_index, x_offset)
+      x = dow_label_offset + column_index * (options[:cell_size] + options[:cell_spacing]) + x_offset
+      y = month_label_offset + day_index * (options[:cell_size] + options[:cell_spacing])
+
+      if current_date.between?(start_date, end_date)
+        score = scores_by_date[current_date] || scores_by_date[current_date.to_s] || 0
+        cell_svg(score, x, y, false)
+      elsif options[:show_outside_cells]
+        cell_svg(0, x, y, true)
+      else
+        ""
+      end
     end
 
     def cell_svg(score, x, y, inactive = false)
@@ -186,16 +214,58 @@ module HeatmapBuilder
       return "" unless options[:show_month_labels]
 
       svg = ""
-      last_month = nil
+      labeled_months = {}
+      column_index = 0
+      x_offset = 0
+      last_spacing_month = nil
+      current_date = calendar_start_date
+      split_enabled = options[:month_spacing] > 0
 
-      each_week do |current_date, _week_index|
-        end_of_week = current_date + 6
-        current_month = [end_of_week.year, end_of_week.month]
+      while current_date <= calendar_end_date_with_full_weeks
+        week_start = current_date
+        week_end = current_date + 6
 
-        if current_month != last_month && month_overlaps_timeframe?(end_of_week)
-          svg << render_month_label(current_date, end_of_week)
-          last_month = current_month
+        if split_enabled && week_start.month != week_end.month
+          split_at = (0..6).find { |i| (week_start + i).month != week_start.month }
+          new_month_date = week_start + split_at
+
+          # Column A: old month
+          month_key_a = [week_start.year, week_start.month]
+          if !labeled_months.key?(month_key_a) && month_overlaps_timeframe?(week_start)
+            svg << month_label_at(column_index, x_offset, week_start)
+            labeled_months[month_key_a] = true
+          end
+          column_index += 1
+
+          # Spacing between columns A and B
+          if last_spacing_month && month_overlaps_timeframe?(new_month_date)
+            x_offset += options[:month_spacing]
+          end
+          last_spacing_month = new_month_date.month
+
+          # Column B: new month
+          month_key_b = [new_month_date.year, new_month_date.month]
+          if !labeled_months.key?(month_key_b) && month_overlaps_timeframe?(new_month_date)
+            svg << month_label_at(column_index, x_offset, new_month_date)
+            labeled_months[month_key_b] = true
+          end
+          column_index += 1
+        else
+          end_of_week_month = week_end.month
+          if end_of_week_month != last_spacing_month && !last_spacing_month.nil? && month_overlaps_timeframe?(week_end)
+            x_offset += options[:month_spacing]
+          end
+          last_spacing_month = end_of_week_month
+
+          month_key = [week_end.year, week_end.month]
+          if !labeled_months.key?(month_key) && month_overlaps_timeframe?(week_end)
+            svg << month_label_at(column_index, x_offset, week_end)
+            labeled_months[month_key] = true
+          end
+          column_index += 1
         end
+
+        current_date += 7
       end
 
       svg
@@ -208,12 +278,14 @@ module HeatmapBuilder
       month_start <= end_date && month_end >= start_date
     end
 
-    def render_month_label(week_start, month_date)
+    def month_label_at(column_index, x_offset, month_date)
+      cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
+      x = dow_label_offset + column_index * cell_size_with_spacing + x_offset + options[:cell_size] * 0.1
       month_name = options[:month_labels][month_date.month - 1]
 
       svg_text(
         month_name,
-        x: calculate_month_label_x(week_start),
+        x: x,
         y: calculate_month_label_y,
         text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
       )
@@ -223,60 +295,57 @@ module HeatmapBuilder
       options[:font_size] * 1.25
     end
 
-    def calculate_month_label_x(week_start_date)
-      days_from_start = (week_start_date - calendar_start_date).to_i
-      week_index = days_from_start / 7
-      x_offset = calculate_x_offset_for_week(week_index)
+    def total_column_count
+      count = 0
+      current_date = calendar_start_date
+      split_enabled = options[:month_spacing] > 0
 
-      dow_label_offset + week_index * (options[:cell_size] + options[:cell_spacing]) + x_offset + options[:cell_size] * 0.1
-    end
+      while current_date <= calendar_end_date_with_full_weeks
+        week_start = current_date
+        week_end = current_date + 6
 
-    def calculate_x_offset_for_week(target_week_index)
-      x_offset = 0
-      last_month = nil
-
-      each_week do |current_date, week_index|
-        end_of_week = current_date + 6
-        end_of_week_month = end_of_week.month
-        if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(end_of_week)
-          x_offset += options[:month_spacing]
+        if split_enabled && week_start.month != week_end.month
+          count += 2
+        else
+          count += 1
         end
 
-        break if week_index >= target_week_index
-
-        last_month = end_of_week_month
+        current_date += 7
       end
 
-      x_offset
+      count
     end
 
     def total_month_spacing
       x_offset = 0
       last_month = nil
+      current_date = calendar_start_date
+      split_enabled = options[:month_spacing] > 0
 
-      each_week do |current_date, _week_index|
-        end_of_week = current_date + 6
-        end_of_week_month = end_of_week.month
-        if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(end_of_week)
-          x_offset += options[:month_spacing]
+      while current_date <= calendar_end_date_with_full_weeks
+        week_start = current_date
+        week_end = current_date + 6
+
+        if split_enabled && week_start.month != week_end.month
+          split_at = (0..6).find { |i| (week_start + i).month != week_start.month }
+          new_month_date = week_start + split_at
+
+          if last_month && month_overlaps_timeframe?(new_month_date)
+            x_offset += options[:month_spacing]
+          end
+          last_month = new_month_date.month
+        else
+          end_of_week_month = week_end.month
+          if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(week_end)
+            x_offset += options[:month_spacing]
+          end
+          last_month = end_of_week_month
         end
 
-        last_month = end_of_week_month
+        current_date += 7
       end
 
       x_offset
-    end
-
-    def each_week
-      current_date = calendar_start_date
-      week_index = 0
-
-      while current_date <= calendar_end_date_with_full_weeks
-        yield current_date, week_index
-
-        current_date += 7
-        week_index += 1
-      end
     end
 
     # Find the start of the week containing start_date
@@ -300,20 +369,12 @@ module HeatmapBuilder
       options[:day_labels].rotate(start_index)
     end
 
-    def month_spacing_weeks
-      options[:month_spacing] / (options[:cell_size] + options[:cell_spacing])
-    end
-
     def dow_label_offset
       options[:show_day_labels] ? options[:font_size] * 2 : 0
     end
 
     def month_label_offset
       options[:show_month_labels] ? options[:font_size] * 1.625 : 0
-    end
-
-    def months_in_range
-      ((end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1)
     end
 
     def default_options
