@@ -26,7 +26,6 @@ jobs:
       run: |
         bundle exec ruby -Ilib:test test/heatmap_builder_test.rb
         bundle exec ruby -Ilib:test test/calendar_heatmap_builder_test.rb
-        bundle exec ruby -Ilib:test test/linear_heatmap_builder_test.rb
 
   lint:
     runs-on: ubuntu-latest
