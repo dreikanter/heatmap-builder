@@ -18,8 +18,7 @@ module HeatmapBuilder
       font_size: 8,
       border_width: 1,
       corner_radius: 0,
-      colors: GITHUB_GREEN,
-      text_color: "#000000"
+      colors: GITHUB_GREEN
     }.freeze
 
     def initialize(scores: nil, values: nil, **options)
