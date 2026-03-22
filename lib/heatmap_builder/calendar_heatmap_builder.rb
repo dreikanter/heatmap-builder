@@ -8,6 +8,12 @@ module HeatmapBuilder
 
     VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
 
+    LABEL_COLOR = "#666666"
+    FONT_VERTICAL_CENTER_RATIO = 0.35
+    MONTH_LABEL_Y_RATIO = 1.25
+    MONTH_LABEL_HEIGHT_RATIO = 1.625
+    MONTH_LABEL_INDENT_RATIO = 0.1
+
     WEEK_START_WDAY = {
       sunday: 0,
       monday: 1,
@@ -198,11 +204,11 @@ module HeatmapBuilder
       svg = ""
 
       day_names.each_with_index do |day_name, index|
-        y = month_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * 0.35
+        y = month_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * FONT_VERTICAL_CENTER_RATIO
         svg << svg_text(
           day_name,
           x: options[:font_size], y: y,
-          font_size: options[:font_size], fill: "#666666"
+          font_size: options[:font_size], fill: LABEL_COLOR
         )
       end
 
@@ -278,19 +284,19 @@ module HeatmapBuilder
 
     def month_label_at(column_index, x_offset, month_date)
       cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
-      x = dow_label_offset + column_index * cell_size_with_spacing + x_offset + options[:cell_size] * 0.1
+      x = dow_label_offset + column_index * cell_size_with_spacing + x_offset + options[:cell_size] * MONTH_LABEL_INDENT_RATIO
       month_name = options[:month_labels][month_date.month - 1]
 
       svg_text(
         month_name,
         x: x,
         y: calculate_month_label_y,
-        text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
+        text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: LABEL_COLOR
       )
     end
 
     def calculate_month_label_y
-      options[:font_size] * 1.25
+      options[:font_size] * MONTH_LABEL_Y_RATIO
     end
 
     def total_column_count
@@ -372,7 +378,7 @@ module HeatmapBuilder
     end
 
     def month_label_offset
-      options[:show_month_labels] ? options[:font_size] * 1.625 : 0
+      options[:show_month_labels] ? options[:font_size] * MONTH_LABEL_HEIGHT_RATIO : 0
     end
 
     def default_options
