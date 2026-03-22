@@ -4,7 +4,7 @@ module HeatmapBuilder
 
     def svg_element(tag, attributes = {}, &block)
       attr_string = attributes.map do |key, value|
-        "#{kebab_case(key)}=\"#{value}\""
+        "#{kebab_case(key)}=\"#{escape_xml(value.to_s)}\""
       end.join(" ")
 
       attr_string = " #{attr_string}" unless attr_string.empty?
@@ -35,7 +35,7 @@ module HeatmapBuilder
         font_family: "Arial, sans-serif"
       }
 
-      svg_element("text", {x: x, y: y}.merge(default_attrs).merge(attributes)) { content }
+      svg_element("text", {x: x, y: y}.merge(default_attrs).merge(attributes)) { escape_xml(content) }
     end
 
     def svg_container(width:, height:, &block)
@@ -48,6 +48,10 @@ module HeatmapBuilder
 
     def kebab_case(key)
       key.to_s.tr("_", "-")
+    end
+
+    def escape_xml(str)
+      str.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub('"', "&quot;")
     end
 
     def cell_border(x, y, color, cell_size:, border_width:, corner_radius:)
