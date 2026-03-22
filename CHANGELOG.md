@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- Linear (single-row) heatmap support — the gem now focuses exclusively on calendar heatmaps
+- `HeatmapBuilder.build_linear` method
+- `HeatmapBuilder.generate` deprecated method
+
 ## [0.2.0] - 2025-10-02
 
 ### Added
@@ -32,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic corner radius clamping to valid range
 
 ### Deprecated
-- `HeatmapBuilder.generate(scores, options)` - use `HeatmapBuilder.build_linear(scores: scores, **options)` instead
 - `HeatmapBuilder.generate_calendar(scores, options)` - use `HeatmapBuilder.build_calendar(scores: scores, **options)` instead
 - Old API still works with deprecation warnings for backward compatibility
 
@@ -41,7 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release with core heatmap visualization capabilities.
 
 ### Added
-- Linear heatmap generation with `HeatmapBuilder.generate()`
 - Calendar heatmap generation with `HeatmapBuilder.generate_calendar()`
 - GitHub-style color schemes and styling
 - Customizable cell size, spacing, colors, and fonts

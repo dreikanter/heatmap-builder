@@ -1,13 +1,12 @@
 # HeatmapBuilder
 
-A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-style calendar layouts and linear progress indicators. Perfect for Rails applications and any project that needs to display activity data in a visual format.
+A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-style calendar layouts. Perfect for Rails applications and any project that needs to display activity data in a visual format.
 
 ![GitHub-style Calendar](examples/calendar_github_style.svg)
 
 ## Features
 
 - GitHub-style calendar layouts for date-based data.
-- Linear heatmaps.
 - Vector-based output (SVG) for crisp rendering at any resolution.
 - Optional numeric values displayed in each cell.
 - **Use pre-calculated scores or raw numeric values** - automatic mapping to color scales.
@@ -36,21 +35,6 @@ Or install it yourself as:
 
 ## Usage
 
-### Linear Heatmaps
-
-```ruby
-require 'heatmap-builder'
-
-# Generate SVG for daily scores
-scores = [0, 1, 2, 3, 4, 5, 2, 1]
-svg = HeatmapBuilder.build_linear(scores: scores)
-
-# In a Rails view
-<%= raw HeatmapBuilder.build_linear(scores: @daily_scores) %>
-```
-
-![Weekly Progress](examples/weekly_progress.svg)
-
 ### Calendar Heatmaps
 
 ```ruby
@@ -66,34 +50,6 @@ svg = HeatmapBuilder.build_calendar(scores: scores_by_date)
 ```
 
 ![GitHub-style Calendar](examples/calendar_github_style.svg)
-
-### Linear Heatmap Options
-
-You must provide either `scores:` or `values:` (but not both). All other options are optional keyword arguments with sensible defaults.
-
-**Data options:**
-
-- `scores` - Array of pre-calculated scores (integers from 0 to number of colors minus 1). Required if `values` is not provided.
-- `values` - Array of arbitrary numeric values to be automatically mapped to scores. Required if `scores` is not provided. See [Using Raw Values Instead of Scores](#using-raw-values-instead-of-scores).
-
-**Value-to-score conversion options** (only used with `values:`):
-
-- `value_min` - Minimum boundary for value-to-score mapping. Defaults to the minimum value in your data.
-- `value_max` - Maximum boundary for value-to-score mapping. Defaults to the maximum value in your data.
-- `value_to_score` - Custom callable for value-to-score conversion. Receives `value:`, `index:`, `min:`, `max:`, `max_score:` parameters and must return an integer between 0 and `max_score`. See [Custom Scoring Logic](#custom-scoring-logic) for details.
-
-**Appearance options:**
-
-- `cell_size` - Size of each square in pixels. Defaults to 10.
-- `cell_spacing` - Space between squares in pixels. Defaults to 1.
-- `font_size` - Font size for score text in pixels. Defaults to 8.
-- `border_width` - Border width around each cell in pixels. Defaults to 1.
-- `corner_radius` - Corner radius for rounded cells. Must be between 0 (square corners) and `floor(cell_size/2)` (circular cells). Values outside this range are automatically clamped. Defaults to 0.
-- `text_color` - Color of score text as a hex string. Defaults to `"#000000"` (black).
-
-**Color options:**
-
-- `colors` - Color palette for the heatmap. Can be a predefined palette constant (e.g., `HeatmapBuilder::GITHUB_GREEN`), an array of hex color strings (e.g., `%w[#ebedf0 #9be9a8 #40c463]`), or a hash for OKLCH interpolation (e.g., `{ from: "#ebedf0", to: "#216e39", steps: 5 }`). Defaults to `HeatmapBuilder::GITHUB_GREEN`. See [Predefined Color Palettes](#predefined-color-palettes) and [Dynamic Palettes Generation](#dynamic-palettes-generation).
 
 ### Calendar Heatmap Options
 
@@ -143,14 +99,6 @@ A **score** is an integer (0 to N-1) that maps directly to a color in your palet
 Instead of pre-calculating scores, you can provide raw numeric values (like 45.2, 78, 1000) and let the builder automatically map them to scores using linear distribution:
 
 ```ruby
-# Linear heatmap with automatic score calculation
-values = [10, 25, 50, 75, 100]
-svg = HeatmapBuilder.build_linear(
-  values: values,
-  value_min: 0,    # Optional: explicitly set minimum (defaults to actual min)
-  value_max: 100   # Optional: explicitly set maximum (defaults to actual max)
-)
-
 # Calendar heatmap with automatic score calculation
 values_by_date = {
   Date.new(2024, 1, 1) => 45.2,
@@ -177,30 +125,17 @@ By default, values are mapped to scores using linear distribution. You can provi
 
 The callable receives these parameters:
 - `value:` - The current value being converted
-- `index:` or `date:` - The position in the data (linear heatmaps use `index:`, calendar heatmaps use `date:`)
+- `date:` - The date for the data point
 - `min:` - The minimum boundary value
 - `max:` - The maximum boundary value
 - `max_score:` - The maximum valid score (color palette length minus 1)
 
 The function must return an integer between 0 and `max_score`.
 
-Custom scoring logic - linear distribution example:
+Custom scoring logic - logarithmic scale for data with wide range (e.g., 1 to 10000):
 
 ```ruby
-linear_formula = ->(value:, index:, min:, max:, max_score:) {
-  ((value - min) / (max - min) * max_score).round
-}
-
-svg = HeatmapBuilder.build_linear(
-  values: [10, 20, 30],
-  value_to_score: linear_formula
-)
-```
-
-Logarithmic scale for data with wide range (e.g., 1 to 10000):
-
-```ruby
-logarithmic_formula = ->(value:, index:, min:, max:, max_score:) {
+logarithmic_formula = ->(value:, date:, min:, max:, max_score:) {
   return 0 if value <= 0 || min <= 0
 
   log_value = Math.log10(value)
@@ -210,8 +145,8 @@ logarithmic_formula = ->(value:, index:, min:, max:, max_score:) {
   ((log_value - log_min) / (log_max - log_min) * max_score).round.clamp(0, max_score)
 }
 
-svg = HeatmapBuilder.build_linear(
-  values: [1, 10, 100, 1000, 10000],
+svg = HeatmapBuilder.build_calendar(
+  values: values_by_date,
   value_to_score: logarithmic_formula
 )
 ```
@@ -219,12 +154,6 @@ svg = HeatmapBuilder.build_linear(
 ### Predefined Color Palettes
 
 #### GitHub Green (Default)
-
-```ruby
-HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::GITHUB_GREEN)
-```
-
-![GitHub Green Linear](examples/linear_github_green.svg)
 
 ```ruby
 HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::GITHUB_GREEN)
@@ -235,24 +164,12 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::GIT
 #### Blue Ocean
 
 ```ruby
-HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::BLUE_OCEAN)
-```
-
-![Blue Ocean Linear](examples/linear_blue_ocean.svg)
-
-```ruby
 HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
 ```
 
 ![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
 
 #### Warm Sunset
-
-```ruby
-HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::WARM_SUNSET)
-```
-
-![Warm Sunset Linear](examples/linear_warm_sunset.svg)
 
 ```ruby
 HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
@@ -263,24 +180,12 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::WAR
 #### Purple Vibes
 
 ```ruby
-HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::PURPLE_VIBES)
-```
-
-![Purple Vibes Linear](examples/linear_purple_vibes.svg)
-
-```ruby
 HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
 
 #### Red to Green
-
-```ruby
-HeatmapBuilder.build_linear(scores: scores, colors: HeatmapBuilder::RED_TO_GREEN)
-```
-
-![Red to Green Linear](examples/linear_red_to_green.svg)
 
 ```ruby
 HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
@@ -300,44 +205,18 @@ neon_gradient = {
   steps: 5
 }
 
-svg = HeatmapBuilder.build_linear(scores: scores, colors: neon_gradient)
+svg = HeatmapBuilder.build_calendar(scores: calendar_data, colors: neon_gradient)
 ```
-
-![Neon Gradient Linear](examples/linear_neon_gradient.svg)
 
 The OKLCH color space ensures perceptually uniform color transitions, making gradients appear smooth and natural to the human eye.
 
 ### Rounded Corners
 
-Both linear and calendar heatmaps support rounded corners using the `corner_radius` option.
+Calendar heatmaps support rounded corners using the `corner_radius` option.
+
+The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Values outside this range are automatically clamped to the valid range (negative values become 0, values exceeding the maximum become `floor(cell_size/2)`).
 
 A typical value is around 2 pixels for a subtle rounded effect:
-
-```ruby
-# Linear heatmap with rounded corners
-HeatmapBuilder.build_linear(
-  scores: scores,
-  corner_radius: 2,
-  cell_size: 18
-)
-```
-
-![Linear Rounded Corners](examples/linear_rounded_corners.svg)
-
-The `corner_radius` value must be between 0 (square corners) and `floor(cell_size/2)`. Values outside this range are automatically clamped to the valid range (negative values become 0, values exceeding the maximum become `floor(cell_size/2)`). Maximum radius values render circular cells:
-
-```ruby
-# Linear heatmap with max radius rounded corners - circular cells
-HeatmapBuilder.build_linear(
-  scores: scores,
-  corner_radius: 9,
-  cell_size: 18
-)
-```
-
-![Linear Rounded Corners](examples/linear_rounded_corners_max_radius.svg)
-
-Calendar heatmap examples:
 
 ```ruby
 # Calendar heatmap with rounded corners
@@ -349,6 +228,8 @@ HeatmapBuilder.build_calendar(
 ```
 
 ![Calendar Rounded Corners](examples/calendar_rounded_corners.svg)
+
+Maximum radius values render circular cells:
 
 ```ruby
 # Calendar heatmap with max radius rounded corners - circular cells
