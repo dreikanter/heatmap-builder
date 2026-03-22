@@ -133,7 +133,6 @@ module HeatmapBuilder
             svg << render_cell(current_date, column_index, day_index, current_x_offset)
             current_date += 1
           end
-          column_index += 1
         else
           # No split: check for month spacing based on end-of-week month
           end_of_week_month = week_end.month
@@ -147,8 +146,8 @@ module HeatmapBuilder
             svg << render_cell(current_date, column_index, day_index, current_x_offset)
             current_date += 1
           end
-          column_index += 1
         end
+        column_index += 1
       end
 
       svg
@@ -249,7 +248,6 @@ module HeatmapBuilder
             svg << month_label_at(column_index, x_offset, new_month_date)
             labeled_months[month_key_b] = true
           end
-          column_index += 1
         else
           end_of_week_month = week_end.month
           if end_of_week_month != last_spacing_month && !last_spacing_month.nil? && month_overlaps_timeframe?(week_end)
@@ -262,8 +260,8 @@ module HeatmapBuilder
             svg << month_label_at(column_index, x_offset, week_end)
             labeled_months[month_key] = true
           end
-          column_index += 1
         end
+        column_index += 1
 
         current_date += 7
       end
@@ -304,10 +302,10 @@ module HeatmapBuilder
         week_start = current_date
         week_end = current_date + 6
 
-        if split_enabled && week_start.month != week_end.month
-          count += 2
+        count += if split_enabled && week_start.month != week_end.month
+          2
         else
-          count += 1
+          1
         end
 
         current_date += 7
