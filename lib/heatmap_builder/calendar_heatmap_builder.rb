@@ -174,10 +174,10 @@ module HeatmapBuilder
     end
 
     def cell_svg(score, x, y, inactive = false)
-      color = score_to_color(score, colors: color_palette)
+      color = ColorHelpers.score_to_color(score, colors: color_palette)
 
       if inactive
-        color = make_color_inactive(color)
+        color = ColorHelpers.make_color_inactive(color)
       end
 
       colored_rect = svg_rect(

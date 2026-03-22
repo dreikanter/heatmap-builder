@@ -61,7 +61,7 @@ module HeatmapBuilder
       border_x = x + inset
       border_y = y + inset
       border_size = cell_size - border_width
-      border_color = darker_color(color)
+      border_color = ColorHelpers.darker_color(color)
       border_radius = (corner_radius > 0) ? [corner_radius - inset, 0].max : 0
 
       svg_rect(
