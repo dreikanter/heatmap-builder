@@ -4,7 +4,7 @@ module HeatmapBuilder
 
     def svg_element(tag, attributes = {}, &block)
       attr_string = attributes.map do |key, value|
-        "#{kebab_case(key)}=\"#{value}\""
+        "#{kebab_case(key)}=\"#{escape_xml(value.to_s)}\""
       end.join(" ")
 
       attr_string = " #{attr_string}" unless attr_string.empty?
@@ -35,7 +35,7 @@ module HeatmapBuilder
         font_family: "Arial, sans-serif"
       }
 
-      svg_element("text", {x: x, y: y}.merge(default_attrs).merge(attributes)) { content }
+      svg_element("text", {x: x, y: y}.merge(default_attrs).merge(attributes)) { escape_xml(content) }
     end
 
     def svg_container(width:, height:, &block)
@@ -50,6 +50,10 @@ module HeatmapBuilder
       key.to_s.tr("_", "-")
     end
 
+    def escape_xml(str)
+      str.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub('"', "&quot;")
+    end
+
     def cell_border(x, y, color, cell_size:, border_width:, corner_radius:)
       return "" unless border_width > 0
 
@@ -57,7 +61,7 @@ module HeatmapBuilder
       border_x = x + inset
       border_y = y + inset
       border_size = cell_size - border_width
-      border_color = darker_color(color)
+      border_color = ColorHelpers.darker_color(color)
       border_radius = (corner_radius > 0) ? [corner_radius - inset, 0].max : 0
 
       svg_rect(

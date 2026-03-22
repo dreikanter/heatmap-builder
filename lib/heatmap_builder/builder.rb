@@ -4,7 +4,6 @@ require_relative "color_helpers"
 module HeatmapBuilder
   class Builder
     include SvgHelpers
-    include ColorHelpers
 
     GITHUB_GREEN = %w[#ebedf0 #9be9a8 #40c463 #30a14e #216e39].freeze
     BLUE_OCEAN = %w[#f0f9ff #bae6fd #7dd3fc #38bdf8 #0ea5e9].freeze
@@ -18,8 +17,7 @@ module HeatmapBuilder
       font_size: 8,
       border_width: 1,
       corner_radius: 0,
-      colors: GITHUB_GREEN,
-      text_color: "#000000"
+      colors: GITHUB_GREEN
     }.freeze
 
     def initialize(scores: nil, values: nil, **options)
@@ -90,7 +88,7 @@ module HeatmapBuilder
       @color_palette ||= begin
         colors_option = options[:colors]
         if colors_option.is_a?(Hash)
-          generate_color_palette(colors_option[:from], colors_option[:to], colors_option[:steps])
+          ColorHelpers.generate_color_palette(colors_option[:from], colors_option[:to], colors_option[:steps])
         else
           colors_option
         end
