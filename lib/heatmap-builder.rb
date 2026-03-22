@@ -7,12 +7,6 @@ require_relative "heatmap_builder/calendar_heatmap_builder"
 module HeatmapBuilder
   class Error < StandardError; end
 
-  GITHUB_GREEN = CalendarHeatmapBuilder::GITHUB_GREEN
-  BLUE_OCEAN = CalendarHeatmapBuilder::BLUE_OCEAN
-  WARM_SUNSET = CalendarHeatmapBuilder::WARM_SUNSET
-  PURPLE_VIBES = CalendarHeatmapBuilder::PURPLE_VIBES
-  RED_TO_GREEN = CalendarHeatmapBuilder::RED_TO_GREEN
-
   # Builds a calendar (GitHub-style) heatmap visualization.
   #
   # @param scores [Hash<Date, Integer>, Hash<String, Integer>, nil] Pre-calculated score values by date. Required unless values provided.

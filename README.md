@@ -76,7 +76,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 
 **Color options:**
 
-- `colors` - Color palette for the heatmap. Can be a predefined palette constant (e.g., `HeatmapBuilder::GITHUB_GREEN`), an array of hex color strings (e.g., `%w[#ebedf0 #9be9a8 #40c463]`), or a hash for OKLCH interpolation (e.g., `{ from: "#ebedf0", to: "#216e39", steps: 5 }`). Defaults to `HeatmapBuilder::GITHUB_GREEN`. See [Predefined Color Palettes](#predefined-color-palettes) and [Dynamic Palettes Generation](#dynamic-palettes-generation).
+- `colors` - Color palette for the heatmap. Can be a predefined palette constant (e.g., `HeatmapBuilder::CalendarHeatmapBuilder::GITHUB_GREEN`), an array of hex color strings (e.g., `%w[#ebedf0 #9be9a8 #40c463]`), or a hash for OKLCH interpolation (e.g., `{ from: "#ebedf0", to: "#216e39", steps: 5 }`). Defaults to `HeatmapBuilder::CalendarHeatmapBuilder::GITHUB_GREEN`. See [Predefined Color Palettes](#predefined-color-palettes) and [Dynamic Palettes Generation](#dynamic-palettes-generation).
 
 **Calendar-specific options:**
 
@@ -155,7 +155,7 @@ svg = HeatmapBuilder.build_calendar(
 #### GitHub Green (Default)
 
 ```ruby
-HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::GITHUB_GREEN)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::CalendarHeatmapBuilder::GITHUB_GREEN)
 ```
 
 ![Default Calendar](examples/calendar_default.svg)
@@ -163,7 +163,7 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::GIT
 #### Blue Ocean
 
 ```ruby
-HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::BLUE_OCEAN)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::CalendarHeatmapBuilder::BLUE_OCEAN)
 ```
 
 ![Blue Ocean Calendar](examples/calendar_blue_ocean.svg)
@@ -171,7 +171,7 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::BLU
 #### Warm Sunset
 
 ```ruby
-HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::WARM_SUNSET)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::CalendarHeatmapBuilder::WARM_SUNSET)
 ```
 
 ![Warm Sunset Calendar](examples/calendar_warm_sunset.svg)
@@ -179,7 +179,7 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::WAR
 #### Purple Vibes
 
 ```ruby
-HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::PURPLE_VIBES)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::CalendarHeatmapBuilder::PURPLE_VIBES)
 ```
 
 ![Purple Vibes Calendar](examples/calendar_purple_vibes.svg)
@@ -187,7 +187,7 @@ HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::PUR
 #### Red to Green
 
 ```ruby
-HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::RED_TO_GREEN)
+HeatmapBuilder.build_calendar(scores: calendar_data, colors: HeatmapBuilder::CalendarHeatmapBuilder::RED_TO_GREEN)
 ```
 
 ![Red to Green Calendar](examples/calendar_red_to_green.svg)
