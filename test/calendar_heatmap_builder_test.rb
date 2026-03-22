@@ -197,6 +197,45 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     assert_matches_snapshot(svg, "calendar_values_string_dates.svg")
   end
 
+  it "should split weeks at month boundaries when month_spacing is positive" do
+    # Jan 25 - Feb 5, 2024. Week of Jan 29-Feb 4 spans month boundary.
+    # With monday start, split_at=3: Mon-Wed (Jan 29-31) in one column, Thu-Sun (Feb 1-4) in next.
+    month_scores = {}
+    (Date.new(2024, 1, 25)..Date.new(2024, 2, 5)).each { |d| month_scores[d] = 1 }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      scores: month_scores,
+      month_spacing: 5,
+      start_of_week: :monday
+    )
+    assert_matches_snapshot(builder.build, "month_spacing_split.svg")
+  end
+
+  it "should split weeks with outside cells visible" do
+    month_scores = {}
+    (Date.new(2024, 1, 25)..Date.new(2024, 2, 5)).each { |d| month_scores[d] = 1 }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      scores: month_scores,
+      month_spacing: 5,
+      start_of_week: :monday,
+      show_outside_cells: true
+    )
+    assert_matches_snapshot(builder.build, "month_spacing_split_outside.svg")
+  end
+
+  it "should not split weeks when month_spacing is zero" do
+    month_scores = {}
+    (Date.new(2024, 1, 25)..Date.new(2024, 2, 5)).each { |d| month_scores[d] = 1 }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      scores: month_scores,
+      month_spacing: 0,
+      start_of_week: :monday
+    )
+    assert_matches_snapshot(builder.build, "no_month_spacing_split.svg")
+  end
+
   it "should raise error if both scores and values provided for calendar" do
     assert_raises(HeatmapBuilder::Error) do
       HeatmapBuilder::CalendarHeatmapBuilder.new(

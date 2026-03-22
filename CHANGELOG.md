@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Month labels and SVG width now render correctly when data starts or ends mid-month
+- `month_spacing` no longer produces spurious gaps at the edges of the calendar grid
+- When `month_spacing` is positive, weeks spanning a month boundary are split into two columns so each day visually belongs to its correct month
+
 ### Removed
 - Linear (single-row) heatmap support — the gem now focuses exclusively on calendar heatmaps
 - `HeatmapBuilder.build_linear` method
