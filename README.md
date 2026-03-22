@@ -126,7 +126,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 **Calendar-specific options:**
 
 - `start_of_week` - First day of the week. One of `:sunday`, `:monday`, `:tuesday`, `:wednesday`, `:thursday`, `:friday`, `:saturday`. Defaults to `:monday`.
-- `month_spacing` - Extra horizontal space between months in pixels. Defaults to 5.
+- `month_spacing` - Extra horizontal space between months in pixels. Defaults to 0.
 - `show_month_labels` - Show month names at the top of the calendar. Defaults to `true`.
 - `show_day_labels` - Show day abbreviations on the left side of the calendar. Defaults to `true`.
 - `show_outside_cells` - Show cells outside the date range with inactive styling. Defaults to `false`.
