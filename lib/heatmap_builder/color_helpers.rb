@@ -3,11 +3,6 @@ module HeatmapBuilder
     private
 
     def score_to_color(score, colors:)
-      # Generate color palette if colors is a hash
-      if colors.is_a?(Hash)
-        colors = generate_color_palette(colors[:from], colors[:to], colors[:steps])
-      end
-
       return colors.first if score == 0
 
       max_color_index = colors.length - 1
