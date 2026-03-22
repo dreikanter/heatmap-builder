@@ -32,10 +32,9 @@ module HeatmapBuilder
       end
 
       weeks_count = ((calendar_end_date_with_full_weeks - calendar_start_date) / 7).ceil
-      month_spacing_total = (months_in_range - 1) * options[:month_spacing]
 
       cell_size_with_spacing = options[:cell_size] + options[:cell_spacing]
-      width = dow_label_offset + weeks_count * cell_size_with_spacing + month_spacing_total
+      width = dow_label_offset + weeks_count * cell_size_with_spacing + total_month_spacing
       height = month_label_offset + 7 * cell_size_with_spacing
 
       svg_container(width: width, height: height) { svg_content.join }
@@ -205,12 +204,11 @@ module HeatmapBuilder
     end
 
     def render_month_label(current_date)
-      first_day_of_month = Date.new(current_date.year, current_date.month, 1)
       month_name = options[:month_labels][current_date.month - 1]
 
       svg_text(
         month_name,
-        x: calculate_month_label_x(first_day_of_month),
+        x: calculate_month_label_x(current_date),
         y: calculate_month_label_y,
         text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
       )
@@ -220,8 +218,8 @@ module HeatmapBuilder
       options[:font_size] * 1.25
     end
 
-    def calculate_month_label_x(first_day_of_month)
-      days_from_start = (first_day_of_month - calendar_start_date).to_i
+    def calculate_month_label_x(week_start_date)
+      days_from_start = (week_start_date - calendar_start_date).to_i
       week_index = days_from_start / 7
       x_offset = calculate_x_offset_for_week(week_index)
 
@@ -233,8 +231,23 @@ module HeatmapBuilder
       last_month = nil
 
       each_week do |current_date, week_index|
+        if current_date.month != last_month && !last_month.nil?
+          x_offset += options[:month_spacing]
+        end
+
         break if week_index >= target_week_index
 
+        last_month = current_date.month
+      end
+
+      x_offset
+    end
+
+    def total_month_spacing
+      x_offset = 0
+      last_month = nil
+
+      each_week do |current_date, _week_index|
         if current_date.month != last_month && !last_month.nil?
           x_offset += options[:month_spacing]
         end
