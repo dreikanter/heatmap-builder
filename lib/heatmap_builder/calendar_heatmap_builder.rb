@@ -108,10 +108,14 @@ module HeatmapBuilder
 
       while current_date <= calendar_end_date
         # Check if we need to add month spacing
-        if current_date.month != last_month && !last_month.nil?
+        # Use end-of-week month to avoid spurious gaps when the calendar
+        # extends into a month before start_date due to week alignment
+        end_of_week = current_date + 6
+        end_of_week_month = end_of_week.month
+        if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(end_of_week)
           current_x_offset += options[:month_spacing]
         end
-        last_month = current_date.month
+        last_month = end_of_week_month
 
         # Generate week column - always fill all 7 days
         7.times do |day_index|
@@ -185,10 +189,11 @@ module HeatmapBuilder
       last_month = nil
 
       each_week do |current_date, _week_index|
-        current_month = [current_date.year, current_date.month]
+        end_of_week = current_date + 6
+        current_month = [end_of_week.year, end_of_week.month]
 
-        if current_month != last_month && month_overlaps_timeframe?(current_date)
-          svg << render_month_label(current_date)
+        if current_month != last_month && month_overlaps_timeframe?(end_of_week)
+          svg << render_month_label(current_date, end_of_week)
           last_month = current_month
         end
       end
@@ -196,19 +201,19 @@ module HeatmapBuilder
       svg
     end
 
-    def month_overlaps_timeframe?(current_date)
-      month_start = Date.new(current_date.year, current_date.month, 1)
-      month_end = Date.new(current_date.year, current_date.month, -1)
+    def month_overlaps_timeframe?(date)
+      month_start = Date.new(date.year, date.month, 1)
+      month_end = Date.new(date.year, date.month, -1)
 
       month_start <= end_date && month_end >= start_date
     end
 
-    def render_month_label(current_date)
-      month_name = options[:month_labels][current_date.month - 1]
+    def render_month_label(week_start, month_date)
+      month_name = options[:month_labels][month_date.month - 1]
 
       svg_text(
         month_name,
-        x: calculate_month_label_x(current_date),
+        x: calculate_month_label_x(week_start),
         y: calculate_month_label_y,
         text_anchor: "start", font_family: "Arial, sans-serif", font_size: options[:font_size], fill: "#666666"
       )
@@ -231,13 +236,15 @@ module HeatmapBuilder
       last_month = nil
 
       each_week do |current_date, week_index|
-        if current_date.month != last_month && !last_month.nil?
+        end_of_week = current_date + 6
+        end_of_week_month = end_of_week.month
+        if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(end_of_week)
           x_offset += options[:month_spacing]
         end
 
         break if week_index >= target_week_index
 
-        last_month = current_date.month
+        last_month = end_of_week_month
       end
 
       x_offset
@@ -248,11 +255,13 @@ module HeatmapBuilder
       last_month = nil
 
       each_week do |current_date, _week_index|
-        if current_date.month != last_month && !last_month.nil?
+        end_of_week = current_date + 6
+        end_of_week_month = end_of_week.month
+        if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(end_of_week)
           x_offset += options[:month_spacing]
         end
 
-        last_month = current_date.month
+        last_month = end_of_week_month
       end
 
       x_offset
