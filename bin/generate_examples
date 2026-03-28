@@ -51,7 +51,7 @@ def generate_sample_svgs(force: false)
   generate_example("calendar_blue_ocean.svg", "calendar with Blue Ocean palette", force: force) do
     HeatmapBuilder.build_calendar(
       scores: calendar_data,
-      colors: HeatmapBuilder::BLUE_OCEAN,
+      colors: HeatmapBuilder::CalendarHeatmapBuilder::BLUE_OCEAN,
       cell_size: 14,
       month_spacing: 0
     )
@@ -60,7 +60,7 @@ def generate_sample_svgs(force: false)
   generate_example("calendar_warm_sunset.svg", "calendar with Warm Sunset palette", force: force) do
     HeatmapBuilder.build_calendar(
       scores: calendar_data,
-      colors: HeatmapBuilder::WARM_SUNSET,
+      colors: HeatmapBuilder::CalendarHeatmapBuilder::WARM_SUNSET,
       cell_size: 14,
       month_spacing: 0
     )
@@ -69,7 +69,7 @@ def generate_sample_svgs(force: false)
   generate_example("calendar_purple_vibes.svg", "calendar with Purple Vibes palette", force: force) do
     HeatmapBuilder.build_calendar(
       scores: calendar_data,
-      colors: HeatmapBuilder::PURPLE_VIBES,
+      colors: HeatmapBuilder::CalendarHeatmapBuilder::PURPLE_VIBES,
       cell_size: 14,
       month_spacing: 0
     )
@@ -78,7 +78,7 @@ def generate_sample_svgs(force: false)
   generate_example("calendar_red_to_green.svg", "calendar with Red to Green palette", force: force) do
     HeatmapBuilder.build_calendar(
       scores: calendar_data,
-      colors: HeatmapBuilder::RED_TO_GREEN,
+      colors: HeatmapBuilder::CalendarHeatmapBuilder::RED_TO_GREEN,
       cell_size: 14,
       month_spacing: 0
     )
