@@ -241,6 +241,21 @@ HeatmapBuilder.build_calendar(
 
 ![Calendar Rounded Corners](examples/calendar_rounded_corners_max_radius.svg)
 
+### Month Spacing
+
+Add visual separation between months using the `month_spacing` option. This adds horizontal gaps at month boundaries, making it easier to distinguish individual months:
+
+```ruby
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
+  cell_size: 14,
+  month_spacing: 10,
+  corner_radius: 3
+)
+```
+
+![Calendar with Month Spacing](examples/calendar_month_spacing_rounded.svg)
+
 ### I18n
 
 Calendar heatmaps support internationalization by customizing the `day_labels` and `month_labels` options:
