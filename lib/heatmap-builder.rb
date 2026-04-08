@@ -2,7 +2,7 @@ require_relative "heatmap_builder/version"
 require_relative "heatmap_builder/svg_helpers"
 require_relative "heatmap_builder/color_helpers"
 require_relative "heatmap_builder/value_conversion"
-require_relative "heatmap_builder/calendar_heatmap_builder"
+require_relative "heatmap_builder/calendar"
 
 module HeatmapBuilder
   class Error < StandardError; end
@@ -18,7 +18,7 @@ module HeatmapBuilder
   #   HeatmapBuilder.build_calendar(scores: { '2024-01-01' => 2, '2024-01-02' => 4 })
   #   HeatmapBuilder.build_calendar(values: { Date.new(2024, 1, 1) => 45.2 })
   def self.build_calendar(scores: nil, values: nil, **options)
-    CalendarHeatmapBuilder.new(scores: scores, values: values, **options).build
+    Calendar.new(scores: scores, values: values, **options).build
   end
 
   # @deprecated Use {.build_calendar} instead
@@ -27,4 +27,7 @@ module HeatmapBuilder
          "Use `HeatmapBuilder.build_calendar(scores: scores_by_date, **options)` instead."
     build_calendar(scores: scores, **options)
   end
+
+  # @deprecated Use {Calendar} instead
+  CalendarHeatmapBuilder = Calendar
 end
