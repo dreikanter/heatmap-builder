@@ -236,6 +236,20 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     assert_matches_snapshot(builder.build, "no_month_spacing_split.svg")
   end
 
+  it "should position month labels above first full column, not split column" do
+    # Dec 1, 2024 is Sunday. The split Column B has only 1 cell.
+    # The "Dec" label should be on the first full December column (Dec 2-8), not Dec 1.
+    month_scores = {}
+    (Date.new(2024, 11, 1)..Date.new(2025, 1, 31)).each { |d| month_scores[d] = 1 }
+
+    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+      scores: month_scores,
+      month_spacing: 10,
+      start_of_week: :monday
+    )
+    assert_matches_snapshot(builder.build, "month_spacing_label_on_full_column.svg")
+  end
+
   it "should raise error if both scores and values provided for calendar" do
     assert_raises(HeatmapBuilder::Error) do
       HeatmapBuilder::CalendarHeatmapBuilder.new(
