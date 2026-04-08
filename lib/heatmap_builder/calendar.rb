@@ -4,7 +4,7 @@ require_relative "color_helpers"
 require_relative "value_conversion"
 
 module HeatmapBuilder
-  class CalendarHeatmapBuilder
+  class Calendar
     include SvgHelpers
     include ValueConversion
 

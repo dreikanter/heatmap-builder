@@ -1,6 +1,6 @@
 require "test_helper"
 
-describe HeatmapBuilder::CalendarHeatmapBuilder do
+describe HeatmapBuilder::Calendar do
   def scores
     {
       "2024-01-01" => 1,
@@ -11,7 +11,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
   end
 
   def builder
-    HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores)
+    HeatmapBuilder::Calendar.new(scores: scores)
   end
 
   it "should build SVG with default options" do
@@ -20,46 +20,46 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
   end
 
   it "should use Monday as start of week when specified" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, start_of_week: :monday)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, start_of_week: :monday)
     assert_matches_snapshot(builder.build, "start_with_monday.svg")
   end
 
   it "should use Sunday as start of week when specified" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, start_of_week: :sunday)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, start_of_week: :sunday)
     assert_matches_snapshot(builder.build, "start_with_sunday.svg")
   end
 
   it "should display month labels when enabled" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, show_month_labels: true)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, show_month_labels: true)
     assert_matches_snapshot(builder.build, "with_months.svg")
   end
 
   it "should display day labels when enabled" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, show_day_labels: true)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, show_day_labels: true)
     assert_matches_snapshot(builder.build, "with_dows.svg")
   end
 
   it "should use custom colors when provided" do
     colors = %w[#ffffff #ff0000 #00ff00]
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, colors: colors)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, colors: colors)
     assert_matches_snapshot(builder.build, "custom_colors.svg")
   end
 
   it "should raise errors for invalid inputs" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::CalendarHeatmapBuilder.new(scores: "invalid")
+      HeatmapBuilder::Calendar.new(scores: "invalid")
     end
 
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, cell_size: 0)
+      HeatmapBuilder::Calendar.new(scores: scores, cell_size: 0)
     end
 
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, colors: [])
+      HeatmapBuilder::Calendar.new(scores: scores, colors: [])
     end
 
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, start_of_week: :invalid)
+      HeatmapBuilder::Calendar.new(scores: scores, start_of_week: :invalid)
     end
   end
 
@@ -69,23 +69,23 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       Date.new(2024, 1, 2) => 2
     }
 
-    assert HeatmapBuilder::CalendarHeatmapBuilder.new(scores: date_scores)
+    assert HeatmapBuilder::Calendar.new(scores: date_scores)
   end
 
   it "should handle empty scores hash" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: {})
+    builder = HeatmapBuilder::Calendar.new(scores: {})
     assert builder.build
   end
 
   it "should apply corner_radius to cells" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, corner_radius: 2)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, corner_radius: 2)
     svg = builder.build
 
     assert_includes svg, 'rx="2"'
   end
 
   it "should normalize corner_radius to maximum allowed value" do
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(scores: scores, cell_size: 12, corner_radius: 100)
+    builder = HeatmapBuilder::Calendar.new(scores: scores, cell_size: 12, corner_radius: 100)
     svg = builder.build
 
     assert_includes svg, 'rx="6"'
@@ -99,7 +99,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       Date.new(2024, 1, 3) => 100
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       values: date_values,
       value_min: 0,
       value_max: 100
@@ -115,7 +115,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       Date.new(2024, 1, 3) => 100
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       values: date_values,
       value_min: 0,
       value_max: 100
@@ -132,7 +132,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       Date.new(2024, 1, 3) => 30
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
+    builder = HeatmapBuilder::Calendar.new(values: date_values)
     svg = builder.build
 
     assert_matches_snapshot(svg, "calendar_values_auto_boundaries.svg")
@@ -147,7 +147,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       Date.new(2024, 1, 2) => 20
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       values: date_values,
       value_to_score: custom_fn
     )
@@ -170,7 +170,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       date2 => 20
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       values: date_values,
       value_min: 0,
       value_max: 100,
@@ -191,7 +191,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       "2024-01-02" => 20
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
+    builder = HeatmapBuilder::Calendar.new(values: date_values)
     svg = builder.build
 
     assert_matches_snapshot(svg, "calendar_values_string_dates.svg")
@@ -203,7 +203,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     month_scores = {}
     (Date.new(2024, 1, 25)..Date.new(2024, 2, 5)).each { |d| month_scores[d] = 1 }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       scores: month_scores,
       month_spacing: 5,
       start_of_week: :monday
@@ -215,7 +215,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     month_scores = {}
     (Date.new(2024, 1, 25)..Date.new(2024, 2, 5)).each { |d| month_scores[d] = 1 }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       scores: month_scores,
       month_spacing: 5,
       start_of_week: :monday,
@@ -228,7 +228,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     month_scores = {}
     (Date.new(2024, 1, 25)..Date.new(2024, 2, 5)).each { |d| month_scores[d] = 1 }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       scores: month_scores,
       month_spacing: 0,
       start_of_week: :monday
@@ -242,7 +242,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
     month_scores = {}
     (Date.new(2024, 11, 1)..Date.new(2025, 1, 31)).each { |d| month_scores[d] = 1 }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(
+    builder = HeatmapBuilder::Calendar.new(
       scores: month_scores,
       month_spacing: 10,
       start_of_week: :monday
@@ -252,7 +252,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
 
   it "should raise error if both scores and values provided for calendar" do
     assert_raises(HeatmapBuilder::Error) do
-      HeatmapBuilder::CalendarHeatmapBuilder.new(
+      HeatmapBuilder::Calendar.new(
         scores: {Date.new(2024, 1, 1) => 1},
         values: {Date.new(2024, 1, 1) => 10}
       )
@@ -265,7 +265,7 @@ describe HeatmapBuilder::CalendarHeatmapBuilder do
       Date.new(2024, 1, 1) => 0
     }
 
-    builder = HeatmapBuilder::CalendarHeatmapBuilder.new(values: date_values)
+    builder = HeatmapBuilder::Calendar.new(values: date_values)
     svg = builder.build
 
     assert_matches_snapshot(svg, "calendar_values_empty.svg")
