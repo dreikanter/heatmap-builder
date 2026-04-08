@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Renamed `CalendarHeatmapBuilder` to `Calendar` — the full name `HeatmapBuilder::CalendarHeatmapBuilder` was redundant; `HeatmapBuilder::Calendar` is cleaner
+- `CalendarHeatmapBuilder` is kept as a backward-compatible alias
+
 ### Fixed
 - Month labels and SVG width now render correctly when data starts or ends mid-month
 - `month_spacing` no longer produces spurious gaps at the edges of the calendar grid
