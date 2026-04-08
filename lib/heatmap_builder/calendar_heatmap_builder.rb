@@ -223,11 +223,9 @@ module HeatmapBuilder
           last_month = new_month_date.month
 
           # Column B: new month days (day_index split_at..6)
+          # Don't place month label on split column — defer to first full column
           days_b = (split_at..6).map { |i| [week_start + i, i] }
-          month_key_b = [new_month_date.year, new_month_date.month]
-          first_b = !labeled_months.key?(month_key_b) && month_overlaps_timeframe?(new_month_date)
-          labeled_months[month_key_b] = true if first_b
-          columns << {index: col_idx, x_offset: x_offset, days: days_b, month_date: new_month_date, first_of_month: first_b}
+          columns << {index: col_idx, x_offset: x_offset, days: days_b, month_date: new_month_date, first_of_month: false}
         else
           end_of_week_month = week_end.month
           if end_of_week_month != last_month && !last_month.nil? && month_overlaps_timeframe?(week_end)
