@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-06-11
+
+### Changed
+- Relaxed `rake` and `minitest` development dependency constraints from `~>` to `>=` to allow future major versions
+
 ## [0.3.0] - 2026-06-11
 
 ### Changed
@@ -54,7 +59,8 @@ Initial release with core heatmap visualization capabilities.
 - Support for custom start of week (Monday/Sunday)
 - SVG output format for perfect scaling
 
-[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/dreikanter/heatmap-builder/releases/tag/v0.1.0
