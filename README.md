@@ -40,9 +40,9 @@ Or install it yourself as:
 ```ruby
 # GitHub-style calendar heatmap
 scores_by_date = {
-  '2024-01-01' => 2,
-  '2024-01-02' => 4,
-  '2024-01-03' => 1,
+  '2026-01-01' => 2,
+  '2026-01-02' => 4,
+  '2026-01-03' => 1,
   # ... more dates
 }
 
@@ -100,9 +100,9 @@ Instead of pre-calculating scores, you can provide raw numeric values (like 45.2
 ```ruby
 # Calendar heatmap with automatic score calculation
 values_by_date = {
-  Date.new(2024, 1, 1) => 45.2,
-  Date.new(2024, 1, 2) => 78.5,
-  Date.new(2024, 1, 3) => 12.0
+  Date.new(2026, 1, 1) => 45.2,
+  Date.new(2026, 1, 2) => 78.5,
+  Date.new(2026, 1, 3) => 12.0
 }
 
 svg = HeatmapBuilder.build_calendar(
