@@ -67,7 +67,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 2.0)
+  bundler (>= 2.0)
   heatmap-builder!
   minitest (~> 5.0)
   rake (~> 13.0)
@@ -75,4 +75,4 @@ DEPENDENCIES
   standard (~> 1.0)
 
 BUNDLED WITH
-  2.7.2
+  4.0.14
