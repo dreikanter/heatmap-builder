@@ -7,19 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-11
+
 ### Changed
-- Renamed `CalendarHeatmapBuilder` to `Calendar` — the full name `HeatmapBuilder::CalendarHeatmapBuilder` was redundant; `HeatmapBuilder::Calendar` is cleaner
-- `CalendarHeatmapBuilder` is kept as a backward-compatible alias
-
-### Fixed
-- Month labels and SVG width now render correctly when data starts or ends mid-month
-- `month_spacing` no longer produces spurious gaps at the edges of the calendar grid
-- When `month_spacing` is positive, weeks spanning a month boundary are split into two columns so each day visually belongs to its correct month
-
-### Removed
-- Linear (single-row) heatmap support — the gem now focuses exclusively on calendar heatmaps
-- `HeatmapBuilder.build_linear` method
-- `HeatmapBuilder.generate` deprecated method
+- Dropped support for Ruby 3.0, 3.1, and 3.2 (all EOL); minimum required version is now 3.3
+- Updated all dependencies to latest stable versions
+- Updated Bundler constraint from `~> 2.0` to `>= 2.0`; locked to Bundler 4.0.14
+- CI matrix updated to Ruby 3.3, 3.4, and 4.0
 
 ## [0.2.0] - 2025-10-02
 
@@ -60,6 +54,7 @@ Initial release with core heatmap visualization capabilities.
 - Support for custom start of week (Monday/Sunday)
 - SVG output format for perfect scaling
 
-[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/dreikanter/heatmap-builder/releases/tag/v0.1.0
