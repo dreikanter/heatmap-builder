@@ -250,6 +250,125 @@ describe HeatmapBuilder::Calendar do
     assert_matches_snapshot(builder.build, "month_spacing_label_on_full_column.svg")
   end
 
+  describe "tooltip" do
+    def tooltip_scores
+      {
+        Date.new(2024, 1, 1) => 1,
+        Date.new(2024, 1, 2) => 3
+      }
+    end
+
+    it "should not include tooltip markup when tooltip is not configured" do
+      svg = HeatmapBuilder::Calendar.new(scores: tooltip_scores).build
+      refute_includes svg, "<title>"
+      refute_includes svg, "<g "
+    end
+
+    it "should wrap active cells in <g> with <title> when tooltip is configured" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: tooltip_scores,
+        tooltip: ->(date:, score:, value: nil) { "#{date}: #{score}" }
+      )
+      svg = builder.build
+      assert_includes svg, "<title>2024-01-01: 1</title>"
+      assert_includes svg, "<title>2024-01-02: 3</title>"
+      assert_includes svg, "<g "
+    end
+
+    it "should emit default data-tooltip attribute" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: tooltip_scores,
+        tooltip: ->(date:, score:, value: nil) { "#{date}: #{score}" }
+      )
+      svg = builder.build
+      assert_includes svg, 'data-tooltip="2024-01-01: 1"'
+      assert_includes svg, 'data-tooltip="2024-01-02: 3"'
+    end
+
+    it "should use custom tooltip_attribute when specified" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: tooltip_scores,
+        tooltip: ->(date:, score:, value: nil) { "#{date}: #{score}" },
+        tooltip_attribute: "data-tippy-content"
+      )
+      svg = builder.build
+      assert_includes svg, 'data-tippy-content="2024-01-01: 1"'
+      refute_includes svg, "data-tooltip="
+    end
+
+    it "should omit data attribute when tooltip_attribute is nil" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: tooltip_scores,
+        tooltip: ->(date:, score:, value: nil) { "#{date}: #{score}" },
+        tooltip_attribute: nil
+      )
+      svg = builder.build
+      assert_includes svg, "<title>2024-01-01: 1</title>"
+      refute_includes svg, "data-tooltip"
+    end
+
+    it "should pass raw value to tooltip proc when values mode is used" do
+      received = {}
+      builder = HeatmapBuilder::Calendar.new(
+        values: {Date.new(2024, 1, 1) => 42, Date.new(2024, 1, 2) => 99},
+        tooltip: ->(date:, score:, value: nil) {
+          received[date] = value
+          "#{date}: #{value}"
+        }
+      )
+      builder.build
+      assert_equal 42, received[Date.new(2024, 1, 1)]
+      assert_equal 99, received[Date.new(2024, 1, 2)]
+    end
+
+    it "should pass nil value to tooltip proc when scores mode is used" do
+      received_value = :sentinel
+      builder = HeatmapBuilder::Calendar.new(
+        scores: tooltip_scores,
+        tooltip: ->(date:, score:, value: nil) {
+          received_value = value if date == Date.new(2024, 1, 1)
+          date.to_s
+        }
+      )
+      builder.build
+      assert_nil received_value
+    end
+
+    it "should not add tooltip to outside cells" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: {Date.new(2024, 1, 3) => 2},
+        show_outside_cells: true,
+        tooltip: ->(date:, score:, value: nil) { date.to_s }
+      )
+      svg = builder.build
+      assert_includes svg, "<title>2024-01-03</title>"
+      assert_equal 1, svg.scan("<title>").length
+    end
+
+    it "should escape special characters in tooltip text" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: {Date.new(2024, 1, 1) => 2},
+        tooltip: ->(date:, score:, value: nil) { "Score: <#{score}> & more" }
+      )
+      svg = builder.build
+      assert_includes svg, "Score: &lt;2&gt; &amp; more"
+    end
+
+    it "should raise error when tooltip is not callable" do
+      assert_raises(HeatmapBuilder::Error) do
+        HeatmapBuilder::Calendar.new(scores: tooltip_scores, tooltip: "not callable")
+      end
+    end
+
+    it "should match tooltip snapshot" do
+      builder = HeatmapBuilder::Calendar.new(
+        scores: tooltip_scores,
+        tooltip: ->(date:, score:, value: nil) { "#{date}: #{score} contributions" }
+      )
+      assert_matches_snapshot(builder.build, "calendar_with_tooltip.svg")
+    end
+  end
+
   it "should raise error if both scores and values provided for calendar" do
     assert_raises(HeatmapBuilder::Error) do
       HeatmapBuilder::Calendar.new(
