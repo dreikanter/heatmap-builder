@@ -27,7 +27,9 @@ module HeatmapBuilder
       show_day_labels: true,
       show_outside_cells: false,
       day_labels: %w[S M T W T F S],
-      month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]
+      month_labels: %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec],
+      tooltip: nil,
+      tooltip_attribute: "data-tooltip"
     }.freeze
 
     VALID_START_DAYS = %i[sunday monday tuesday wednesday thursday friday saturday].freeze
@@ -91,6 +93,7 @@ module HeatmapBuilder
       validate_colors_option!
       validate_scores_or_values!
       validate_value_boundaries! if values
+      validate_tooltip_option!
 
       raise Error, "scores must be a hash" if scores && !scores.is_a?(Hash)
       raise Error, "values must be a hash" if values && !values.is_a?(Hash)
@@ -98,6 +101,11 @@ module HeatmapBuilder
       unless VALID_START_DAYS.include?(options[:start_of_week])
         raise Error, "start_of_week must be one of: #{VALID_START_DAYS.join(", ")}"
       end
+    end
+
+    def validate_tooltip_option!
+      return unless options[:tooltip]
+      raise Error, "tooltip must be callable" unless options[:tooltip].respond_to?(:call)
     end
 
     def validate_scores_or_values!
@@ -263,7 +271,7 @@ module HeatmapBuilder
 
       if current_date.between?(start_date, end_date)
         score = scores_by_date[current_date] || scores_by_date[current_date.to_s] || 0
-        cell_svg(score, x, y, false)
+        cell_svg(score, x, y, false, date: current_date)
       elsif options[:show_outside_cells]
         cell_svg(0, x, y, true)
       else
@@ -271,12 +279,9 @@ module HeatmapBuilder
       end
     end
 
-    def cell_svg(score, x, y, inactive = false)
+    def cell_svg(score, x, y, inactive = false, date: nil)
       color = ColorHelpers.score_to_color(score, colors: color_palette)
-
-      if inactive
-        color = ColorHelpers.make_color_inactive(color)
-      end
+      color = ColorHelpers.make_color_inactive(color) if inactive
 
       colored_rect = svg_rect(
         x: x, y: y,
@@ -292,7 +297,25 @@ module HeatmapBuilder
         corner_radius: options[:corner_radius]
       )
 
-      "#{colored_rect}#{border_rect}"
+      cell_content = "#{colored_rect}#{border_rect}"
+
+      if options[:tooltip] && !inactive && date
+        cell_with_tooltip(cell_content, resolve_tooltip(date, score))
+      else
+        cell_content
+      end
+    end
+
+    def resolve_tooltip(date, score)
+      raw_value = values ? (values[date] || values[date.to_s]) : nil
+      options[:tooltip].call(date: date, score: score, value: raw_value)
+    end
+
+    def cell_with_tooltip(content, text)
+      title_element = svg_element("title") { escape_xml(text) }
+      group_attrs = {}
+      group_attrs[options[:tooltip_attribute]] = text if options[:tooltip_attribute]
+      svg_element("g", group_attrs) { "#{title_element}#{content}" }
     end
 
     def day_labels_svg
