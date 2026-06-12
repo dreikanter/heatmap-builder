@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-12
+
+### Added
+- Tooltip support for calendar cells via the `tooltip:` option. Accepts a callable
+  invoked per active cell with `date:`, `score:`, and `value:` keyword arguments;
+  the return value becomes the tooltip text.
+- Native SVG `<title>` element is always emitted as a zero-JS browser fallback.
+- `tooltip_attribute:` option (default `"data-tooltip"`) controls which `data-*`
+  attribute is written on the cell's `<g>` wrapper for JS tooltip library pickup.
+  Set to `nil` to suppress the data attribute and use only the native fallback.
+
 ## [0.3.1] - 2026-06-11
 
 ### Changed
@@ -59,7 +70,8 @@ Initial release with core heatmap visualization capabilities.
 - Support for custom start of week (Monday/Sunday)
 - SVG output format for perfect scaling
 
-[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.1.0...v0.2.0

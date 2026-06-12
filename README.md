@@ -15,6 +15,7 @@ A Ruby gem that generates embeddable SVG heatmap visualizations with GitHub-styl
 - Rounded corners (and circular cells, if you're into that kind of thing).
 - Dynamic palette generation from two colors or manually-specified colors.
 - OKLCH color interpolation for clean color transitions and perceptual uniformity.
+- Tooltip support with native browser fallback and JS library integration hooks.
 - **Zero dependencies.**
 
 ## Installation
@@ -85,6 +86,11 @@ You must provide either `scores:` or `values:` (but not both). All other options
 - `show_month_labels` - Show month names at the top of the calendar. Defaults to `true`.
 - `show_day_labels` - Show day abbreviations on the left side of the calendar. Defaults to `true`.
 - `show_outside_cells` - Show cells outside the date range with inactive styling. Defaults to `false`.
+
+**Tooltip options:**
+
+- `tooltip` - Callable invoked per active cell with `date:`, `score:`, and `value:` keyword arguments. Return value is used as the tooltip text. Emits a native SVG `<title>` element (browser fallback) and a data attribute (JS library hook). Defaults to `nil` (no tooltip markup).
+- `tooltip_attribute` - Name of the `data-*` attribute written on each cell's `<g>` wrapper for JS tooltip library pickup. Defaults to `"data-tooltip"`. Set to `nil` to suppress the data attribute and use only the native `<title>` fallback. See [Tooltips](#tooltips).
 
 **Internationalization options:**
 
@@ -255,6 +261,46 @@ HeatmapBuilder.build_calendar(
 ```
 
 ![Calendar with Month Spacing](examples/calendar_month_spacing_rounded.svg)
+
+### Tooltips
+
+The `tooltip:` option accepts a callable that is invoked once per active cell. It receives `date:`, `score:`, and `value:` keyword arguments and should return the tooltip text string. `value:` is the original input value when `values:` mode is used, and `nil` when `scores:` mode is used.
+
+```ruby
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
+  tooltip: ->(date:, score:, value: nil) { "#{date.strftime('%b %-d')}: #{score} contributions" }
+)
+```
+
+When `tooltip:` is set, each active cell is wrapped in an SVG `<g>` element containing a `<title>` child. The `<title>` element is the standard SVG mechanism for native browser tooltips — it works out of the box in any browser that renders inline SVG, with no JavaScript required.
+
+```xml
+<g data-tooltip="Jan 15: 4 contributions">
+  <title>Jan 15: 4 contributions</title>
+  <rect fill="#40c463" .../>
+</g>
+```
+
+The `tooltip_attribute:` option (default: `"data-tooltip"`) controls which `data-*` attribute is emitted on the `<g>` wrapper. This attribute is the hook for any JS tooltip library:
+
+```js
+// Tippy.js — one line of initialization
+tippy('[data-tooltip]', { content: el => el.dataset.tooltip })
+```
+
+Set `tooltip_attribute: nil` to suppress the data attribute and rely solely on the native `<title>` fallback. Use any other attribute name to match your tooltip library's expected selector:
+
+```ruby
+# Matches data-tippy-content used by some Tippy.js configurations
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
+  tooltip: ->(date:, score:, value: nil) { "#{date}: #{score}" },
+  tooltip_attribute: "data-tippy-content"
+)
+```
+
+Outside cells rendered via `show_outside_cells: true` never receive tooltip markup.
 
 ### I18n
 
