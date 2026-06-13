@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Default value-to-score conversion now reserves score `0` for empty cells
+  (zero or missing values) and maps every non-zero value into the `1..max_score`
+  range, so the smallest amount of activity is always visually distinct from an
+  empty day. Regenerated `examples/*.svg` to reflect the new bucketing.
+
 ## [0.4.0] - 2026-06-12
 
 ### Added

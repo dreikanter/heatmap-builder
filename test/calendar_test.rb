@@ -138,6 +138,23 @@ describe HeatmapBuilder::Calendar do
     assert_matches_snapshot(svg, "calendar_values_auto_boundaries.svg")
   end
 
+  it "should reserve score 0 for empty cells and bucket a small value above zero" do
+    builder = HeatmapBuilder::Calendar.new(
+      values: {Date.new(2024, 1, 1) => 1, Date.new(2024, 1, 2) => 1000},
+      value_min: 0,
+      value_max: 1000
+    )
+
+    # Zero and missing values collapse to the reserved empty bucket...
+    assert_equal 0, builder.send(:convert_value_to_score, 0)
+    assert_equal 0, builder.send(:convert_value_to_score, nil)
+
+    # ...while a tiny value next to a large maximum still lands in the first
+    # active bucket rather than being rounded down into the empty one.
+    assert_equal 1, builder.send(:convert_value_to_score, 1)
+    assert_equal 4, builder.send(:convert_value_to_score, 1000)
+  end
+
   it "should accept custom value_to_score callable for calendar" do
     # Custom formula: always return score 2
     custom_fn = ->(value:, date:, min:, max:, max_score:) { 2 }

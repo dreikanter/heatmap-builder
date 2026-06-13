@@ -32,11 +32,9 @@ module HeatmapBuilder
     end
 
     def convert_value_to_score(value, **params)
-      value = value_min if value.nil?
-
       if options[:value_to_score]
         score = options[:value_to_score].call(
-          value: value,
+          value: value.nil? ? value_min : value,
           min: value_min,
           max: value_max,
           max_score: color_count - 1,
@@ -50,14 +48,20 @@ module HeatmapBuilder
         return score
       end
 
+      # Score 0 is reserved for empty cells (zero or missing values). Any
+      # non-zero value maps into 1..max_score so even the smallest activity is
+      # visibly distinct from an empty day.
+      return 0 if value.nil? || value.zero?
+
+      max_score = color_count - 1
       clamped_value = value.clamp(value_min, value_max)
 
       if value_min == value_max
-        0
+        max_score
       else
         range = value_max - value_min
         normalized = (clamped_value - value_min).to_f / range
-        (normalized * (color_count - 1)).round
+        1 + (normalized * (max_score - 1)).round
       end
     end
   end
