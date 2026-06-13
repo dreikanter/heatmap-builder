@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (zero or missing values) and maps every non-zero value into the `1..max_score`
   range, so the smallest amount of activity is always visually distinct from an
   empty day. Regenerated `examples/*.svg` to reflect the new bucketing.
+- Auto-calculated `value_min` now anchors on the smallest non-zero value instead
+  of zero. Because zero is the reserved empty bucket, this keeps the lightest
+  activity color reachable rather than stranding it on values that never occur.
 
 ## [0.4.0] - 2026-06-12
 
