@@ -175,8 +175,11 @@ module HeatmapBuilder
     end
 
     def calculated_min_from_values
-      non_nil_values = values.values.compact
-      non_nil_values.empty? ? 0 : non_nil_values.min
+      # Zero is rendered as the reserved empty bucket, so the activity gradient
+      # starts at the smallest non-zero value. Anchoring the minimum here keeps
+      # the lightest activity color reachable.
+      candidates = values.values.compact.reject(&:zero?)
+      candidates.empty? ? 0 : candidates.min
     end
 
     def calculated_max_from_values

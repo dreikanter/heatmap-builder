@@ -34,7 +34,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_github_style.svg", "GitHub-style calendar", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       month_spacing: 0
     )
@@ -42,7 +42,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_default.svg", "default colors calendar", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       month_spacing: 0
     )
@@ -50,7 +50,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_blue_ocean.svg", "calendar with Blue Ocean palette", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       colors: HeatmapBuilder::Calendar::BLUE_OCEAN,
       cell_size: 14,
       month_spacing: 0
@@ -59,7 +59,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_warm_sunset.svg", "calendar with Warm Sunset palette", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       colors: HeatmapBuilder::Calendar::WARM_SUNSET,
       cell_size: 14,
       month_spacing: 0
@@ -68,7 +68,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_purple_vibes.svg", "calendar with Purple Vibes palette", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       colors: HeatmapBuilder::Calendar::PURPLE_VIBES,
       cell_size: 14,
       month_spacing: 0
@@ -77,7 +77,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_red_to_green.svg", "calendar with Red to Green palette", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       colors: HeatmapBuilder::Calendar::RED_TO_GREEN,
       cell_size: 14,
       month_spacing: 0
@@ -86,7 +86,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_sunday_start.svg", "calendar with Sunday start", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       start_of_week: :sunday,
       month_spacing: 0
@@ -95,7 +95,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_with_outside_cells.svg", "calendar with outside cells", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       show_outside_cells: true,
       month_spacing: 0
@@ -104,7 +104,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_rounded_corners.svg", "calendar with rounded corners", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       corner_radius: 2,
       month_spacing: 0
@@ -113,7 +113,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_rounded_corners_max_radius.svg", "calendar with rounded corners (max radius)", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       corner_radius: 7,
       month_spacing: 0
@@ -122,7 +122,7 @@ def generate_sample_svgs(force: false)
 
   generate_example("calendar_month_spacing_rounded.svg", "calendar with month spacing and rounded corners", force: force) do
     HeatmapBuilder.build_calendar(
-      scores: calendar_data,
+      values: calendar_data,
       cell_size: 14,
       month_spacing: 10,
       corner_radius: 3
@@ -145,7 +145,7 @@ def sample_calendar_data
     base_score = (seasonal_factor * 2.7 + 3.6).round
 
     score = rand(0..base_score)
-    score = score / 2 if [0, 6].include?(date.wday) # Weekend reduction
+    score /= 2 if [0, 6].include?(date.wday) # Weekend reduction
 
     data[date.to_s] = score
   end

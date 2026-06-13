@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-13
+
+### Changed
+- Default value-to-score conversion now reserves score `0` for empty cells
+  (zero or missing values) and maps every non-zero value into the `1..max_score`
+  range, so the smallest amount of activity is always visually distinct from an
+  empty day. Regenerated `examples/*.svg` to reflect the new bucketing.
+- Auto-calculated `value_min` now anchors on the smallest non-zero value instead
+  of zero. Because zero is the reserved empty bucket, this keeps the lightest
+  activity color reachable rather than stranding it on values that never occur.
+
+### Fixed
+- Example calendar heatmaps misrendered high-activity days. The generator passed
+  raw values straight through as `scores:`, so any value beyond the palette's
+  color count wrapped around via modulo (`score_to_color`) and the busiest days
+  could render as nearly empty cells. The examples now feed values through the
+  bucketing conversion, so cell intensity increases monotonically with the
+  underlying value.
+
 ## [0.4.0] - 2026-06-12
 
 ### Added
@@ -70,7 +89,8 @@ Initial release with core heatmap visualization capabilities.
 - Support for custom start of week (Monday/Sunday)
 - SVG output format for perfect scaling
 
-[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.2.0...v0.3.0
