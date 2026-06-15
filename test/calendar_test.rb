@@ -284,6 +284,31 @@ describe HeatmapBuilder::Calendar do
     assert_matches_snapshot(builder.build, "month_spacing_label_on_full_column.svg")
   end
 
+  it "should label the first full week regardless of month_spacing" do
+    # Dec 29 2025 - Jan 4 2026 is a single Mon-Sun week straddling the year.
+    # The "Jan" label belongs on the first full January week (Jan 5-11) whether
+    # or not month_spacing splits the straddling week into separate columns.
+    month_scores = {}
+    (Date.new(2025, 12, 15)..Date.new(2026, 1, 31)).each { |d| month_scores[d] = 1 }
+
+    [0, 8].each do |spacing|
+      builder = HeatmapBuilder::Calendar.new(
+        scores: month_scores,
+        month_spacing: spacing,
+        start_of_week: :monday
+      )
+
+      jan_label = builder.send(:column_layout).find do |col|
+        col[:first_of_month] && col[:month_date].month == 1
+      end
+
+      assert jan_label, "expected a January label with month_spacing=#{spacing}"
+      jan_days = jan_label[:days].map(&:first)
+      assert_equal 7, jan_days.size, "label column should be a full week (spacing=#{spacing})"
+      assert_equal Date.new(2026, 1, 5), jan_days.first, "spacing=#{spacing}"
+    end
+  end
+
   describe "tooltip" do
     def tooltip_scores
       {

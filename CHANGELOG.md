@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-06-15
+
+### Fixed
+- Calendar month labels now always sit above the first full week of the month.
+  Previously, with `month_spacing: 0`, a label could land on the straddling
+  column shared by two months; the label position is now derived from each
+  week's `week_start`, so straddling weeks defer the label to the next full week.
+
 ## [0.4.2] - 2026-06-15
 
 ### Added
@@ -97,7 +105,9 @@ Initial release with core heatmap visualization capabilities.
 - Support for custom start of week (Monday/Sunday)
 - SVG output format for perfect scaling
 
-[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.2...v0.4.3
+[0.4.2]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.3.0...v0.3.1

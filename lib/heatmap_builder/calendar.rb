@@ -222,11 +222,10 @@ module HeatmapBuilder
           new_month_date = week_start + split_at
 
           # Column A: old month days (day_index 0..split_at-1)
+          # Partial column — month labels are only placed on the first full
+          # week, so neither split column carries a label.
           days_a = (0...split_at).map { |i| [week_start + i, i] }
-          month_key_a = [week_start.year, week_start.month]
-          first_a = !labeled_months.key?(month_key_a) && month_overlaps_timeframe?(week_start)
-          labeled_months[month_key_a] = true if first_a
-          columns << {index: col_idx, x_offset: x_offset, days: days_a, month_date: week_start, first_of_month: first_a}
+          columns << {index: col_idx, x_offset: x_offset, days: days_a, month_date: week_start, first_of_month: false}
           col_idx += 1
 
           # Spacing between columns A and B
@@ -246,11 +245,13 @@ module HeatmapBuilder
           end
           last_month = end_of_week_month
 
+          # Label on the first full week of a month (the week_start determines
+          # the month, so straddling weeks defer to the next full week).
           days = (0..6).map { |i| [week_start + i, i] }
-          month_key = [week_end.year, week_end.month]
-          first = !labeled_months.key?(month_key) && month_overlaps_timeframe?(week_end)
+          month_key = [week_start.year, week_start.month]
+          first = !labeled_months.key?(month_key) && month_overlaps_timeframe?(week_start)
           labeled_months[month_key] = true if first
-          columns << {index: col_idx, x_offset: x_offset, days: days, month_date: week_end, first_of_month: first}
+          columns << {index: col_idx, x_offset: x_offset, days: days, month_date: week_start, first_of_month: first}
         end
 
         col_idx += 1
