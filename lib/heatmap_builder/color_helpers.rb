@@ -9,7 +9,7 @@ module HeatmapBuilder
         colors[color_index]
       end
 
-      def darker_color(hex_color, factor: 0.9)
+      def adjust_lightness(hex_color, factor: 0.9)
         rgb = hex_to_rgb(hex_color)
         oklch = rgb_to_oklch(*rgb)
 

@@ -54,17 +54,17 @@ module HeatmapBuilder
       str.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub('"', "&quot;")
     end
 
-    def cell_border(x, y, color, cell_size:, border_width:, corner_radius:, border_color_factor: 0.9)
+    def cell_border(x, y, color, cell_size:, border_width:, corner_radius:, border_lightness_factor: 0.9)
       return "" unless border_width > 0
       # A factor of 1 leaves the color unchanged, so the border matches the
       # fill exactly and would be invisible. Skip drawing it entirely.
-      return "" if border_color_factor == 1
+      return "" if border_lightness_factor == 1
 
       inset = border_width / 2.0
       border_x = x + inset
       border_y = y + inset
       border_size = cell_size - border_width
-      border_color = ColorHelpers.darker_color(color, factor: border_color_factor)
+      border_color = ColorHelpers.adjust_lightness(color, factor: border_lightness_factor)
       border_radius = (corner_radius > 0) ? [corner_radius - inset, 0].max : 0
 
       svg_rect(

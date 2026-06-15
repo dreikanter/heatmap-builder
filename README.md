@@ -73,7 +73,7 @@ You must provide either `scores:` or `values:` (but not both). All other options
 - `cell_spacing` - Space between squares in pixels. Defaults to 1.
 - `font_size` - Font size for labels in pixels. Defaults to 8.
 - `border_width` - Border width around each cell in pixels. Defaults to 1.
-- `border_color_factor` - Controls the border color, derived from each cell's color by scaling its lightness (in OKLCH) by this factor. Values below 1 produce a darker border; a value of 1 makes the border match the cell color, in which case the border is omitted entirely. Must be positive. Defaults to 0.9.
+- `border_lightness_factor` - Controls the border color, derived from each cell's color by scaling its lightness (in OKLCH) by this factor. Values below 1 produce a darker border; a value of 1 makes the border match the cell color, in which case the border is omitted entirely. Must be positive. Defaults to 0.9.
 - `corner_radius` - Corner radius for rounded cells. Must be between 0 (square corners) and `floor(cell_size/2)` (circular cells). Values outside this range are automatically clamped. Defaults to 0.
 
 **Color options:**
@@ -218,15 +218,15 @@ The OKLCH color space ensures perceptually uniform color transitions, making gra
 
 ### Cell Borders
 
-Each cell has a border whose color is derived from the cell's own color. The `border_width` option sets its thickness, and `border_color_factor` controls its shade: the cell color's OKLCH lightness is multiplied by this factor, so values below `1` produce a darker border (the default `0.9` is a subtle darkening).
+Each cell has a border whose color is derived from the cell's own color. The `border_width` option sets its thickness, and `border_lightness_factor` controls its shade: the cell color's OKLCH lightness is multiplied by this factor, so values below `1` produce a darker border (the default `0.9` is a subtle darkening).
 
-Setting `border_color_factor` to `1` keeps the border color identical to the cell color. In that case the border is invisible, so it is omitted from the SVG entirely.
+Setting `border_lightness_factor` to `1` keeps the border color identical to the cell color. In that case the border is invisible, so it is omitted from the SVG entirely.
 
 ```ruby
 HeatmapBuilder.build_calendar(
   scores: calendar_data,
   border_width: 1,
-  border_color_factor: 0.7
+  border_lightness_factor: 0.7
 )
 ```
 
