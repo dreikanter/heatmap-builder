@@ -230,6 +230,8 @@ HeatmapBuilder.build_calendar(
 )
 ```
 
+![Calendar with Cell Borders](examples/calendar_cell_borders.svg)
+
 ### Rounded Corners
 
 Calendar heatmaps support rounded corners using the `corner_radius` option.

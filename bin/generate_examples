@@ -120,6 +120,16 @@ def generate_sample_svgs(force: false)
     )
   end
 
+  generate_example("calendar_cell_borders.svg", "calendar with cell borders", force: force) do
+    HeatmapBuilder.build_calendar(
+      values: calendar_data,
+      cell_size: 14,
+      border_width: 1,
+      border_lightness_factor: 0.7,
+      month_spacing: 0
+    )
+  end
+
   generate_example("calendar_month_spacing_rounded.svg", "calendar with month spacing and rounded corners", force: force) do
     HeatmapBuilder.build_calendar(
       values: calendar_data,
