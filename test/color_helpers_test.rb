@@ -7,7 +7,7 @@ describe HeatmapBuilder::ColorHelpers do
 
   it ".adjust_lightness should maintain hue while reducing lightness" do
     original = "#ff0000"
-    darker = HeatmapBuilder::ColorHelpers.adjust_lightness(original)
+    darker = HeatmapBuilder::ColorHelpers.adjust_lightness(original, factor: 0.9)
 
     refute_equal original, darker
     assert_match(valid_hex_color, darker)
