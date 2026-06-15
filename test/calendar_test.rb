@@ -284,6 +284,58 @@ describe HeatmapBuilder::Calendar do
     assert_matches_snapshot(builder.build, "month_spacing_label_on_full_column.svg")
   end
 
+  it "should label the first full week regardless of month_spacing" do
+    # Dec 29 2025 - Jan 4 2026 is a single Mon-Sun week straddling the year.
+    # The "Jan" label belongs on the first full January week (Jan 5-11) whether
+    # or not month_spacing splits the straddling week into separate columns.
+    month_scores = {}
+    (Date.new(2025, 12, 15)..Date.new(2026, 1, 31)).each { |d| month_scores[d] = 1 }
+
+    [0, 8].each do |spacing|
+      builder = HeatmapBuilder::Calendar.new(
+        scores: month_scores,
+        month_spacing: spacing,
+        start_of_week: :monday
+      )
+
+      jan_label = builder.send(:column_layout).find do |col|
+        col[:first_of_month] && col[:month_date].month == 1
+      end
+
+      assert jan_label, "expected a January label with month_spacing=#{spacing}"
+      jan_days = jan_label[:days].map(&:first)
+      assert_equal 7, jan_days.size, "label column should be a full week (spacing=#{spacing})"
+      assert_equal Date.new(2026, 1, 5), jan_days.first, "spacing=#{spacing}"
+    end
+  end
+
+  it "should not label a month whose only visible week is incomplete" do
+    # Jan 28 2026 is a Wednesday, so the interval's leading week (Jan 26-Feb 1,
+    # Monday start) is incomplete and is January's only visible week. Without a
+    # full week, January must not be labeled — otherwise its label would crowd
+    # into February's adjacent column. February's first full week (Feb 2-8)
+    # still carries its label.
+    scores = {}
+    (Date.new(2026, 1, 28)..Date.new(2026, 3, 15)).each { |d| scores[d] = 1 }
+
+    [0, 8].each do |spacing|
+      builder = HeatmapBuilder::Calendar.new(
+        scores: scores,
+        month_spacing: spacing,
+        start_of_week: :monday
+      )
+
+      labeled = builder.send(:column_layout).select { |col| col[:first_of_month] }
+      labeled_months = labeled.map { |col| col[:month_date].month }
+
+      refute_includes labeled_months, 1, "January sliver should be unlabeled (spacing=#{spacing})"
+
+      feb_label = labeled.find { |col| col[:month_date].month == 2 }
+      assert feb_label, "expected a February label with month_spacing=#{spacing}"
+      assert_equal Date.new(2026, 2, 2), feb_label[:days].map(&:first).first, "spacing=#{spacing}"
+    end
+  end
+
   describe "tooltip" do
     def tooltip_scores
       {
