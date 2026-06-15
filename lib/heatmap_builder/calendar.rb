@@ -245,11 +245,12 @@ module HeatmapBuilder
           end
           last_month = end_of_week_month
 
-          # Label on the first full week of a month (the week_start determines
-          # the month, so straddling weeks defer to the next full week).
+          # Label on the first fully visible week of a month. A month whose only
+          # visible week is incomplete (a leading or trailing sliver) gets no
+          # label, so the first label can't crowd into the next month's column.
           days = (0..6).map { |i| [week_start + i, i] }
           month_key = [week_start.year, week_start.month]
-          first = !labeled_months.key?(month_key) && month_overlaps_timeframe?(week_start)
+          first = !labeled_months.key?(month_key) && week_fully_visible?(week_start)
           labeled_months[month_key] = true if first
           columns << {index: col_idx, x_offset: x_offset, days: days, month_date: week_start, first_of_month: first}
         end
@@ -353,6 +354,12 @@ module HeatmapBuilder
         end
       end
       svg
+    end
+
+    # A week carries its month's label only when every one of its seven days
+    # falls within the data range; partial boundary weeks are not labelable.
+    def week_fully_visible?(week_start)
+      week_start >= start_date && (week_start + 6) <= end_date
     end
 
     def month_overlaps_timeframe?(date)

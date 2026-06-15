@@ -309,6 +309,33 @@ describe HeatmapBuilder::Calendar do
     end
   end
 
+  it "should not label a month whose only visible week is incomplete" do
+    # Jan 28 2026 is a Wednesday, so the interval's leading week (Jan 26-Feb 1,
+    # Monday start) is incomplete and is January's only visible week. Without a
+    # full week, January must not be labeled — otherwise its label would crowd
+    # into February's adjacent column. February's first full week (Feb 2-8)
+    # still carries its label.
+    scores = {}
+    (Date.new(2026, 1, 28)..Date.new(2026, 3, 15)).each { |d| scores[d] = 1 }
+
+    [0, 8].each do |spacing|
+      builder = HeatmapBuilder::Calendar.new(
+        scores: scores,
+        month_spacing: spacing,
+        start_of_week: :monday
+      )
+
+      labeled = builder.send(:column_layout).select { |col| col[:first_of_month] }
+      labeled_months = labeled.map { |col| col[:month_date].month }
+
+      refute_includes labeled_months, 1, "January sliver should be unlabeled (spacing=#{spacing})"
+
+      feb_label = labeled.find { |col| col[:month_date].month == 2 }
+      assert feb_label, "expected a February label with month_spacing=#{spacing}"
+      assert_equal Date.new(2026, 2, 2), feb_label[:days].map(&:first).first, "spacing=#{spacing}"
+    end
+  end
+
   describe "tooltip" do
     def tooltip_scores
       {

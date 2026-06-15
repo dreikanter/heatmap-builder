@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Previously, with `month_spacing: 0`, a label could land on the straddling
   column shared by two months; the label position is now derived from each
   week's `week_start`, so straddling weeks defer the label to the next full week.
+- A month is no longer labeled when its only visible week is incomplete (a
+  leading or trailing sliver at the edge of the data range). Previously such a
+  label could overlap the next month's label when the partial month occupied a
+  single column. Labels are now placed only on a fully visible week.
 
 ## [0.4.2] - 2026-06-15
 
