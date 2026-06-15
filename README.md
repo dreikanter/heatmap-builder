@@ -232,6 +232,18 @@ HeatmapBuilder.build_calendar(
 
 ![Calendar with Cell Borders](examples/calendar_cell_borders.svg)
 
+With `border_lightness_factor` set to `1`, the border is omitted entirely, leaving cells edge to edge:
+
+```ruby
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
+  border_width: 1,
+  border_lightness_factor: 1
+)
+```
+
+![Calendar with No Cell Borders](examples/calendar_no_borders.svg)
+
 ### Rounded Corners
 
 Calendar heatmaps support rounded corners using the `corner_radius` option.
