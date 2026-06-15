@@ -61,6 +61,23 @@ describe HeatmapBuilder::Calendar do
     assert_raises(HeatmapBuilder::Error) do
       HeatmapBuilder::Calendar.new(scores: scores, start_of_week: :invalid)
     end
+
+    assert_raises(HeatmapBuilder::Error) do
+      HeatmapBuilder::Calendar.new(scores: scores, border_color_factor: 0)
+    end
+  end
+
+  it "should use border_color_factor to derive the border color" do
+    light = HeatmapBuilder::Calendar.new(scores: scores, border_color_factor: 0.9).build
+    dark = HeatmapBuilder::Calendar.new(scores: scores, border_color_factor: 0.5).build
+
+    refute_equal light, dark
+  end
+
+  it "should omit the border when border_color_factor is 1" do
+    svg = HeatmapBuilder::Calendar.new(scores: scores, border_color_factor: 1).build
+
+    refute_includes svg, "stroke="
   end
 
   it "should accept Date objects as keys" do

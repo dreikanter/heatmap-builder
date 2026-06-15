@@ -19,6 +19,7 @@ module HeatmapBuilder
       cell_spacing: 1,
       font_size: 8,
       border_width: 1,
+      border_color_factor: 0.9,
       corner_radius: 0,
       colors: GITHUB_GREEN,
       start_of_week: :monday,
@@ -90,6 +91,7 @@ module HeatmapBuilder
     def validate_options!
       raise Error, "cell_size must be positive" unless options[:cell_size].positive?
       raise Error, "font_size must be positive" unless options[:font_size].positive?
+      raise Error, "border_color_factor must be positive" unless options[:border_color_factor].positive?
       validate_colors_option!
       validate_scores_or_values!
       validate_value_boundaries! if values
@@ -297,6 +299,7 @@ module HeatmapBuilder
         x, y, color,
         cell_size: options[:cell_size],
         border_width: options[:border_width],
+        border_color_factor: options[:border_color_factor],
         corner_radius: options[:corner_radius]
       )
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- New `border_color_factor` option controls how the cell border color is derived
+  from each cell's color by scaling its OKLCH lightness. Setting it to `1` makes
+  the border match the cell color, in which case the (now invisible) border is
+  omitted from the SVG entirely. Defaults to `0.9`, preserving previous output.
+
 ## [0.4.1] - 2026-06-13
 
 ### Changed
