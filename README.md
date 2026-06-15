@@ -216,6 +216,20 @@ svg = HeatmapBuilder.build_calendar(scores: calendar_data, colors: neon_gradient
 
 The OKLCH color space ensures perceptually uniform color transitions, making gradients appear smooth and natural to the human eye.
 
+### Cell Borders
+
+Each cell has a border whose color is derived from the cell's own color. The `border_width` option sets its thickness, and `border_color_factor` controls its shade: the cell color's OKLCH lightness is multiplied by this factor, so values below `1` produce a darker border (the default `0.9` is a subtle darkening).
+
+Setting `border_color_factor` to `1` keeps the border color identical to the cell color. In that case the border is invisible, so it is omitted from the SVG entirely.
+
+```ruby
+HeatmapBuilder.build_calendar(
+  scores: calendar_data,
+  border_width: 1,
+  border_color_factor: 0.7
+)
+```
+
 ### Rounded Corners
 
 Calendar heatmaps support rounded corners using the `corner_radius` option.
