@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-06-29
+
+### Fixed
+- Silenced "literal string will be frozen in the future" warnings emitted when
+  building SVG output. The hand-rolled mutable string buffers in `Calendar` were
+  replaced with `map`/`flat_map`/`filter_map` + `join` (matching how `build`
+  already assembles SVG fragments), and every file under `lib/` carries the
+  `# frozen_string_literal: true` magic comment. This makes the gem forward
+  compatible with Ruby's upcoming frozen-string-literal default.
+
 ## [0.4.3] - 2026-06-15
 
 ### Fixed
@@ -109,7 +119,8 @@ Initial release with core heatmap visualization capabilities.
 - Support for custom start of week (Monday/Sunday)
 - SVG output format for perfect scaling
 
-[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.4...HEAD
+[0.4.4]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/dreikanter/heatmap-builder/compare/v0.4.0...v0.4.1
