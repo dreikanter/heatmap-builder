@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "date"
 require_relative "svg_helpers"
 require_relative "color_helpers"
@@ -263,13 +265,11 @@ module HeatmapBuilder
     end
 
     def calendar_cells_svg
-      svg = ""
-      column_layout.each do |col|
-        col[:days].each do |date, day_index|
-          svg << render_cell(date, col[:index], day_index, col[:x_offset])
+      column_layout.flat_map do |col|
+        col[:days].map do |date, day_index|
+          render_cell(date, col[:index], day_index, col[:x_offset])
         end
-      end
-      svg
+      end.join
     end
 
     def render_cell(current_date, column_index, day_index, x_offset)
@@ -329,31 +329,22 @@ module HeatmapBuilder
     def day_labels_svg
       return "" unless options[:show_day_labels]
 
-      day_names = day_names_for_week_start
-      svg = ""
-
-      day_names.each_with_index do |day_name, index|
+      day_names_for_week_start.map.with_index do |day_name, index|
         y = month_label_offset + index * (options[:cell_size] + options[:cell_spacing]) + options[:cell_size] / 2 + options[:font_size] * FONT_VERTICAL_CENTER_RATIO
-        svg << svg_text(
+        svg_text(
           day_name,
           x: options[:font_size], y: y,
           font_size: options[:font_size], fill: LABEL_COLOR
         )
-      end
-
-      svg
+      end.join
     end
 
     def month_labels_svg
       return "" unless options[:show_month_labels]
 
-      svg = ""
-      column_layout.each do |col|
-        if col[:first_of_month]
-          svg << month_label_at(col[:index], col[:x_offset], col[:month_date])
-        end
-      end
-      svg
+      column_layout.filter_map do |col|
+        month_label_at(col[:index], col[:x_offset], col[:month_date]) if col[:first_of_month]
+      end.join
     end
 
     # A week carries its month's label only when every one of its seven days

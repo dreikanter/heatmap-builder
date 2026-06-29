@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "heatmap_builder/version"
 require_relative "heatmap_builder/svg_helpers"
 require_relative "heatmap_builder/color_helpers"
